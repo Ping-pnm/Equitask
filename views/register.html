@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Equitask - Create your account">
+    <title>Equitask - Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/assets/style.css">
+</head>
+<body>
+
+    <!-- Logo -->
+    <div class="register-page">
+        <div class="logo-wrapper">
+            <div class="logo-glow"></div>
+            <img src="../public/assets/Logo.png" alt="Equitask Logo" id="logo-image" class="logo-image">
+        </div>
+
+        <!-- Register Card -->
+        <div class="register-card">
+            <h1 class="register-title" id="register-title">Please Enter Your Personal Information</h1>
+
+            <form id="register-form">
+                <div class="register-form-group">
+                    <label for="first-name" class="register-label">First Name</label>
+                    <input type="text" id="first-name" placeholder="Enter your first name" required>
+                </div>
+
+                <div class="register-form-group">
+                    <label for="last-name" class="register-label">Last Name</label>
+                    <input type="text" id="last-name" placeholder="Enter your last name" required>
+                </div>
+
+                <div class="register-form-group">
+                    <label for="email-input" class="register-label">Email</label>
+                    <input type="email" id="email-input" placeholder="Enter your email" autocomplete="email" required>
+                </div>
+
+                <div class="register-form-group">
+                    <label for="password-input" class="register-label">Password</label>
+                    <input type="password" id="password-input" placeholder="Enter your password" autocomplete="new-password" required>
+                </div>
+
+                <div class="register-form-group">
+                    <label for="confirm-password" class="register-label">Confirm Password</label>
+                    <input type="password" id="confirm-password" placeholder="Re enter your password" autocomplete="new-password" required>
+                </div>
+
+                <div class="register-btn-container">
+                    <a href="login.html" class="btn btn-login" id="register-btn">Register</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
