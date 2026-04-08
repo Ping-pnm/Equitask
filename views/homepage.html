@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equitask - Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/style.css">
+</head>
+
+<body class="homepage-body">
+    <div class="layout-container" style="flex-direction: column;">
+        <!-- Top layer: Grey rectangle -->
+        <header class="top-header"
+            style="display: flex; align-items: center; padding: 10px 30px; height: 85px; flex-shrink: 0; background: #e9ecf3;">
+            <div class="logo-area" style="display: flex; align-items: center; padding: 0;">
+                <div class="logo-icon-wrapper"
+                    style="background: transparent; box-shadow: none; width: 65px; height: 65px;">
+                    <img src="../public/assets/logo-primary.png" alt="E Logo" class="side-logo-img"
+                        style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <img src="../public/assets/logo-word.png" alt="Equitask" class="logo-text"
+                    style="height: 35px; object-fit: contain; margin-left: 10px;">
+            </div>
+        </header>
+
+        <!-- Bottom layer: Sidebar + Main -->
+        <div class="content-wrapper" style="display: flex; flex-grow: 1; overflow: hidden;">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="class-list-container">
+                    <ul id="class-list" class="class-list">
+                        <li><a href="#" class="class-item active">Class 1</a></li>
+                        <li><a href="#" class="class-item">Class 2</a></li>
+                    </ul>
+                </div>
+
+                <button id="btn-create-class" class="btn-create-class-sidebar"
+                    onclick="openModal('modal-create-class')">+ Create New Class</button>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Tabs Navbar -->
+                <header class="top-nav">
+                    <nav class="tabs">
+                        <a href="homepage.html" class="tab-item active">Stream</a>
+                        <a href="classwork.html" class="tab-item">Classwork</a>
+                        <a href="people.html" class="tab-item">People</a>
+                        <a href="dashboard.html" class="tab-item">Dashboard</a>
+                    </nav>
+                </header>
+
+                <!-- Stream Content -->
+                <section class="stream-content">
+                    <div id="posts-container" class="posts-container">
+                        <!-- Initial Post 1 -->
+                        <div class="post-card">
+                            <div class="post-icon-wrapper"
+                                style="background: #9ab4c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px;">
+                                <img src="../public/assets/checklist-icon.png" alt="Post Icon"
+                                    style="width: 24px; height: 24px; object-fit: contain;">
+                            </div>
+                            <div class="post-info">
+                                <div class="post-title">Sasiporn Usanavasin posted a new assignment: Group Project</div>
+                                <div class="post-date">31 DEC</div>
+                            </div>
+                        </div>
+                        <!-- Initial Post 2 -->
+                        <div class="post-card">
+                            <div class="post-icon-wrapper"
+                                style="background: #9ab4c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px;">
+                                <img src="../public/assets/checklist-icon.png" alt="Post Icon"
+                                    style="width: 24px; height: 24px; object-fit: contain;">
+                            </div>
+                            <div class="post-info">
+                                <div class="post-title">Sasiporn Usanavasin posted a new assignment: Homework1</div>
+                                <div class="post-date">20 NOV</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Compose Button -->
+                <button id="btn-compose" class="btn-compose" onclick="openModal('modal-compose')">
+                    <img src="../public/assets/pen-icon.png" alt="Compose" class="pencil-icon"
+                        style="width: 20px; height: 20px; object-fit: contain; filter: invert(0.2);"> Compose
+                </button>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Create Class Modal -->
+    <div id="modal-create-class" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Create class</h2>
+            <form id="form-create-class" onsubmit="handleCreateClass(event)">
+                <div class="input-group">
+                    <input type="text" id="class-name" placeholder="Class name (required)" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="class-section" placeholder="Section">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="class-subject" placeholder="Subject">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('modal-create-class')">Cancel</button>
+                    <button type="submit" class="btn-submit blue-text">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Compose Modal -->
+    <div id="modal-compose" class="modal-overlay hidden">
+        <div class="modal-content compose-modal">
+            <h2>Post</h2>
+            <form id="form-compose" onsubmit="handlePost(event)">
+                <div class="compose-area">
+                    <textarea id="post-content" placeholder="Announce something to your class" required></textarea>
+                </div>
+                <div class="modal-actions compose-actions">
+                    <div class="compose-icons" style="display: flex; gap: 10px;">
+                        <input type="file" id="file-upload" style="display: none;">
+                        <button type="button" class="icon-btn tool-btn" onclick="document.getElementById('file-upload').click()" style="background: transparent; border: none; padding: 0; cursor: pointer;">
+                            <img src="../public/assets/UploadSign.png" alt="Upload" style="width: 36px; height: 36px; object-fit: contain;">
+                        </button>
+                        <button type="button" class="icon-btn tool-btn" style="background: transparent; border: none; padding: 0; cursor: pointer;">
+                            <img src="../public/assets/LinkSign.png" alt="Link" style="width: 36px; height: 36px; object-fit: contain;">
+                        </button>
+                    </div>
+                    <div class="compose-btns">
+                        <button type="button" class="btn-cancel" onclick="closeModal('modal-compose')">Cancel</button>
+                        <button type="submit" class="btn-submit btn-post">Post</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../public/script.js"></script>
+</body>
+
+</html>

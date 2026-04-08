@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equitask - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/style.css">
+</head>
+
+<body class="homepage-body">
+    <div class="layout-container" style="flex-direction: column;">
+        <!-- Top layer: Grey rectangle -->
+        <header class="top-header"
+            style="display: flex; align-items: center; padding: 10px 30px; height: 85px; flex-shrink: 0; background: #e9ecf3;">
+            <div class="logo-area" style="display: flex; align-items: center; padding: 0;">
+                <div class="logo-icon-wrapper"
+                    style="background: transparent; box-shadow: none; width: 65px; height: 65px;">
+                    <img src="../public/assets/logo-primary.png" alt="E Logo" class="side-logo-img"
+                        style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <img src="../public/assets/logo-word.png" alt="Equitask" class="logo-text"
+                    style="height: 35px; object-fit: contain; margin-left: 10px;">
+            </div>
+        </header>
+
+        <!-- Bottom layer: Sidebar + Main -->
+        <div class="content-wrapper" style="display: flex; flex-grow: 1; overflow: hidden;">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="class-list-container">
+                    <ul id="class-list" class="class-list">
+                        <li><a href="#" class="class-item active">Class 1</a></li>
+                        <li><a href="#" class="class-item">Class 2</a></li>
+                    </ul>
+                </div>
+
+                <button id="btn-create-class" class="btn-create-class-sidebar"
+                    onclick="openModal('modal-create-class')">+ Create New Class</button>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Tabs Navbar -->
+                <header class="top-nav">
+                    <nav class="tabs">
+                        <a href="homepage.html" class="tab-item">Stream</a>
+                        <a href="classwork.html" class="tab-item">Classwork</a>
+                        <a href="people.html" class="tab-item">People</a>
+                        <a href="dashboard.html" class="tab-item active">Dashboard</a>
+                    </nav>
+                </header>
+
+                <!-- Dashboard Content -->
+                <section class="stream-content">
+                    <div id="assignments-container" class="posts-container">
+                        <!-- Assignment 1 -->
+                        <div class="assignment-card"
+                            style="background: #f6f6f6; border-radius: 20px; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                                    style="width: 24px; height: 24px; object-fit: contain;">
+                                <div class="post-title" style="font-weight: 700; margin-bottom: 0;">Group Project</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px; color: #444; font-size: 15px;">
+                                Due 31 Dec
+                            </div>
+                        </div>
+
+                        <!-- Assignment 2 -->
+                        <div class="assignment-card"
+                            style="background: #f6f6f6; border-radius: 20px; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                                    style="width: 24px; height: 24px; object-fit: contain;">
+                                <div class="post-title" style="font-weight: 700; margin-bottom: 0;">Homework 1</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px; color: #444; font-size: 15px;">
+                                Due 20 Nov
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Create Class Modal -->
+    <div id="modal-create-class" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Create class</h2>
+            <form id="form-create-class" onsubmit="handleCreateClass(event)">
+                <div class="input-group">
+                    <input type="text" id="class-name" placeholder="Class name (required)" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="class-section" placeholder="Section">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="class-subject" placeholder="Subject">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('modal-create-class')">Cancel</button>
+                    <button type="submit" class="btn-submit blue-text">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../public/script.js"></script>
+</body>
+
+</html>
