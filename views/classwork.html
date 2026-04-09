@@ -48,18 +48,18 @@
                 <header class="top-nav">
                     <nav class="tabs">
                         <a href="homepage.html" class="tab-item">Stream</a>
-                        <a href="classwork.html" class="tab-item active">Classwork</a>
+                        <a href="classwork.html" class="tab-item active">Work</a>
                         <a href="people.html" class="tab-item">People</a>
                         <a href="dashboard.html" class="tab-item">Dashboard</a>
                     </nav>
                 </header>
 
                 <!-- Classwork Content -->
-                <section class="stream-content">
+                <section class="stream-content" style="overflow-y: auto;">
                     <div id="assignments-container" class="posts-container">
                         <!-- Assignment 1 -->
-                        <div class="assignment-card"
-                            style="background: #f6f6f6; border-radius: 20px; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                        <div class="assignment-card" onclick="openAssignmentDetail()"
+                            style="background: #f6f6f6; border-radius: 20px; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; gap: 20px; cursor: pointer;">
                             <div style="display: flex; align-items: center; gap: 15px;">
                                 <img src="../public/assets/checklist-icon.png" alt="Checklist"
                                     style="width: 24px; height: 24px; object-fit: contain;">
@@ -67,7 +67,7 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 15px; color: #444; font-size: 15px;">
                                 Due 31 Dec
-                                <img src="../public/assets/pen-icon.png" alt="Edit"
+                                <img src="../public/assets/editSign.png" alt="Edit" onclick="openEditModal(event)"
                                     style="width: 22px; height: 22px; object-fit: contain; cursor: pointer;">
                             </div>
                         </div>
@@ -82,18 +82,400 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 15px; color: #444; font-size: 15px;">
                                 Due 20 Nov
-                                <img src="../public/assets/pen-icon.png" alt="Edit"
+                                <img src="../public/assets/editSign.png" alt="Edit" onclick="openEditModal(event)"
                                     style="width: 22px; height: 22px; object-fit: contain; cursor: pointer;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assignment Detail View -->
+                    <div id="assignment-detail-view"
+                        style="display: none; width: 100%; max-width: 800px; align-self: center;">
+                        <!-- Title Area -->
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 25px;">
+                            <div style="display: flex; gap: 15px;">
+                                <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                                    style="width: 32px; height: 32px; object-fit: contain; margin-top: 5px;">
+                                <div>
+                                    <h1 style="font-size: 26px; font-weight: 700; color: #222; margin-bottom: 5px;">
+                                        Group Project</h1>
+                                    <div style="font-size: 14px; color: #555;">Due 31 Dec</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                                <img src="../public/assets/editSign.png" alt="Edit" onclick="openEditModal(event)" style="width: 24px; height: 24px; cursor: pointer;">
+                                <div style="font-size: 14px; color: #63778f; font-weight: 600;">100 points</div>
+                            </div>
+                        </div>
+
+                        <!-- Body Text -->
+                        <div
+                            style="font-size: 15px; color: #333; line-height: 1.6; margin-bottom: 25px; padding-bottom: 25px; border-bottom: 2px solid #ccc;">
+                            <div>[Group Project]</div>
+                            <div>For the project proposal, prepare your topic and answer these questions.</div>
+                            <ol style="margin-left: 20px; margin-top: 5px;">
+                                <li>The name of the application and what its main objectives?</li>
+                                <li>Who are the stakeholders of your applications?</li>
+                                <li>What pain points or problems that your application can solve for users?</li>
+                                <li>Why users need to use your application compared to other existing applications in
+                                    the market?</li>
+                                <li>What are unique functions?</li>
+                                <li>How can you sustain the application or scale up the application?</li>
+                                <li>If you need to invest your own money into this project, would you do it? If not,
+                                    why?</li>
+                                <li>Can you make profit from this application?</li>
+                            </ol>
+                        </div>
+
+                        <!-- Groups Section -->
+                        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 650px;">
+                            <button onclick="openModal('modal-create-group')"
+                                style="background: #a8bccb; color: #222; border: none; padding: 10px 25px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; align-self: flex-start; margin-bottom: 15px;">Create
+                                Group</button>
+
+                            <!-- Groups List -->
+                            <div style="display: flex; flex-direction: column; gap: 15px;">
+                                <!-- Group 1 -->
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; gap: 25px;">
+                                    <div
+                                        style="background: #f6f6f6; border-radius: 20px; display: flex; align-items: center; padding: 12px 25px; flex-grow: 1;">
+                                        <div style="font-weight: 700; font-size: 14px; color: #222; width: 120px;">Group
+                                            1</div>
+                                        <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
+                                            <div
+                                                style="height: 12px; background: #bcbcbc; border-radius: 6px; width: 100%; max-width: 250px; overflow: hidden;">
+                                                <div
+                                                    style="height: 100%; background: #63778f; width: 66%; border-radius: 6px;">
+                                                </div>
+                                            </div>
+                                            <span style="font-size: 11px; color: #333;">66%</span>
+                                        </div>
+                                    </div>
+                                    <div onclick="this.parentElement.remove()" style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
+                                        Delete</div>
+                                </div>
+                                <!-- Group 2 -->
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; gap: 25px;">
+                                    <div
+                                        style="background: #f6f6f6; border-radius: 20px; display: flex; align-items: center; padding: 12px 25px; flex-grow: 1;">
+                                        <div style="font-weight: 700; font-size: 14px; color: #222; width: 120px;">Group
+                                            2</div>
+                                        <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
+                                            <div
+                                                style="height: 12px; background: #bcbcbc; border-radius: 6px; width: 100%; max-width: 250px; overflow: hidden;">
+                                                <div
+                                                    style="height: 100%; background: #63778f; width: 33%; border-radius: 6px;">
+                                                </div>
+                                            </div>
+                                            <span style="font-size: 11px; color: #333;">33%</span>
+                                        </div>
+                                    </div>
+                                    <div onclick="this.parentElement.remove()" style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
+                                        Delete</div>
+                                </div>
+                                <!-- Group 3 -->
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; gap: 25px;">
+                                    <div
+                                        style="background: #f6f6f6; border-radius: 20px; display: flex; align-items: center; padding: 12px 25px; flex-grow: 1;">
+                                        <div style="font-weight: 700; font-size: 14px; color: #222; width: 120px;">Group
+                                            3</div>
+                                        <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
+                                            <div
+                                                style="height: 12px; background: #bcbcbc; border-radius: 6px; width: 100%; max-width: 250px; overflow: hidden;">
+                                                <div
+                                                    style="height: 100%; background: #63778f; width: 80%; border-radius: 6px;">
+                                                </div>
+                                            </div>
+                                            <span style="font-size: 11px; color: #333;">80%</span>
+                                        </div>
+                                    </div>
+                                    <div onclick="this.parentElement.remove()" style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
+                                        Delete</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- Assign Button -->
-                <button id="btn-assign" class="btn-compose" style="gap: 8px;">
+                <button id="btn-assign" class="btn-compose" style="gap: 8px;" onclick="openModal('modal-assign')">
                     <span style="font-size: 32px; font-weight: 400; line-height: 0.5;">+</span> Assign
                 </button>
             </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Create Class Modal -->
+    <div id="modal-create-class" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Create class</h2>
+            <form id="form-create-class" onsubmit="handleCreateClass(event)">
+                <div class="input-group">
+                    <input type="text" id="class-name" placeholder="Class name (required)" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="class-section" placeholder="Section">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="class-subject" placeholder="Subject">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('modal-create-class')">Cancel</button>
+                    <button type="submit" class="btn-submit blue-text">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Assign Modal -->
+    <div id="modal-assign" class="modal-overlay hidden">
+        <div class="modal-content"
+            style="max-width: 650px; padding: 25px 35px; border-radius: 12px; font-family: 'Inter', sans-serif;">
+            <!-- Header -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; color: #3eb5cd;">
+                    <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                        style="width: 24px; height: 24px; object-fit: contain;">
+                    <span style="font-size: 16px; font-weight: 700;">Assignment</span>
+                </div>
+                <button type="button" onclick="closeModal('modal-assign')"
+                    style="background: transparent; border: none; font-size: 24px; cursor: pointer; font-weight: 600; color: #333;">&times;</button>
+            </div>
+
+            <!-- Body -->
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+                <input type="text" placeholder="Title"
+                    style="width: 100%; padding: 15px; border-radius: 6px; border: none; background: #f4f6fa; font-size: 14px; outline: none; font-family: inherit;">
+                <textarea placeholder="Instructions (optional)"
+                    style="width: 100%; height: 120px; padding: 15px; border-radius: 6px; border: none; background: #f4f6fa; font-size: 14px; outline: none; resize: none; font-family: inherit;"></textarea>
+            </div>
+
+            <!-- Options -->
+            <div
+                style="display: flex; align-items: center; gap: 30px; margin-bottom: 30px; font-size: 14px; font-weight: 600; color: #888;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    Points
+                    <div
+                        style="display: flex; align-items: center; border-bottom: 1px solid #888; padding-bottom: 2px; color: #333;">
+                        <input type="text" value="100"
+                            style="width: 40px; border: none; outline: none; background: transparent; font-size: 14px; font-weight: 600; color: #333; font-family: inherit; padding: 0;">
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    Due
+                    <div style="display: flex; align-items: center; color: #333; position: relative;">
+                        <input type="date"
+                            style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;"
+                            onchange="if(this.value) { const d = new Date(this.value); document.getElementById('due-display').innerText = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) }">
+                        <span id="due-display"
+                            style="width: 55px; font-size: 14px; font-weight: 600; color: #333; display: inline-block;">Apr
+                            30</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3eb5cd" stroke-width="3"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-left: 5px; pointer-events: none;">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    Group work
+                    <div id="group-work-toggle" onclick="toggleGroupWork()"
+                        style="width: 36px; height: 20px; background: #999; border-radius: 10px; display: flex; align-items: center; padding: 2px; cursor: pointer; transition: background 0.3s;"
+                        data-toggled="false">
+                        <div id="group-work-knob"
+                            style="width: 16px; height: 16px; background: white; border-radius: 50%; transition: transform 0.3s; transform: translateX(0);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 10px;">
+                    <button type="button"
+                        style="background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <img src="../public/assets/UploadSign.png" alt="Upload"
+                            style="width: 36px; height: 36px; object-fit: contain;">
+                    </button>
+                    <button type="button"
+                        style="background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <img src="../public/assets/LinkSign.png" alt="Link"
+                            style="width: 36px; height: 36px; object-fit: contain;">
+                    </button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <button type="button" class="btn-cancel" onclick="closeModal('modal-assign')"
+                        style="font-weight: 600; color: #333; padding: 0; margin-right: 10px;">Cancle</button>
+                    <button type="button"
+                        style="background: #3eb5cd; color: white; border: none; padding: 0 24px; height: 36px; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; font-family: inherit;">Assign</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Assignment Modal -->
+    <div id="modal-edit-assignment" class="modal-overlay hidden">
+        <div class="modal-content"
+            style="max-width: 650px; padding: 25px 35px; border-radius: 12px; font-family: 'Inter', sans-serif;">
+            <!-- Header -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; color: #3eb5cd;">
+                    <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                        style="width: 24px; height: 24px; object-fit: contain;">
+                    <span style="font-size: 16px; font-weight: 700;">Assignment</span>
+                </div>
+                <button type="button" onclick="closeModal('modal-edit-assignment')"
+                    style="background: transparent; border: none; font-size: 24px; cursor: pointer; font-weight: 600; color: #333;">&times;</button>
+            </div>
+
+            <!-- Body -->
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+                <div style="position: relative; background: #f4f6fa; border-radius: 6px;">
+                    <div style="font-size: 12px; color: #888; position: absolute; top: 10px; left: 15px;">Title</div>
+                    <input type="text" value="Group Project"
+                        style="width: 100%; padding: 28px 15px 10px; border: none; background: transparent; font-size: 18px; font-weight: 700; color: #222; outline: none; font-family: inherit;">
+                </div>
+                <textarea placeholder="Instructions (optional)"
+                    style="width: 100%; height: 160px; padding: 15px; border-radius: 6px; border: none; background: #f4f6fa; font-size: 14px; outline: none; resize: none; font-family: inherit; line-height: 1.5;">[Group Project]
+For the project proposal, prepare your topic and answer these questions.
+1. The name of the application and what its main objectives?
+2. Who are the stakeholders of your applications?
+3. What pain points or problems that your application can solve for users?</textarea>
+            </div>
+
+            <!-- Options -->
+            <div
+                style="display: flex; align-items: center; gap: 30px; margin-bottom: 30px; font-size: 14px; font-weight: 600; color: #888;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    Points
+                    <div
+                        style="display: flex; align-items: center; border-bottom: 1px solid #888; padding-bottom: 2px; color: #333;">
+                        <input type="text" value="100"
+                            style="width: 40px; border: none; outline: none; background: transparent; font-size: 14px; font-weight: 600; color: #333; font-family: inherit; padding: 0;">
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    Due
+                    <div style="display: flex; align-items: center; color: #333; position: relative;">
+                        <input type="date"
+                            style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;"
+                            onchange="if(this.value) { const d = new Date(this.value); document.getElementById('edit-due-display').innerText = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) }">
+                        <span id="edit-due-display"
+                            style="width: 55px; font-size: 14px; font-weight: 600; color: #333; display: inline-block;">Apr 30</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3eb5cd" stroke-width="3"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-left: 5px; pointer-events: none;">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    Group work
+                    <div id="edit-group-work-toggle" onclick="toggleEditGroupWork()"
+                        style="width: 36px; height: 20px; background: #999; border-radius: 10px; display: flex; align-items: center; padding: 2px; cursor: pointer; transition: background 0.3s;"
+                        data-toggled="false">
+                        <div id="edit-group-work-knob"
+                            style="width: 16px; height: 16px; background: white; border-radius: 50%; transition: transform 0.3s; transform: translateX(0);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 10px;">
+                    <button type="button"
+                        style="background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <img src="../public/assets/UploadSign.png" alt="Upload"
+                            style="width: 36px; height: 36px; object-fit: contain;">
+                    </button>
+                    <button type="button"
+                        style="background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <img src="../public/assets/LinkSign.png" alt="Link"
+                            style="width: 36px; height: 36px; object-fit: contain;">
+                    </button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <button type="button" class="btn-cancel" onclick="closeModal('modal-edit-assignment')"
+                        style="font-weight: 600; color: #333; padding: 0; margin-right: 10px;">Cancel</button>
+                    <button type="button"
+                        style="background: #3eb5cd; color: white; border: none; padding: 0 24px; height: 36px; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; font-family: inherit;">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div id="modal-create-group" class="modal-overlay hidden">
+        <div class="modal-content"
+            style="max-width: 600px; padding: 25px 35px; border-radius: 12px; font-family: 'Inter', sans-serif;">
+            <!-- Header -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 style="font-size: 22px; font-weight: 700; color: #3eb5cd; margin: 0;">Create Group</h2>
+                <button type="button" onclick="closeModal('modal-create-group')"
+                    style="background: transparent; border: none; font-size: 24px; cursor: pointer; font-weight: 600; color: #333;">&times;</button>
+            </div>
+
+            <!-- Body -->
+            <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px;">
+                <!-- Group Name Input -->
+                <div style="position: relative; background: #f4f6fa; border-radius: 6px;">
+                    <div style="font-size: 13px; color: #888; position: absolute; top: 10px; left: 15px;">Group Name</div>
+                    <input type="text"
+                        style="width: 100%; padding: 28px 15px 10px; border: none; background: transparent; font-size: 16px; color: #222; outline: none; font-family: inherit;">
+                </div>
+
+                <!-- Members Box -->
+                <div style="background: #f4f6fa; border-radius: 6px; padding: 15px;">
+                    <div style="font-size: 13px; color: #888; margin-bottom: 10px;">Members</div>
+                    
+                    <!-- Search / Dropdown Input Mockup -->
+                    <div style="position: relative; max-width: 300px; margin-bottom: 20px;">
+                        <select style="width: 100%; appearance: none; background: #b8b8b8; color: white; border: none; border-radius: 20px; padding: 8px 30px 8px 25px; font-size: 14px; outline: none; cursor: pointer; font-family: inherit;">
+                            <option value="" disabled selected></option>
+                            <option value="1">6622780268@g.siit.tu.ac.th</option>
+                            <option value="2">student.two@g.siit.tu.ac.th</option>
+                            <option value="3">student.three@g.siit.tu.ac.th</option>
+                        </select>
+                        <div style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 1px; height: 16px; background: white; pointer-events: none;"></div>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+                            stroke-linecap="round" stroke-linejoin="round" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+
+                    <!-- Member Chip -->
+                    <div style="display: inline-flex; align-items: center; background: #b8b8b8; border-radius: 25px; padding: 5px 15px 5px 5px; gap: 10px;">
+                        <!-- Avatar -->
+                        <div style="width: 28px; height: 28px; background: #666; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <span style="font-size: 14px; font-weight: 500; color: #222;">6622780268@g.siit.tu.ac.th</span>
+                        <span onclick="this.parentElement.remove()" style="font-weight: 600; cursor: pointer; color: #222; margin-left: 5px; font-size: 16px;">&times;</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #666;">
+                    Google Meet Link
+                    <input type="text" style="border: none; border-bottom: 1px solid #888; outline: none; background: transparent; width: 250px; font-family: inherit; font-size: 14px; color: #333;">
+                </div>
+                <button type="button"
+                    style="background: #3eb5cd; color: white; border: none; padding: 10px 25px; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; font-family: inherit;">Create</button>
+            </div>
         </div>
     </div>
 

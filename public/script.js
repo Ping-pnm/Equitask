@@ -68,6 +68,59 @@ function handlePost(event) {
     }
 }
 
+function toggleGroupWork() {
+    const toggle = document.getElementById('group-work-toggle');
+    const knob = document.getElementById('group-work-knob');
+    
+    if (toggle && knob) {
+        const isToggled = toggle.getAttribute('data-toggled') === 'true';
+        if (isToggled) {
+            toggle.style.background = '#999';
+            knob.style.transform = 'translateX(0)';
+            toggle.setAttribute('data-toggled', 'false');
+        } else {
+            toggle.style.background = '#41b8d5';
+            knob.style.transform = 'translateX(16px)';
+            toggle.setAttribute('data-toggled', 'true');
+        }
+    }
+}
+
+function openAssignmentDetail() {
+    const listContainer = document.getElementById('assignments-container');
+    const detailView = document.getElementById('assignment-detail-view');
+    const btnAssign = document.getElementById('btn-assign');
+
+    if (listContainer) listContainer.style.display = 'none';
+    if (btnAssign) btnAssign.style.display = 'none';
+    if (detailView) detailView.style.display = 'block';
+}
+
+function openEditModal(event) {
+    if (event) {
+        event.stopPropagation();
+    }
+    openModal('modal-edit-assignment');
+}
+
+function toggleEditGroupWork() {
+    const toggle = document.getElementById('edit-group-work-toggle');
+    const knob = document.getElementById('edit-group-work-knob');
+    
+    if (toggle && knob) {
+        const isToggled = toggle.getAttribute('data-toggled') === 'true';
+        if (isToggled) {
+            toggle.style.background = '#999';
+            knob.style.transform = 'translateX(0)';
+            toggle.setAttribute('data-toggled', 'false');
+        } else {
+            toggle.style.background = '#41b8d5';
+            knob.style.transform = 'translateX(16px)';
+            toggle.setAttribute('data-toggled', 'true');
+        }
+    }
+}
+
 // Ensure DOM is loaded before attaching global event listeners
 document.addEventListener('DOMContentLoaded', () => {
     // Close modal when clicking outside
