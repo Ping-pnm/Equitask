@@ -235,7 +235,7 @@
     <!-- Assign Modal -->
     <div id="modal-assign" class="modal-overlay hidden">
         <div class="modal-content"
-            style="max-width: 650px; padding: 25px 35px; border-radius: 12px; font-family: 'Inter', sans-serif;">
+            style="max-width: 650px; padding: 25px 35px; border-radius: 12px; font-family: 'Inter', sans-serif; max-height: 90vh; overflow-y: auto;">
             <!-- Header -->
             <div
                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 20px;">
@@ -254,6 +254,47 @@
                     style="width: 100%; padding: 15px; border-radius: 6px; border: none; background: #f4f6fa; font-size: 14px; outline: none; font-family: inherit;">
                 <textarea placeholder="Instructions (optional)"
                     style="width: 100%; height: 120px; padding: 15px; border-radius: 6px; border: none; background: #f4f6fa; font-size: 14px; outline: none; resize: none; font-family: inherit;"></textarea>
+
+                <!-- Rubrics Section -->
+                <div style="background: #f4f6fa; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 700; color: #b3b9c6;">
+                        Rubrics
+                        <div style="display: flex; align-items: center; gap: 8px; color: #000;">
+                            Rows: 
+                            <svg onclick="updateRubric('assign', 'row', -1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <span id="rubric-rows-assign">3</span>
+                            <svg onclick="updateRubric('assign', 'row', 1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; color: #000;">
+                            Columns: 
+                            <svg onclick="updateRubric('assign', 'col', -1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <span id="rubric-cols-assign">3</span>
+                            <svg onclick="updateRubric('assign', 'col', 1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <!-- Table -->
+                    <div style="width: 100%; border: 3px solid #8B5CF6; border-radius: 4px; overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse; background: white;">
+                            <tbody id="rubric-table-assign">
+                                <tr>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                </tr>
+                                <tr>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                </tr>
+                                <tr>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Options -->
@@ -322,7 +363,7 @@
     <!-- Edit Assignment Modal -->
     <div id="modal-edit-assignment" class="modal-overlay hidden">
         <div class="modal-content"
-            style="max-width: 650px; padding: 25px 35px; border-radius: 12px; font-family: 'Inter', sans-serif;">
+            style="max-width: 650px; padding: 25px 35px; border-radius: 12px; font-family: 'Inter', sans-serif; max-height: 90vh; overflow-y: auto;">
             <!-- Header -->
             <div
                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 20px;">
@@ -348,6 +389,47 @@ For the project proposal, prepare your topic and answer these questions.
 1. The name of the application and what its main objectives?
 2. Who are the stakeholders of your applications?
 3. What pain points or problems that your application can solve for users?</textarea>
+
+                <!-- Rubrics Section -->
+                <div style="background: #f4f6fa; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 700; color: #b3b9c6;">
+                        Rubrics
+                        <div style="display: flex; align-items: center; gap: 8px; color: #000;">
+                            Rows: 
+                            <svg onclick="updateRubric('edit', 'row', -1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <span id="rubric-rows-edit">3</span>
+                            <svg onclick="updateRubric('edit', 'row', 1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; color: #000;">
+                            Columns: 
+                            <svg onclick="updateRubric('edit', 'col', -1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <span id="rubric-cols-edit">3</span>
+                            <svg onclick="updateRubric('edit', 'col', 1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <!-- Table -->
+                    <div style="width: 100%; border: 3px solid #8B5CF6; border-radius: 4px; overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse; background: white;">
+                            <tbody id="rubric-table-edit">
+                                <tr>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                </tr>
+                                <tr>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                </tr>
+                                <tr>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                    <td contenteditable="true" style="border: 1px solid #000; height: 40px; padding: 5px; outline: none; font-size: 14px; vertical-align: top;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Options -->

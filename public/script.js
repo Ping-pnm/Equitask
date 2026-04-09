@@ -121,6 +121,64 @@ function toggleEditGroupWork() {
     }
 }
 
+function updateRubric(prefix, type, delta) {
+    const tableBody = document.getElementById('rubric-table-' + prefix);
+    const rowsSpan = document.getElementById('rubric-rows-' + prefix);
+    const colsSpan = document.getElementById('rubric-cols-' + prefix);
+    
+    if (!tableBody || !rowsSpan || !colsSpan) return;
+
+    let currentRows = parseInt(rowsSpan.innerText);
+    let currentCols = parseInt(colsSpan.innerText);
+
+    if (type === 'row') {
+        const newRows = currentRows + delta;
+        if (newRows < 1 || newRows > 10) return; // limit 1-10
+        
+        if (delta > 0) {
+            const tr = document.createElement('tr');
+            for (let i = 0; i < currentCols; i++) {
+                const td = document.createElement('td');
+                td.contentEditable = "true";
+                td.style.border = "1px solid #000";
+                td.style.height = "40px";
+                td.style.padding = "5px";
+                td.style.outline = "none";
+                td.style.fontSize = "14px";
+                td.style.verticalAlign = "top";
+                tr.appendChild(td);
+            }
+            tableBody.appendChild(tr);
+        } else {
+            tableBody.removeChild(tableBody.lastElementChild);
+        }
+        rowsSpan.innerText = newRows;
+    } else if (type === 'col') {
+        const newCols = currentCols + delta;
+        if (newCols < 1 || newCols > 10) return;
+
+        const rows = tableBody.querySelectorAll('tr');
+        if (delta > 0) {
+            rows.forEach(tr => {
+                const td = document.createElement('td');
+                td.contentEditable = "true";
+                td.style.border = "1px solid #000";
+                td.style.height = "40px";
+                td.style.padding = "5px";
+                td.style.outline = "none";
+                td.style.fontSize = "14px";
+                td.style.verticalAlign = "top";
+                tr.appendChild(td);
+            });
+        } else {
+            rows.forEach(tr => {
+                tr.removeChild(tr.lastElementChild);
+            });
+        }
+        colsSpan.innerText = newCols;
+    }
+}
+
 // Ensure DOM is loaded before attaching global event listeners
 document.addEventListener('DOMContentLoaded', () => {
     // Close modal when clicking outside
