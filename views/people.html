@@ -64,7 +64,7 @@
                             style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #56c4df; padding-bottom: 5px; margin-bottom: 20px;">
                             <h2 style="color: #56c4df; font-size: 32px; font-weight: 700; margin: 0;">Leaders</h2>
                             <!-- Add User SVG -->
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#56c4df"
+                            <svg onclick="openInviteModal('Invite leader')" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#56c4df"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                 style="margin-bottom: 5px; cursor: pointer;">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -94,7 +94,7 @@
                             style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #56c4df; padding-bottom: 5px; margin-bottom: 15px;">
                             <h2 style="color: #56c4df; font-size: 32px; font-weight: 700; margin: 0;">Members</h2>
                             <!-- Add User SVG -->
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#56c4df"
+                            <svg onclick="openInviteModal('Invite student')" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#56c4df"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                 style="margin-bottom: 5px; cursor: pointer;">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -106,14 +106,14 @@
 
                         <div class="members-actions"
                             style="display: flex; align-items: center; gap: 25px; margin-bottom: 25px; padding-left: 2px;">
-                            <div
+                            <div onclick="toggleSelectAll()" id="btn-select-all"
                                 style="display: flex; align-items: center; gap: 8px; color: #56c4df; font-weight: 700; cursor: pointer; font-size: 15px;">
-                                <div
-                                    style="width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px;">
+                                <div id="checkbox-select-all" data-selected="false"
+                                    style="width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; display: flex; align-items: center; justify-content: center;">
                                 </div>
                                 Select All
                             </div>
-                            <div
+                            <div onclick="deleteSelectedMembers()"
                                 style="display: flex; align-items: center; gap: 8px; color: #56c4df; font-weight: 700; cursor: pointer; font-size: 15px;">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#56c4df"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -131,8 +131,8 @@
                         <div class="people-list" style="display: flex; flex-direction: column; gap: 25px;">
                             <!-- Member 1 -->
                             <div class="person-row" style="display: flex; align-items: center; gap: 20px;">
-                                <div
-                                    style="width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; cursor: pointer;">
+                                <div class="member-checkbox" onclick="toggleMemberSelection(this)" data-selected="false"
+                                    style="width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                                 </div>
                                 <!-- Avatar SVG -->
                                 <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
@@ -148,8 +148,8 @@
 
                             <!-- Member 2 -->
                             <div class="person-row" style="display: flex; align-items: center; gap: 20px;">
-                                <div
-                                    style="width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; cursor: pointer;">
+                                <div class="member-checkbox" onclick="toggleMemberSelection(this)" data-selected="false"
+                                    style="width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                                 </div>
                                 <!-- Avatar SVG -->
                                 <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
@@ -165,8 +165,8 @@
 
                             <!-- Member 3 -->
                             <div class="person-row" style="display: flex; align-items: center; gap: 20px;">
-                                <div
-                                    style="width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; cursor: pointer;">
+                                <div class="member-checkbox" onclick="toggleMemberSelection(this)" data-selected="false"
+                                    style="width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                                 </div>
                                 <!-- Avatar SVG -->
                                 <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
@@ -187,6 +187,30 @@
     </div>
 
     <!-- Modals -->
+    <!-- Invite Modal -->
+    <div id="modal-invite" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 500px; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #56c4df; padding-bottom: 15px; margin-bottom: 25px;">
+                <h2 id="invite-modal-title" style="color: #56c4df; font-size: 24px; font-weight: 700; margin: 0;">Invite student</h2>
+                <svg onclick="closeModal('modal-invite')" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#56c4df" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="cursor: pointer;">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </div>
+            
+            <div id="invite-chips-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+                <!-- Chips go here -->
+            </div>
+
+            <form id="form-invite" onsubmit="handleInvite(event)" style="display: flex; align-items: flex-end; gap: 15px;">
+                <div style="flex-grow: 1; border-bottom: 2px solid #ccc; padding-bottom: 5px;">
+                    <input type="text" id="invite-email" placeholder="Email Address" style="width: 100%; border: none; outline: none; font-size: 15px; color: #333; background: transparent; padding: 5px 0;">
+                </div>
+                <button type="submit" style="background: none; border: none; color: #56c4df; font-size: 16px; font-weight: 700; cursor: pointer; padding-bottom: 10px;">INVITE</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Create Class Modal -->
     <div id="modal-create-class" class="modal-overlay hidden">
         <div class="modal-content">

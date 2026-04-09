@@ -17,6 +17,11 @@ function closeModal(modalId) {
         document.getElementById('form-create-class').reset();
     } else if (modalId === 'modal-compose') {
         document.getElementById('form-compose').reset();
+    } else if (modalId === 'modal-invite') {
+        const form = document.getElementById('form-invite');
+        if (form) form.reset();
+        const chips = document.getElementById('invite-chips-container');
+        if (chips) chips.innerHTML = '';
     }
 }
 
@@ -204,3 +209,135 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function openInviteModal(title) {
+    const modal = document.getElementById('modal-invite');
+    const titleEl = document.getElementById('invite-modal-title');
+    if (modal && titleEl) {
+        titleEl.textContent = title;
+        const form = document.getElementById('form-invite');
+        if (form) form.reset();
+        const chips = document.getElementById('invite-chips-container');
+        if (chips) chips.innerHTML = '';
+        modal.classList.remove('hidden');
+    }
+}
+
+function handleInvite(event) {
+    event.preventDefault();
+    const emailInput = document.getElementById('invite-email');
+    const email = emailInput.value.trim();
+
+    if (email !== '') {
+        const container = document.getElementById('invite-chips-container');
+        
+        const chip = document.createElement('div');
+        chip.style.display = 'flex';
+        chip.style.alignItems = 'center';
+        chip.style.background = '#a8a8a8';
+        chip.style.borderRadius = '20px';
+        chip.style.padding = '4px 10px 4px 4px';
+        chip.style.width = 'fit-content';
+        chip.style.gap = '8px';
+        
+        chip.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 45 45" fill="none">
+                <circle cx="22.5" cy="22.5" r="22.5" fill="#666666" />
+                <circle cx="22.5" cy="16" r="6" fill="#ffffff" />
+                <path d="M10.5 35.5C10.5 28.5 15.5 25 22.5 25C29.5 25 34.5 28.5 34.5 35.5V36.5H10.5V35.5Z" fill="#ffffff" />
+            </svg>
+            <span style="font-size: 13px; color: #111;">${email}</span>
+            <span style="font-size: 16px; color: #111; cursor: pointer; line-height: 1; padding-left: 4px;" onclick="this.parentElement.remove()">×</span>
+        `;
+        
+        container.appendChild(chip);
+        emailInput.value = '';
+    }
+}
+
+function toggleMemberSelection(element) {
+    const isSelected = element.getAttribute('data-selected') === 'true';
+    if (isSelected) {
+        element.setAttribute('data-selected', 'false');
+        element.style.background = 'transparent';
+        element.innerHTML = '';
+    } else {
+        element.setAttribute('data-selected', 'true');
+        element.style.background = '#56c4df';
+        element.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    }
+    updateSelectAllState();
+}
+
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('checkbox-select-all');
+    if (!selectAllCheckbox) return;
+
+    const isCurrentlySelected = selectAllCheckbox.getAttribute('data-selected') === 'true';
+    const newState = !isCurrentlySelected;
+
+    if (newState) {
+        selectAllCheckbox.setAttribute('data-selected', 'true');
+        selectAllCheckbox.style.background = '#56c4df';
+        selectAllCheckbox.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    } else {
+        selectAllCheckbox.setAttribute('data-selected', 'false');
+        selectAllCheckbox.style.background = 'transparent';
+        selectAllCheckbox.innerHTML = '';
+    }
+
+    const memberCheckboxes = document.querySelectorAll('.member-checkbox');
+    memberCheckboxes.forEach(cb => {
+        if (newState) {
+            cb.setAttribute('data-selected', 'true');
+            cb.style.background = '#56c4df';
+            cb.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        } else {
+            cb.setAttribute('data-selected', 'false');
+            cb.style.background = 'transparent';
+            cb.innerHTML = '';
+        }
+    });
+}
+
+function updateSelectAllState() {
+    const selectAllCheckbox = document.getElementById('checkbox-select-all');
+    if (!selectAllCheckbox) return;
+    
+    const memberCheckboxes = document.querySelectorAll('.member-checkbox');
+    if (memberCheckboxes.length === 0) {
+        selectAllCheckbox.setAttribute('data-selected', 'false');
+        selectAllCheckbox.style.background = 'transparent';
+        selectAllCheckbox.innerHTML = '';
+        return;
+    }
+
+    const allSelected = Array.from(memberCheckboxes).every(cb => cb.getAttribute('data-selected') === 'true');
+    const someSelected = Array.from(memberCheckboxes).some(cb => cb.getAttribute('data-selected') === 'true');
+
+    if (allSelected) {
+        selectAllCheckbox.setAttribute('data-selected', 'true');
+        selectAllCheckbox.style.background = '#56c4df';
+        selectAllCheckbox.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    } else {
+        selectAllCheckbox.setAttribute('data-selected', 'false');
+        selectAllCheckbox.style.background = 'transparent';
+        if (someSelected) {
+            selectAllCheckbox.style.background = '#56c4df';
+            selectAllCheckbox.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+        } else {
+            selectAllCheckbox.innerHTML = '';
+        }
+    }
+}
+
+function deleteSelectedMembers() {
+    const memberCheckboxes = document.querySelectorAll('.member-checkbox');
+    memberCheckboxes.forEach(cb => {
+        if (cb.getAttribute('data-selected') === 'true') {
+            const row = cb.closest('.person-row');
+            if (row) row.remove();
+        }
+    });
+    updateSelectAllState();
+}
