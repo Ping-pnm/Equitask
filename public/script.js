@@ -76,7 +76,7 @@ function handlePost(event) {
 function toggleGroupWork() {
     const toggle = document.getElementById('group-work-toggle');
     const knob = document.getElementById('group-work-knob');
-    
+
     if (toggle && knob) {
         const isToggled = toggle.getAttribute('data-toggled') === 'true';
         if (isToggled) {
@@ -111,7 +111,7 @@ function openEditModal(event) {
 function toggleEditGroupWork() {
     const toggle = document.getElementById('edit-group-work-toggle');
     const knob = document.getElementById('edit-group-work-knob');
-    
+
     if (toggle && knob) {
         const isToggled = toggle.getAttribute('data-toggled') === 'true';
         if (isToggled) {
@@ -130,7 +130,7 @@ function updateRubric(prefix, type, delta) {
     const tableBody = document.getElementById('rubric-table-' + prefix);
     const rowsSpan = document.getElementById('rubric-rows-' + prefix);
     const colsSpan = document.getElementById('rubric-cols-' + prefix);
-    
+
     if (!tableBody || !rowsSpan || !colsSpan) return;
 
     let currentRows = parseInt(rowsSpan.innerText);
@@ -139,7 +139,7 @@ function updateRubric(prefix, type, delta) {
     if (type === 'row') {
         const newRows = currentRows + delta;
         if (newRows < 1 || newRows > 10) return; // limit 1-10
-        
+
         if (delta > 0) {
             const tr = document.createElement('tr');
             for (let i = 0; i < currentCols; i++) {
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle post button color based on input
     const postContentInput = document.getElementById('post-content');
     if (postContentInput) {
-        postContentInput.addEventListener('input', function() {
+        postContentInput.addEventListener('input', function () {
             const btnPost = document.querySelector('#modal-compose .btn-post');
             if (btnPost) {
                 if (this.value.trim().length > 0) {
@@ -230,7 +230,7 @@ function handleInvite(event) {
 
     if (email !== '') {
         const container = document.getElementById('invite-chips-container');
-        
+
         const chip = document.createElement('div');
         chip.style.display = 'flex';
         chip.style.alignItems = 'center';
@@ -239,7 +239,7 @@ function handleInvite(event) {
         chip.style.padding = '4px 10px 4px 4px';
         chip.style.width = 'fit-content';
         chip.style.gap = '8px';
-        
+
         chip.innerHTML = `
             <svg width="24" height="24" viewBox="0 0 45 45" fill="none">
                 <circle cx="22.5" cy="22.5" r="22.5" fill="#666666" />
@@ -249,7 +249,7 @@ function handleInvite(event) {
             <span style="font-size: 13px; color: #111;">${email}</span>
             <span style="font-size: 16px; color: #111; cursor: pointer; line-height: 1; padding-left: 4px;" onclick="this.parentElement.remove()">×</span>
         `;
-        
+
         container.appendChild(chip);
         emailInput.value = '';
     }
@@ -303,7 +303,7 @@ function toggleSelectAll() {
 function updateSelectAllState() {
     const selectAllCheckbox = document.getElementById('checkbox-select-all');
     if (!selectAllCheckbox) return;
-    
+
     const memberCheckboxes = document.querySelectorAll('.member-checkbox');
     if (memberCheckboxes.length === 0) {
         selectAllCheckbox.setAttribute('data-selected', 'false');
@@ -348,9 +348,11 @@ let dashboardProjectInitialized = false;
 function showDashboardProjectView() {
     const listingView = document.getElementById('dashboard-listing-view');
     const projectView = document.getElementById('dashboard-project-view');
+    const detailView = document.getElementById('dashboard-group-detail-view');
     if (!listingView || !projectView) return;
 
     listingView.style.display = 'none';
+    if (detailView) detailView.style.display = 'none';
     projectView.style.display = '';
 
     // Only render group cards once
@@ -363,10 +365,34 @@ function showDashboardProjectView() {
 function showDashboardListingView() {
     const listingView = document.getElementById('dashboard-listing-view');
     const projectView = document.getElementById('dashboard-project-view');
+    const detailView = document.getElementById('dashboard-group-detail-view');
     if (!listingView || !projectView) return;
 
+    if (detailView) detailView.style.display = 'none';
     projectView.style.display = 'none';
     listingView.style.display = '';
+}
+
+function showGroupDetailView(groupName) {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
+    const detailView = document.getElementById('dashboard-group-detail-view');
+    const titleEl = document.getElementById('detail-group-title');
+
+    if (listingView) listingView.style.display = 'none';
+    if (projectView) projectView.style.display = 'none';
+    if (detailView) detailView.style.display = '';
+
+    if (titleEl && groupName) {
+        titleEl.textContent = 'Group Project - ' + groupName;
+    }
+}
+
+function toggleAddCreateMenu() {
+    const menu = document.getElementById('add-create-menu');
+    if (menu) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
 }
 
 function initDashboardGroupProject() {
@@ -453,7 +479,7 @@ function initDashboardGroupProject() {
                 </div>
 
                 <div class="btn-more-container">
-                    <button class="btn-more">More</button>
+                    <button class="btn-more" onclick="showGroupDetailView('${group.name}')">More</button>
                 </div>
             </div>
         `;
@@ -476,3 +502,55 @@ function initDashboardGroupProject() {
         });
     }, 200);
 }
+
+
+/* Extracted Scripts */
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("btn-create-class").addEventListener("click", function (event) {
+        openModal('modal-create-class')
+    });
+
+    document.getElementById("extracted-el-1").addEventListener("click", function (event) {
+        showDashboardProjectView()
+    });
+
+    document.getElementById("extracted-el-2").addEventListener("click", function (event) {
+        showDashboardProjectView()
+    });
+
+    document.getElementById("extracted-el-3").addEventListener("click", function (event) {
+        toggleAddCreateMenu()
+    });
+
+    document.getElementById("extracted-el-4").addEventListener("click", function (event) {
+        this.style.background = '#f0f0f0'
+    });
+
+    document.getElementById("extracted-el-5").addEventListener("click", function (event) {
+        document.getElementById('file-upload-input').click()
+    });
+
+    document.getElementById("extracted-el-6").addEventListener("click", function (event) {
+        closeModal('modal-create-class')
+    });
+
+    document.getElementById("extracted-el-3").addEventListener("mouseover", function (event) {
+        this.style.background = '#e0e0e0'
+    });
+
+    document.getElementById("extracted-el-5").addEventListener("mouseover", function (event) {
+        this.style.background = '#f0f0f0'
+    });
+
+    document.getElementById("extracted-el-3").addEventListener("mouseout", function (event) {
+        this.style.background = 'transparent'
+    });
+
+    document.getElementById("extracted-el-4").addEventListener("mouseout", function (event) {
+        this.style.background = 'white'
+    });
+
+    document.getElementById("extracted-el-5").addEventListener("mouseout", function (event) {
+        this.style.background = 'white'
+    });
+});
