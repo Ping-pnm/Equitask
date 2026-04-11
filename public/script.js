@@ -341,3 +341,138 @@ function deleteSelectedMembers() {
     });
     updateSelectAllState();
 }
+
+// ===== Dashboard Group Project =====
+let dashboardProjectInitialized = false;
+
+function showDashboardProjectView() {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
+    if (!listingView || !projectView) return;
+
+    listingView.style.display = 'none';
+    projectView.style.display = '';
+
+    // Only render group cards once
+    if (!dashboardProjectInitialized) {
+        initDashboardGroupProject();
+        dashboardProjectInitialized = true;
+    }
+}
+
+function showDashboardListingView() {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
+    if (!listingView || !projectView) return;
+
+    projectView.style.display = 'none';
+    listingView.style.display = '';
+}
+
+function initDashboardGroupProject() {
+    const container = document.getElementById('groups-container');
+    if (!container) return;
+
+    // Group Data
+    const groupsData = [
+        {
+            name: "Group 1",
+            students: [
+                { name: "Student 1", score: 48 },
+                { name: "Student 2", score: 63 },
+                { name: "Student 3", score: 27 }
+            ]
+        },
+        {
+            name: "Group 2",
+            students: [
+                { name: "Student 1", score: 67 },
+                { name: "Student 2", score: 95 },
+                { name: "Student 3", score: 82 }
+            ]
+        }
+    ];
+
+    const circleRadius = 42;
+    const circumference = 2 * Math.PI * circleRadius;
+
+    groupsData.forEach(group => {
+        // Calculate average
+        const sum = group.students.reduce((acc, curr) => acc + curr.score, 0);
+        const average = Math.round(sum / group.students.length);
+        const offset = circumference - (average / 100) * circumference;
+
+        // Build students HTML
+        const studentsHtml = group.students.map(student => `
+            <div class="student-row">
+                <div class="student-name">${student.name}</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div class="student-percent">${student.score}%</div>
+            </div>
+        `).join('');
+
+        // Build Group Card HTML with SVG donut chart
+        const cardHtml = `
+            <div class="group-card">
+                <div class="group-header">${group.name}</div>
+                <div class="group-divider"></div>
+
+                <div class="group-content">
+                    <!-- Left: Circular SVG donut progress -->
+                    <div class="progress-circle-wrapper">
+                        <div class="progress-circle-container">
+                            <svg viewBox="0 0 110 110">
+                                <circle class="progress-track" cx="55" cy="55" r="${circleRadius}"></circle>
+                                <circle class="progress-fill" cx="55" cy="55" r="${circleRadius}"
+                                    stroke-dasharray="${circumference}"
+                                    stroke-dashoffset="${circumference}"
+                                    data-target-offset="${offset}"></circle>
+                            </svg>
+                            <div class="progress-label">${average}%</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: AI Summary -->
+                    <div class="ai-summary-container">
+                        <div class="ai-summary-header">
+                            <img src="../public/assets/Ai-sign.png" alt="AI Icon">
+                            AI Summary
+                        </div>
+                        <div class="ai-summary-box">
+                            <div class="summary-text">This group are...................................<br>.................</div>
+                            <span class="read-more">read more</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Progress Bars -->
+                <div class="student-list">
+                    ${studentsHtml}
+                </div>
+
+                <div class="btn-more-container">
+                    <button class="btn-more">More</button>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML += cardHtml;
+    });
+
+    // Animate progress bars and circles
+    setTimeout(() => {
+        document.querySelectorAll('.progress-bar-fill').forEach((bar, i) => {
+            const allStudents = groupsData.flatMap(g => g.students);
+            if (allStudents[i]) {
+                bar.style.width = allStudents[i].score + '%';
+            }
+        });
+
+        document.querySelectorAll('.progress-fill').forEach(circle => {
+            const targetOffset = circle.getAttribute('data-target-offset');
+            circle.style.strokeDashoffset = targetOffset;
+        });
+    }, 200);
+}

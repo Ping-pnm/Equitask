@@ -717,3 +717,280 @@ body.homepage-body {
     background: #88aec0;
     color: #ffffff;
 }
+
+/* ===== Dashboard Group Project Page ===== */
+
+.dashboard-page-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+    padding: 0 10px;
+}
+
+.dashboard-page-header img {
+    height: 34px;
+    object-fit: contain;
+}
+
+.dashboard-page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.3px;
+}
+
+/* ===== Groups Grid ===== */
+.groups-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 24px;
+    padding: 0 10px;
+}
+
+/* ===== Group Card ===== */
+.group-card {
+    background: #f0f2f8;
+    border-radius: 22px;
+    padding: 24px 28px 22px;
+    display: flex;
+    flex-direction: column;
+    box-shadow:
+        6px 6px 14px rgba(180, 185, 210, 0.35),
+        -4px -4px 10px rgba(255, 255, 255, 0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeSlideUp 0.5s ease-out both;
+}
+
+.group-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        8px 8px 20px rgba(180, 185, 210, 0.45),
+        -6px -6px 14px rgba(255, 255, 255, 0.7);
+}
+
+.group-card:nth-child(1) { animation-delay: 0.1s; }
+.group-card:nth-child(2) { animation-delay: 0.25s; }
+.group-card:nth-child(3) { animation-delay: 0.4s; }
+.group-card:nth-child(4) { animation-delay: 0.55s; }
+
+.group-header {
+    text-align: center;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 14px;
+    letter-spacing: -0.2px;
+}
+
+.group-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #bfc4d6, transparent);
+    margin-bottom: 20px;
+}
+
+/* ===== Group Content Row (Circle + AI Summary) ===== */
+.group-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+/* ===== Circular Progress (Donut) ===== */
+.progress-circle-wrapper {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-circle-container {
+    position: relative;
+    width: 110px;
+    height: 110px;
+}
+
+.progress-circle-container svg {
+    width: 110px;
+    height: 110px;
+    transform: rotate(-90deg);
+}
+
+.progress-track {
+    fill: none;
+    stroke: #d3d7e4;
+    stroke-width: 12;
+}
+
+.progress-fill {
+    fill: none;
+    stroke: #5a718c;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease-in-out;
+}
+
+.progress-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+/* ===== AI Summary ===== */
+.ai-summary-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.ai-summary-header {
+    font-size: 13px;
+    color: #55b2ca;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.ai-summary-header img {
+    height: 16px;
+    object-fit: contain;
+}
+
+.ai-summary-box {
+    flex: 1;
+    background: #ffffff;
+    border: 1.5px solid #bfc4d6;
+    border-radius: 10px;
+    padding: 12px 14px;
+    min-height: 70px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+    position: relative;
+}
+
+.ai-summary-box .summary-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ai-summary-box .read-more {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1a1a2e;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* ===== Student Progress Bars ===== */
+.student-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.student-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.student-name {
+    min-width: 68px;
+    color: #444;
+    font-weight: 500;
+}
+
+.progress-bar-container {
+    flex: 1;
+    height: 14px;
+    background-color: #d3d7e4;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #5a718c, #7b92ab);
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
+
+.student-percent {
+    width: 36px;
+    text-align: right;
+    font-weight: 600;
+    color: #333;
+}
+
+/* ===== More Button ===== */
+.btn-more-container {
+    text-align: center;
+    margin-top: auto;
+}
+
+.btn-more {
+    background: linear-gradient(135deg, #6d8199, #7b92ab);
+    color: white;
+    border: none;
+    border-radius: 22px;
+    padding: 10px 40px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(109, 129, 153, 0.3);
+    letter-spacing: 0.3px;
+}
+
+.btn-more:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(109, 129, 153, 0.4);
+    background: linear-gradient(135deg, #5e7289, #6d8199);
+}
+
+.btn-more:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(109, 129, 153, 0.25);
+}
+
+/* ===== Dashboard Animations ===== */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nav-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ===== Dashboard Responsive ===== */
+@media (max-width: 900px) {
+    .groups-grid {
+        grid-template-columns: 1fr;
+    }
+}
