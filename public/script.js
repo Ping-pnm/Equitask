@@ -25,6 +25,14 @@ function closeModal(modalId) {
     }
 }
 
+function openAddTaskModal(studentName) {
+    const studentNameSpan = document.getElementById('add-task-student-name');
+    if (studentNameSpan) {
+        studentNameSpan.innerText = studentName;
+    }
+    openModal('modal-add-task');
+}
+
 function handleCreateClass(event) {
     event.preventDefault();
     const className = document.getElementById('class-name').value;
@@ -142,15 +150,22 @@ function updateRubric(prefix, type, delta) {
 
         if (delta > 0) {
             const tr = document.createElement('tr');
+            const sampleTr = tableBody.querySelector('tr');
+            const sampleTd = sampleTr ? sampleTr.querySelector('td') : null;
+
             for (let i = 0; i < currentCols; i++) {
                 const td = document.createElement('td');
                 td.contentEditable = "true";
-                td.style.border = "1px solid #000";
-                td.style.height = "40px";
-                td.style.padding = "5px";
-                td.style.outline = "none";
-                td.style.fontSize = "14px";
-                td.style.verticalAlign = "top";
+                if (sampleTd) {
+                    td.style.cssText = sampleTd.style.cssText;
+                } else {
+                    td.style.border = "1px solid #000";
+                    td.style.height = "40px";
+                    td.style.padding = "5px";
+                    td.style.outline = "none";
+                    td.style.fontSize = "14px";
+                    td.style.verticalAlign = "top";
+                }
                 tr.appendChild(td);
             }
             tableBody.appendChild(tr);
@@ -165,14 +180,19 @@ function updateRubric(prefix, type, delta) {
         const rows = tableBody.querySelectorAll('tr');
         if (delta > 0) {
             rows.forEach(tr => {
+                const sampleTd = tr.querySelector('td');
                 const td = document.createElement('td');
                 td.contentEditable = "true";
-                td.style.border = "1px solid #000";
-                td.style.height = "40px";
-                td.style.padding = "5px";
-                td.style.outline = "none";
-                td.style.fontSize = "14px";
-                td.style.verticalAlign = "top";
+                if (sampleTd) {
+                    td.style.cssText = sampleTd.style.cssText;
+                } else {
+                    td.style.border = "1px solid #000";
+                    td.style.height = "40px";
+                    td.style.padding = "5px";
+                    td.style.outline = "none";
+                    td.style.fontSize = "14px";
+                    td.style.verticalAlign = "top";
+                }
                 tr.appendChild(td);
             });
         } else {
@@ -464,7 +484,7 @@ function initDashboardGroupProject() {
                     <div class="ai-summary-container">
                         <div class="ai-summary-header">
                             <img src="../public/assets/Ai-sign.png" alt="AI Icon">
-                            AI Summary
+                            <span class="ai-summary-text-gradient">AI Summary</span>
                         </div>
                         <div class="ai-summary-box">
                             <div class="summary-text">This group are...................................<br>.................</div>

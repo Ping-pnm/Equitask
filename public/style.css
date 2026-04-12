@@ -879,12 +879,14 @@ body.homepage-body {
 
 .ai-summary-header {
     font-size: 13px;
-    color: #55b2ca;
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 6px;
     margin-bottom: 8px;
+    background: linear-gradient(to right, #0a7e8c, #a2d8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .ai-summary-header img {
@@ -903,6 +905,13 @@ body.homepage-body {
     color: #666;
     line-height: 1.5;
     position: relative;
+}
+
+.ai-summary-text-gradient {
+    background: linear-gradient(to right, #0a7e8c, #a2d8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
 }
 
 .ai-summary-box .summary-text {
