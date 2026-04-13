@@ -109,6 +109,27 @@ function openAssignmentDetail() {
     if (detailView) detailView.style.display = 'block';
 }
 
+function openTaskDetail(studentName, taskName) {
+    const groupDetailView = document.getElementById('dashboard-group-detail-view');
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
+    const studentNameSpan = document.getElementById('task-detail-student-name');
+    const taskNameHeading = document.getElementById('task-detail-task-name');
+
+    if (groupDetailView) groupDetailView.style.display = 'none';
+    if (taskDetailView) taskDetailView.style.display = 'block';
+
+    if (studentNameSpan) studentNameSpan.innerText = studentName;
+    if (taskNameHeading) taskNameHeading.innerText = taskName;
+}
+
+function goBackToProjectDetail() {
+    const groupDetailView = document.getElementById('dashboard-group-detail-view');
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
+
+    if (taskDetailView) taskDetailView.style.display = 'none';
+    if (groupDetailView) groupDetailView.style.display = 'block';
+}
+
 function openEditModal(event) {
     if (event) {
         event.stopPropagation();
@@ -573,4 +594,21 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("extracted-el-5").addEventListener("mouseout", function (event) {
         this.style.background = 'white'
     });
+
+    // Back to Group Button in Task Detail
+    const btnBackToGroup = document.getElementById('btn-back-to-group');
+    if (btnBackToGroup) {
+        btnBackToGroup.addEventListener('click', goBackToProjectDetail);
+    }
 });
+
+/**
+ * Utility to remove the parent of an element (used for chips)
+ * @param {HTMLElement} el 
+ */
+function removeParentElement(el) {
+    if (el && el.parentElement) {
+        el.parentElement.remove();
+    }
+}
+

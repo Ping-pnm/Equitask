@@ -509,15 +509,18 @@ body.homepage-body {
 .stream-content::-webkit-scrollbar {
     width: 8px;
 }
+
 .stream-content::-webkit-scrollbar-track {
-    background: #f1f1f1; 
+    background: #f1f1f1;
 }
+
 .stream-content::-webkit-scrollbar-thumb {
-    background: #c1c1c1; 
+    background: #c1c1c1;
     border-radius: 4px;
 }
+
 .stream-content::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8; 
+    background: #a8a8a8;
 }
 
 .posts-container {
@@ -908,7 +911,7 @@ body.homepage-body {
 }
 
 .ai-summary-text-gradient {
-    background: linear-gradient(to right, #0a7e8c, #a2d8ff);
+    background: linear-gradient(to right, #0a7e8c, #96c1e0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
@@ -1207,22 +1210,26 @@ body.homepage-body {
     overflow-y: auto;
     overflow-x: hidden;
     border-radius: 8px;
-    padding-right: 4px; /* Space for scrollbar */
+    padding-right: 4px;
+    /* Space for scrollbar */
 }
 
 /* Custom Webkit Scrollbar for group members */
 .extracted-style-26::-webkit-scrollbar {
     width: 6px;
 }
+
 .extracted-style-26::-webkit-scrollbar-track {
-    background: transparent; 
+    background: transparent;
 }
+
 .extracted-style-26::-webkit-scrollbar-thumb {
-    background: #bbb; 
+    background: #bbb;
     border-radius: 3px;
 }
+
 .extracted-style-26::-webkit-scrollbar-thumb:hover {
-    background: #999; 
+    background: #999;
 }
 
 .extracted-style-27 {
@@ -1648,4 +1655,438 @@ body.homepage-body {
     cursor: pointer;
     margin-bottom: 12px;
     margin-left: 5px;
+}
+
+/* ===== Refactored Dashboard Styles ===== */
+
+/* Section & Layout Containers */
+.dashboard-view-detail {
+    padding: 28px 40px;
+    background: white;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.detail-content-grid {
+    display: flex;
+    gap: 40px;
+    width: 100%;
+}
+
+.column-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.column-sidebar {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Breadcrumbs */
+.breadcrumb-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.breadcrumb-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.breadcrumb-logo {
+    width: 48px;
+    height: 48px;
+}
+
+.breadcrumb-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+}
+
+.breadcrumb-separator {
+    font-weight: 400;
+    color: #666;
+    margin: 0 5px;
+}
+
+/* Task Specific Styles */
+.task-header-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.task-header-title {
+    font-size: 32px;
+    font-weight: 500;
+    color: #333;
+}
+
+.task-progress-container {
+    flex: 1;
+    height: 8px;
+    background: #E9ECEF;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 15px;
+}
+
+.task-progress-fill {
+    height: 100%;
+    background: #6ba7c2;
+    border-radius: 4px;
+}
+
+.task-percent-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #222;
+}
+
+.task-text-description {
+    padding-left: 47px;
+    color: #444;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.horizontal-divider {
+    border-top: 2px solid #ddd;
+    margin: 30px 0;
+}
+
+/* Sidebar Cards */
+.sidebar-card {
+    background: #f4f6fa;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.sidebar-card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #444;
+}
+
+.status-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #fae489;
+    color: #111;
+}
+
+.file-attachment-box {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.file-info-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-thumb {
+    width: 40px;
+    height: 40px;
+    background: #f0f0f0;
+    border-radius: 8px;
+}
+
+.file-name {
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 2px;
+}
+
+.file-source {
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.sidebar-action-btn {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #aaa;
+    color: #5b7ab7;
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.add-comment-btn {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #aaa;
+    color: #5b7ab7;
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Table Refinements */
+.task-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+}
+
+.task-history-table th {
+    background: #B2DFDB !important;
+    color: #222 !important;
+    font-weight: 700 !important;
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    text-transform: none !important;
+}
+
+.task-history-table td {
+    padding: 15px;
+    border: 1px solid #eee !important;
+    font-size: 13px;
+    background: #fff;
+}
+
+/* AI Rubrics Table */
+.ai-rubrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.ai-rubrics-table td {
+    border: 2px solid #ddd !important;
+    height: 50px;
+    padding: 10px;
+    font-size: 14px;
+    color: #444;
+}
+
+/* AI Summary Section */
+.ai-section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ai-summary-text-gradient {
+    background: linear-gradient(to right, #0a7e8c, #96c1e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+.ai-summary-text-gradient-large {
+    font-size: 24px;
+}
+
+.ai-summary-text-gradient-small {
+    font-size: 12px;
+}
+
+.dashboard-section-title-gradient {
+    background: linear-gradient(to right, #0a7e8c, #96c1e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 38px;
+    display: inline-block;
+}
+
+.ai-summary-description {
+    font-size: 12px;
+    color: #444;
+    line-height: 1.5;
+}
+
+/* Modal Neumorphic Refinements */
+.modal-edit-content {
+    max-width: 600px;
+    padding: 25px 35px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-title-text {
+    font-size: 22px;
+    font-weight: 700;
+    color: #3eb5cd;
+    margin: 0;
+}
+
+.modal-close-symbol {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-input-field {
+    width: 100%;
+    padding: 28px 15px 10px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+    outline: none;
+    font-family: inherit;
+}
+
+.modal-input-wrapper {
+    position: relative;
+    background: #f4f6fa;
+    border-radius: 6px;
+}
+
+.modal-input-label {
+    font-size: 13px;
+    color: #888;
+    position: absolute;
+    top: 10px;
+    left: 15px;
+}
+
+.modal-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-submit-btn {
+    background: #3eb5cd;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* Shared utility for Task Detail view showing up */
+#dashboard-task-detail-view {
+    animation: fadeSlideUp 0.5s ease-out both;
+}
+
+#dashboard-task-detail-view button {
+    transition: all 0.2s ease;
+}
+
+#dashboard-task-detail-view button:hover {
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+}
+
+#dashboard-task-detail-view button:active {
+    transform: translateY(0);
+}
+
+/* Member List Table */
+.member-table-wrapper {
+    background: #f4f6fa;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.member-list-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.member-list-table td {
+    padding: 10px;
+    color: #333;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.member-list-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Member Chips */
+.member-chip {
+    display: inline-flex;
+    align-items: center;
+    background: #b8b8b8;
+    border-radius: 25px;
+    padding: 5px 15px 5px 5px;
+    gap: 10px;
+}
+
+.member-chip-avatar {
+    width: 28px;
+    height: 28px;
+    background: #666;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.member-chip-email {
+    font-size: 14px;
+    font-weight: 500;
+    color: #222;
+}
+
+.member-chip-remove {
+    font-weight: 600;
+    cursor: pointer;
+    color: #222;
+    margin-left: 5px;
+    font-size: 16px;
 }
