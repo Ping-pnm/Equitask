@@ -2090,3 +2090,473 @@ body.homepage-body {
     margin-left: 5px;
     font-size: 16px;
 }
+
+/* ===================================================================
+   HOMEWORK 1 DETAIL VIEW  (VIEW 5)
+   =================================================================== */
+
+/* Section wrapper – no centre-align, flush left-aligned scroll */
+.hw1-section {
+    align-items: stretch !important;
+    padding: 32px 36px !important;
+}
+
+/* Two-column layout */
+.hw1-layout {
+    display: flex;
+    gap: 28px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+/* LEFT column */
+.hw1-main-col {
+    flex: 1;
+    min-width: 0;
+}
+
+/* RIGHT sticky sidebar */
+.hw1-side-col {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 20px;
+}
+
+/* ── Back button ── */
+.hw1-back-btn:hover {
+    color: #1a73e8;
+}
+
+/* ── Header row ── */
+.hw1-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+}
+
+.hw1-title-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.hw1-checklist-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.hw1-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.hw1-due {
+    font-size: 13px;
+    color: #777;
+    margin-top: 4px;
+}
+
+.hw1-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.hw1-gear-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.hw1-gear-icon:hover {
+    transform: rotate(30deg);
+    opacity: 0.75;
+}
+
+.hw1-points {
+    font-size: 13px;
+    color: #666;
+}
+
+/* ── Dividers ── */
+.hw1-divider {
+    border-top: 1px solid #e0e0e0;
+    margin: 14px 0;
+}
+
+/* ── Description ── */
+.hw1-desc-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.hw1-desc-list {
+    margin: 0 0 16px 20px;
+    padding: 0;
+    font-size: 14px;
+    color: #444;
+    list-style: disc;
+    line-height: 1.6;
+}
+
+/* ── Attachments ── */
+.hw1-attachments {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.hw1-attachment-pill {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 18px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+
+.hw1-attachment-pill:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.hw1-attachment-name {
+    font-size: 14px;
+    color: #1a73e8;
+    font-weight: 500;
+}
+
+.hw1-attachment-type {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.hw1-attachment-thumb {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 58px;
+    height: 50px;
+    background: #f5f5f5;
+}
+
+/* ── Stats Row ── */
+.hw1-stats-row {
+    display: flex;
+    margin-bottom: 24px;
+}
+
+.hw1-stat-item {
+    flex: 1;
+    padding: 10px 12px;
+}
+
+.hw1-stat-border-r {
+    border-right: 1px solid #ddd;
+}
+
+.hw1-stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+    line-height: 1;
+}
+
+.hw1-stat-label {
+    font-size: 13px;
+    color: #666;
+    margin-top: 3px;
+}
+
+/* ── Student section headings ── */
+.hw1-student-section {
+    margin-bottom: 8px;
+}
+
+.hw1-section-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hw1-section-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #8ab4c8;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* ── Student rows (left list) ── */
+.hw1-student-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 8px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+}
+
+.hw1-student-row:hover {
+    background: #f3f7fb;
+}
+
+.hw1-student-row.active {
+    background: #e8f1fb;
+}
+
+.hw1-avatar {
+    flex-shrink: 0;
+}
+
+.hw1-student-name {
+    flex: 1;
+    font-size: 15px;
+    color: #222;
+}
+
+.hw1-grade-badge {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0a7e8c;
+    background: #e0f7f6;
+    border-radius: 12px;
+    padding: 2px 10px;
+}
+
+.hw1-chevron {
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+
+.hw1-student-row:hover .hw1-chevron {
+    transform: translateX(3px);
+}
+
+/* ================================================================
+   RIGHT SIDE PANEL
+   ================================================================ */
+.hw1-side-col {
+    border-left: 1px solid #e8e8e8;
+    padding-left: 24px;
+    min-height: 300px;
+}
+
+/* Empty state */
+.hw1-side-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 200px;
+    color: #bbb;
+    text-align: center;
+    padding: 30px 10px;
+}
+
+.hw1-side-empty p {
+    font-size: 13px;
+    color: #bbb;
+}
+
+/* Student header in right panel */
+.hw1-side-student-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.hw1-side-avatar {
+    flex-shrink: 0;
+}
+
+.hw1-side-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+}
+
+.hw1-side-status-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a7e8c;
+    background: #e0f7f6;
+    border-radius: 10px;
+    padding: 2px 9px;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+/* Cards inside the right panel */
+.hw1-side-card {
+    background: #f7f9fc;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+}
+
+.hw1-side-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.hw1-side-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+}
+
+.hw1-side-work-status {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0a7e8c;
+}
+
+/* File attachment row inside card */
+.hw1-file-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+
+.hw1-file-thumb-sm {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #ff6b6b, #e53935);
+    flex-shrink: 0;
+}
+
+.hw1-file-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.hw1-file-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+}
+
+.hw1-file-type {
+    font-size: 11px;
+    color: #888;
+}
+
+/* Grade input row */
+.hw1-grade-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.hw1-grade-input {
+    width: 70px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    background: transparent;
+    text-align: center;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s;
+}
+
+.hw1-grade-input:focus {
+    border-color: #1a73e8;
+}
+
+.hw1-grade-input::placeholder {
+    color: #bbb;
+}
+
+.hw1-grade-input::-webkit-inner-spin-button,
+.hw1-grade-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+.hw1-grade-max {
+    font-size: 16px;
+    color: #666;
+}
+
+/* Return button */
+.hw1-return-btn {
+    display: block;
+    width: 100%;
+    padding: 9px 0;
+    background: #2ab3d6;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.hw1-return-btn:hover {
+    background: #1a9bbf;
+    transform: translateY(-1px);
+}
+
+/* Add comment button */
+.hw1-add-comment-btn {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 8px 0;
+    background: transparent;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    color: #555;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.hw1-add-comment-btn:hover {
+    background: #f0f0f0;
+}
+
+/* Group Navigation Hover */
+.group-nav-row:hover {
+    background: #e0e0e0 !important;
+}

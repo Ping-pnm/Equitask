@@ -249,6 +249,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Check for URL parameters (e.g., dashboard.html?group=Group 1 or dashboard.html?homework=1)
+    const urlParams = new URLSearchParams(window.location.search);
+    const groupParam = urlParams.get('group');
+    const homeworkParam = urlParams.get('homework');
+    
+    if (window.location.pathname.includes('dashboard.html')) {
+        if (groupParam) {
+            showGroupDetailView(groupParam);
+        } else if (homeworkParam === '1') {
+            showHomework1View();
+        }
+    }
 });
 
 function openInviteModal(title) {
@@ -407,11 +420,27 @@ function showDashboardListingView() {
     const listingView = document.getElementById('dashboard-listing-view');
     const projectView = document.getElementById('dashboard-project-view');
     const detailView = document.getElementById('dashboard-group-detail-view');
+    const hw1View = document.getElementById('dashboard-hw1-view');
     if (!listingView || !projectView) return;
 
     if (detailView) detailView.style.display = 'none';
+    if (hw1View) hw1View.style.display = 'none';
     projectView.style.display = 'none';
     listingView.style.display = '';
+}
+
+function showHomework1View() {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
+    const detailView = document.getElementById('dashboard-group-detail-view');
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
+    const hw1View = document.getElementById('dashboard-hw1-view');
+
+    if (listingView) listingView.style.display = 'none';
+    if (projectView) projectView.style.display = 'none';
+    if (detailView) detailView.style.display = 'none';
+    if (taskDetailView) taskDetailView.style.display = 'none';
+    if (hw1View) hw1View.style.display = '';
 }
 
 function showGroupDetailView(groupName) {
@@ -600,9 +629,91 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btnBackToGroup) {
         btnBackToGroup.addEventListener('click', goBackToProjectDetail);
     }
-});
+
+    // Homework 1 card click
+    const hw1Card = document.getElementById('hw1-card');
+    if (hw1Card) {
+        hw1Card.addEventListener('click', showHomework1View);
+    }
+
+    // Back to listing from Homework 1 view
+    const btnBackToListing = document.getElementById('btn-back-to-listing');
+    if (btnBackToListing) {
+        btnBackToListing.addEventListener('click', showDashboardListingView);
+    }
+
+    // Student row click → populate right-side grading panel
+    // Data for each student row: [element-id-or-null, name, status, grade]
+    const hw1StudentData = [
+        { selector: '#hw1-row-graded-1', name: 'Phinnawat Yaemsanguan', status: 'Graded', grade: '10', showFile: true },
+        { selector: '#hw1-row-graded-2', name: 'Napha Mongkolwittayakul', status: 'Graded', grade: '8', showFile: true }
+    ];
+
+    // Generic click for ALL .hw1-student-row elements
+    document.querySelectorAll('.hw1-student-row').forEach(row => {
+        row.addEventListener('click', function () {
+            // Remove active from all rows
+            document.querySelectorAll('.hw1-student-row').forEach(r => r.classList.remove('active'));
+            this.classList.add('active');
+
+            // Determine name + status from row content
+            const nameEl = this.querySelector('.hw1-student-name');
+            const gradeEl = this.querySelector('.hw1-grade-badge');
+            const name = nameEl ? nameEl.textContent.trim() : 'Student';
+            const gradeText = gradeEl ? gradeEl.textContent.trim() : null;
+
+            // Determine status from the section heading closest ancestor
+            const section = this.closest('.hw1-student-section');
+            const sectionTitleEl = section ? section.querySelector('.hw1-section-title') : null;
+            let status = 'Assigned';
+            if (sectionTitleEl) {
+                const titleText = sectionTitleEl.childNodes[0].textContent.trim();
+                if (titleText.toLowerCase().includes('grade')) status = 'Graded';
+                else if (titleText.toLowerCase().includes('turned')) status = 'Turned in';
+                else status = 'Assigned';
+            }
+
+            // Show side panel
+            const sideEmpty = document.getElementById('hw1-side-empty');
+            const sideDetail = document.getElementById('hw1-side-detail');
+            if (sideEmpty) sideEmpty.style.display = 'none';
+            if (sideDetail) sideDetail.style.display = '';
+
+            // Populate fields
+            const sideName = document.getElementById('hw1-side-name');
+            const sideStatus = document.getElementById('hw1-side-status');
+            const sideWorkStatus = document.getElementById('hw1-side-work-status');
+            const gradeInput = document.getElementById('hw1-grade-input');
+
+            if (sideName) sideName.textContent = name;
+            if (sideStatus) {
+                sideStatus.textContent = status;
+                sideStatus.style.background = status === 'Graded' ? '#e0f7f6' :
+                    status === 'Turned in' ? '#fff3e0' : '#fce4ec';
+                sideStatus.style.color = status === 'Graded' ? '#0a7e8c' :
+                    status === 'Turned in' ? '#e65100' : '#c62828';
+            }
+            if (sideWorkStatus) sideWorkStatus.textContent = status;
+            if (gradeInput) {
+                if (gradeText) {
+                    const num = gradeText.split('/')[0].trim();
+                    gradeInput.value = num;
+                } else {
+                    gradeInput.value = '';
+                }
+            }
+
+            // Update the return button label
+            const returnBtn = document.getElementById('hw1-return-btn');
+            if (returnBtn) {
+                returnBtn.textContent = status === 'Graded' ? 'Unsubmit' : 'Return';
+            }
+        });
+    });
+}); // end DOMContentLoaded
 
 /**
+
  * Utility to remove the parent of an element (used for chips)
  * @param {HTMLElement} el 
  */
