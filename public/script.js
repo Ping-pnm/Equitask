@@ -250,16 +250,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Check for URL parameters (e.g., dashboard.html?group=Group 1 or dashboard.html?homework=1)
+    // Check for URL parameters (e.g., dashboard.html?group=Group 1 or classwork.html?assignment=group)
     const urlParams = new URLSearchParams(window.location.search);
     const groupParam = urlParams.get('group');
     const homeworkParam = urlParams.get('homework');
+    const assignmentParam = urlParams.get('assignment');
     
     if (window.location.pathname.includes('dashboard.html')) {
         if (groupParam) {
             showGroupDetailView(groupParam);
         } else if (homeworkParam === '1') {
             showHomework1View();
+        }
+    } else if (window.location.pathname.includes('classwork.html')) {
+        if (assignmentParam === 'group') {
+            openAssignmentDetail();
         }
     }
 });
