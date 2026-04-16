@@ -102,20 +102,60 @@ function toggleGroupWork() {
 function openAssignmentDetail() {
     const listContainer = document.getElementById('assignments-container');
     const detailView = document.getElementById('assignment-detail-view');
+    const hwDetailView = document.getElementById('homework-detail-view');
     const btnAssign = document.getElementById('btn-assign');
 
     if (listContainer) listContainer.style.display = 'none';
     if (btnAssign) btnAssign.style.display = 'none';
+    if (hwDetailView) hwDetailView.style.display = 'none';
     if (detailView) detailView.style.display = 'block';
 }
 
+function closeAssignmentDetail() {
+    const listContainer = document.getElementById('assignments-container');
+    const detailView = document.getElementById('assignment-detail-view');
+    const btnAssign = document.getElementById('btn-assign');
+
+    if (listContainer) listContainer.style.display = 'flex';
+    if (btnAssign) btnAssign.style.display = 'flex';
+    if (detailView) detailView.style.display = 'none';
+}
+
+function openHomeworkDetail() {
+    const listContainer = document.getElementById('assignments-container');
+    const detailView = document.getElementById('assignment-detail-view');
+    const hwDetailView = document.getElementById('homework-detail-view');
+    const btnAssign = document.getElementById('btn-assign');
+
+    if (listContainer) listContainer.style.display = 'none';
+    if (btnAssign) btnAssign.style.display = 'none';
+    if (detailView) detailView.style.display = 'none';
+    if (hwDetailView) hwDetailView.style.display = 'block';
+}
+
+function closeHomeworkDetail() {
+    const listContainer = document.getElementById('assignments-container');
+    const hwDetailView = document.getElementById('homework-detail-view');
+    const btnAssign = document.getElementById('btn-assign');
+
+    if (listContainer) listContainer.style.display = 'flex';
+    if (btnAssign) btnAssign.style.display = 'flex';
+    if (hwDetailView) hwDetailView.style.display = 'none';
+}
+
 function openTaskDetail(studentName, taskName) {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
     const groupDetailView = document.getElementById('dashboard-group-detail-view');
     const taskDetailView = document.getElementById('dashboard-task-detail-view');
+    const hw1View = document.getElementById('dashboard-hw1-view');
     const studentNameSpan = document.getElementById('task-detail-student-name');
     const taskNameHeading = document.getElementById('task-detail-task-name');
 
+    if (listingView) listingView.style.display = 'none';
+    if (projectView) projectView.style.display = 'none';
     if (groupDetailView) groupDetailView.style.display = 'none';
+    if (hw1View) hw1View.style.display = 'none';
     if (taskDetailView) taskDetailView.style.display = 'block';
 
     if (studentNameSpan) studentNameSpan.innerText = studentName;
@@ -123,11 +163,7 @@ function openTaskDetail(studentName, taskName) {
 }
 
 function goBackToProjectDetail() {
-    const groupDetailView = document.getElementById('dashboard-group-detail-view');
-    const taskDetailView = document.getElementById('dashboard-task-detail-view');
-
-    if (taskDetailView) taskDetailView.style.display = 'none';
-    if (groupDetailView) groupDetailView.style.display = 'block';
+    showGroupDetailView();
 }
 
 function openEditModal(event) {
@@ -255,12 +291,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const groupParam = urlParams.get('group');
     const homeworkParam = urlParams.get('homework');
     const assignmentParam = urlParams.get('assignment');
-    
-    if (window.location.pathname.includes('dashboard.html')) {
+
+    if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('dashboard-class2.html')) {
         if (groupParam) {
             showGroupDetailView(groupParam);
         } else if (homeworkParam === '1') {
             showHomework1View();
+        }
+    } else if (window.location.pathname.includes('classwork-class2.html')) {
+        if (homeworkParam === '1') {
+            openHomeworkDetail();
+        } else if (assignmentParam === '1' || assignmentParam === 'group') {
+            openAssignmentDetail();
         }
     } else if (window.location.pathname.includes('classwork.html')) {
         if (assignmentParam === 'group') {
@@ -408,11 +450,14 @@ function showDashboardProjectView() {
     const listingView = document.getElementById('dashboard-listing-view');
     const projectView = document.getElementById('dashboard-project-view');
     const detailView = document.getElementById('dashboard-group-detail-view');
-    if (!listingView || !projectView) return;
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
+    const hw1View = document.getElementById('dashboard-hw1-view');
 
-    listingView.style.display = 'none';
+    if (listingView) listingView.style.display = 'none';
     if (detailView) detailView.style.display = 'none';
-    projectView.style.display = '';
+    if (taskDetailView) taskDetailView.style.display = 'none';
+    if (hw1View) hw1View.style.display = 'none';
+    if (projectView) projectView.style.display = '';
 
     // Only render group cards once
     if (!dashboardProjectInitialized) {
@@ -425,13 +470,23 @@ function showDashboardListingView() {
     const listingView = document.getElementById('dashboard-listing-view');
     const projectView = document.getElementById('dashboard-project-view');
     const detailView = document.getElementById('dashboard-group-detail-view');
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
     const hw1View = document.getElementById('dashboard-hw1-view');
-    if (!listingView || !projectView) return;
 
     if (detailView) detailView.style.display = 'none';
+    if (projectView) projectView.style.display = 'none';
+    if (taskDetailView) taskDetailView.style.display = 'none';
     if (hw1View) hw1View.style.display = 'none';
-    projectView.style.display = 'none';
-    listingView.style.display = '';
+
+    if (listingView) {
+        listingView.style.display = '';
+    } else if (projectView) {
+        // For Class 2 where Dashboard Listing is skipped
+        projectView.style.display = '';
+        if (typeof showDashboardProjectView === 'function') {
+            showDashboardProjectView();
+        }
+    }
 }
 
 function showHomework1View() {
@@ -452,10 +507,14 @@ function showGroupDetailView(groupName) {
     const listingView = document.getElementById('dashboard-listing-view');
     const projectView = document.getElementById('dashboard-project-view');
     const detailView = document.getElementById('dashboard-group-detail-view');
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
+    const hw1View = document.getElementById('dashboard-hw1-view');
     const titleEl = document.getElementById('detail-group-title');
 
     if (listingView) listingView.style.display = 'none';
     if (projectView) projectView.style.display = 'none';
+    if (taskDetailView) taskDetailView.style.display = 'none';
+    if (hw1View) hw1View.style.display = 'none';
     if (detailView) detailView.style.display = '';
 
     if (titleEl && groupName) {
