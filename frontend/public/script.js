@@ -25,6 +25,14 @@ function closeModal(modalId) {
     }
 }
 
+function openAddTaskModal(studentName) {
+    const studentNameSpan = document.getElementById('add-task-student-name');
+    if (studentNameSpan) {
+        studentNameSpan.innerText = studentName;
+    }
+    openModal('modal-add-task');
+}
+
 function handleCreateClass(event) {
     event.preventDefault();
     const className = document.getElementById('class-name').value;
@@ -76,7 +84,7 @@ function handlePost(event) {
 function toggleGroupWork() {
     const toggle = document.getElementById('group-work-toggle');
     const knob = document.getElementById('group-work-knob');
-    
+
     if (toggle && knob) {
         const isToggled = toggle.getAttribute('data-toggled') === 'true';
         if (isToggled) {
@@ -101,6 +109,27 @@ function openAssignmentDetail() {
     if (detailView) detailView.style.display = 'block';
 }
 
+function openTaskDetail(studentName, taskName) {
+    const groupDetailView = document.getElementById('dashboard-group-detail-view');
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
+    const studentNameSpan = document.getElementById('task-detail-student-name');
+    const taskNameHeading = document.getElementById('task-detail-task-name');
+
+    if (groupDetailView) groupDetailView.style.display = 'none';
+    if (taskDetailView) taskDetailView.style.display = 'block';
+
+    if (studentNameSpan) studentNameSpan.innerText = studentName;
+    if (taskNameHeading) taskNameHeading.innerText = taskName;
+}
+
+function goBackToProjectDetail() {
+    const groupDetailView = document.getElementById('dashboard-group-detail-view');
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
+
+    if (taskDetailView) taskDetailView.style.display = 'none';
+    if (groupDetailView) groupDetailView.style.display = 'block';
+}
+
 function openEditModal(event) {
     if (event) {
         event.stopPropagation();
@@ -111,7 +140,7 @@ function openEditModal(event) {
 function toggleEditGroupWork() {
     const toggle = document.getElementById('edit-group-work-toggle');
     const knob = document.getElementById('edit-group-work-knob');
-    
+
     if (toggle && knob) {
         const isToggled = toggle.getAttribute('data-toggled') === 'true';
         if (isToggled) {
@@ -130,7 +159,7 @@ function updateRubric(prefix, type, delta) {
     const tableBody = document.getElementById('rubric-table-' + prefix);
     const rowsSpan = document.getElementById('rubric-rows-' + prefix);
     const colsSpan = document.getElementById('rubric-cols-' + prefix);
-    
+
     if (!tableBody || !rowsSpan || !colsSpan) return;
 
     let currentRows = parseInt(rowsSpan.innerText);
@@ -139,18 +168,25 @@ function updateRubric(prefix, type, delta) {
     if (type === 'row') {
         const newRows = currentRows + delta;
         if (newRows < 1 || newRows > 10) return; // limit 1-10
-        
+
         if (delta > 0) {
             const tr = document.createElement('tr');
+            const sampleTr = tableBody.querySelector('tr');
+            const sampleTd = sampleTr ? sampleTr.querySelector('td') : null;
+
             for (let i = 0; i < currentCols; i++) {
                 const td = document.createElement('td');
                 td.contentEditable = "true";
-                td.style.border = "1px solid #000";
-                td.style.height = "40px";
-                td.style.padding = "5px";
-                td.style.outline = "none";
-                td.style.fontSize = "14px";
-                td.style.verticalAlign = "top";
+                if (sampleTd) {
+                    td.style.cssText = sampleTd.style.cssText;
+                } else {
+                    td.style.border = "1px solid #000";
+                    td.style.height = "40px";
+                    td.style.padding = "5px";
+                    td.style.outline = "none";
+                    td.style.fontSize = "14px";
+                    td.style.verticalAlign = "top";
+                }
                 tr.appendChild(td);
             }
             tableBody.appendChild(tr);
@@ -165,14 +201,19 @@ function updateRubric(prefix, type, delta) {
         const rows = tableBody.querySelectorAll('tr');
         if (delta > 0) {
             rows.forEach(tr => {
+                const sampleTd = tr.querySelector('td');
                 const td = document.createElement('td');
                 td.contentEditable = "true";
-                td.style.border = "1px solid #000";
-                td.style.height = "40px";
-                td.style.padding = "5px";
-                td.style.outline = "none";
-                td.style.fontSize = "14px";
-                td.style.verticalAlign = "top";
+                if (sampleTd) {
+                    td.style.cssText = sampleTd.style.cssText;
+                } else {
+                    td.style.border = "1px solid #000";
+                    td.style.height = "40px";
+                    td.style.padding = "5px";
+                    td.style.outline = "none";
+                    td.style.fontSize = "14px";
+                    td.style.verticalAlign = "top";
+                }
                 tr.appendChild(td);
             });
         } else {
@@ -197,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle post button color based on input
     const postContentInput = document.getElementById('post-content');
     if (postContentInput) {
-        postContentInput.addEventListener('input', function() {
+        postContentInput.addEventListener('input', function () {
             const btnPost = document.querySelector('#modal-compose .btn-post');
             if (btnPost) {
                 if (this.value.trim().length > 0) {
@@ -207,6 +248,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+    }
+
+    // Check for URL parameters (e.g., dashboard.html?group=Group 1 or classwork.html?assignment=group)
+    const urlParams = new URLSearchParams(window.location.search);
+    const groupParam = urlParams.get('group');
+    const homeworkParam = urlParams.get('homework');
+    const assignmentParam = urlParams.get('assignment');
+    
+    if (window.location.pathname.includes('dashboard.html')) {
+        if (groupParam) {
+            showGroupDetailView(groupParam);
+        } else if (homeworkParam === '1') {
+            showHomework1View();
+        }
+    } else if (window.location.pathname.includes('classwork.html')) {
+        if (assignmentParam === 'group') {
+            openAssignmentDetail();
+        }
     }
 });
 
@@ -230,7 +289,7 @@ function handleInvite(event) {
 
     if (email !== '') {
         const container = document.getElementById('invite-chips-container');
-        
+
         const chip = document.createElement('div');
         chip.style.display = 'flex';
         chip.style.alignItems = 'center';
@@ -239,7 +298,7 @@ function handleInvite(event) {
         chip.style.padding = '4px 10px 4px 4px';
         chip.style.width = 'fit-content';
         chip.style.gap = '8px';
-        
+
         chip.innerHTML = `
             <svg width="24" height="24" viewBox="0 0 45 45" fill="none">
                 <circle cx="22.5" cy="22.5" r="22.5" fill="#666666" />
@@ -249,7 +308,7 @@ function handleInvite(event) {
             <span style="font-size: 13px; color: #111;">${email}</span>
             <span style="font-size: 16px; color: #111; cursor: pointer; line-height: 1; padding-left: 4px;" onclick="this.parentElement.remove()">×</span>
         `;
-        
+
         container.appendChild(chip);
         emailInput.value = '';
     }
@@ -303,7 +362,7 @@ function toggleSelectAll() {
 function updateSelectAllState() {
     const selectAllCheckbox = document.getElementById('checkbox-select-all');
     if (!selectAllCheckbox) return;
-    
+
     const memberCheckboxes = document.querySelectorAll('.member-checkbox');
     if (memberCheckboxes.length === 0) {
         selectAllCheckbox.setAttribute('data-selected', 'false');
@@ -341,3 +400,331 @@ function deleteSelectedMembers() {
     });
     updateSelectAllState();
 }
+
+// ===== Dashboard Group Project =====
+let dashboardProjectInitialized = false;
+
+function showDashboardProjectView() {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
+    const detailView = document.getElementById('dashboard-group-detail-view');
+    if (!listingView || !projectView) return;
+
+    listingView.style.display = 'none';
+    if (detailView) detailView.style.display = 'none';
+    projectView.style.display = '';
+
+    // Only render group cards once
+    if (!dashboardProjectInitialized) {
+        initDashboardGroupProject();
+        dashboardProjectInitialized = true;
+    }
+}
+
+function showDashboardListingView() {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
+    const detailView = document.getElementById('dashboard-group-detail-view');
+    const hw1View = document.getElementById('dashboard-hw1-view');
+    if (!listingView || !projectView) return;
+
+    if (detailView) detailView.style.display = 'none';
+    if (hw1View) hw1View.style.display = 'none';
+    projectView.style.display = 'none';
+    listingView.style.display = '';
+}
+
+function showHomework1View() {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
+    const detailView = document.getElementById('dashboard-group-detail-view');
+    const taskDetailView = document.getElementById('dashboard-task-detail-view');
+    const hw1View = document.getElementById('dashboard-hw1-view');
+
+    if (listingView) listingView.style.display = 'none';
+    if (projectView) projectView.style.display = 'none';
+    if (detailView) detailView.style.display = 'none';
+    if (taskDetailView) taskDetailView.style.display = 'none';
+    if (hw1View) hw1View.style.display = '';
+}
+
+function showGroupDetailView(groupName) {
+    const listingView = document.getElementById('dashboard-listing-view');
+    const projectView = document.getElementById('dashboard-project-view');
+    const detailView = document.getElementById('dashboard-group-detail-view');
+    const titleEl = document.getElementById('detail-group-title');
+
+    if (listingView) listingView.style.display = 'none';
+    if (projectView) projectView.style.display = 'none';
+    if (detailView) detailView.style.display = '';
+
+    if (titleEl && groupName) {
+        titleEl.textContent = 'Group Project - ' + groupName;
+    }
+}
+
+function toggleAddCreateMenu() {
+    const menu = document.getElementById('add-create-menu');
+    if (menu) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function initDashboardGroupProject() {
+    const container = document.getElementById('groups-container');
+    if (!container) return;
+
+    // Group Data
+    const groupsData = [
+        {
+            name: "Group 1",
+            students: [
+                { name: "Student 1", score: 48 },
+                { name: "Student 2", score: 63 },
+                { name: "Student 3", score: 27 }
+            ]
+        },
+        {
+            name: "Group 2",
+            students: [
+                { name: "Student 1", score: 67 },
+                { name: "Student 2", score: 95 },
+                { name: "Student 3", score: 82 }
+            ]
+        }
+    ];
+
+    const circleRadius = 42;
+    const circumference = 2 * Math.PI * circleRadius;
+
+    groupsData.forEach(group => {
+        // Calculate average
+        const sum = group.students.reduce((acc, curr) => acc + curr.score, 0);
+        const average = Math.round(sum / group.students.length);
+        const offset = circumference - (average / 100) * circumference;
+
+        // Build students HTML
+        const studentsHtml = group.students.map(student => `
+            <div class="student-row">
+                <div class="student-name">${student.name}</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div class="student-percent">${student.score}%</div>
+            </div>
+        `).join('');
+
+        // Build Group Card HTML with SVG donut chart
+        const cardHtml = `
+            <div class="group-card">
+                <div class="group-header">${group.name}</div>
+                <div class="group-divider"></div>
+
+                <div class="group-content">
+                    <!-- Left: Circular SVG donut progress -->
+                    <div class="progress-circle-wrapper">
+                        <div class="progress-circle-container">
+                            <svg viewBox="0 0 110 110">
+                                <circle class="progress-track" cx="55" cy="55" r="${circleRadius}"></circle>
+                                <circle class="progress-fill" cx="55" cy="55" r="${circleRadius}"
+                                    stroke-dasharray="${circumference}"
+                                    stroke-dashoffset="${circumference}"
+                                    data-target-offset="${offset}"></circle>
+                            </svg>
+                            <div class="progress-label">${average}%</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: AI Summary -->
+                    <div class="ai-summary-container">
+                        <div class="ai-summary-header">
+                            <img src="../public/assets/Ai-sign.png" alt="AI Icon">
+                            <span class="ai-summary-text-gradient">AI Summary</span>
+                        </div>
+                        <div class="ai-summary-box">
+                            <div class="summary-text">This group are...................................<br>.................</div>
+                            <span class="read-more">read more</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Progress Bars -->
+                <div class="student-list">
+                    ${studentsHtml}
+                </div>
+
+                <div class="btn-more-container">
+                    <button class="btn-more" onclick="showGroupDetailView('${group.name}')">More</button>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML += cardHtml;
+    });
+
+    // Animate progress bars and circles
+    setTimeout(() => {
+        document.querySelectorAll('.progress-bar-fill').forEach((bar, i) => {
+            const allStudents = groupsData.flatMap(g => g.students);
+            if (allStudents[i]) {
+                bar.style.width = allStudents[i].score + '%';
+            }
+        });
+
+        document.querySelectorAll('.progress-fill').forEach(circle => {
+            const targetOffset = circle.getAttribute('data-target-offset');
+            circle.style.strokeDashoffset = targetOffset;
+        });
+    }, 200);
+}
+
+
+/* Extracted Scripts */
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("btn-create-class").addEventListener("click", function (event) {
+        openModal('modal-create-class')
+    });
+
+    document.getElementById("extracted-el-1").addEventListener("click", function (event) {
+        showDashboardProjectView()
+    });
+
+    document.getElementById("extracted-el-2").addEventListener("click", function (event) {
+        showDashboardProjectView()
+    });
+
+    document.getElementById("extracted-el-3").addEventListener("click", function (event) {
+        toggleAddCreateMenu()
+    });
+
+    document.getElementById("extracted-el-4").addEventListener("click", function (event) {
+        this.style.background = '#f0f0f0'
+    });
+
+    document.getElementById("extracted-el-5").addEventListener("click", function (event) {
+        document.getElementById('file-upload-input').click()
+    });
+
+    document.getElementById("extracted-el-6").addEventListener("click", function (event) {
+        closeModal('modal-create-class')
+    });
+
+    document.getElementById("extracted-el-3").addEventListener("mouseover", function (event) {
+        this.style.background = '#e0e0e0'
+    });
+
+    document.getElementById("extracted-el-5").addEventListener("mouseover", function (event) {
+        this.style.background = '#f0f0f0'
+    });
+
+    document.getElementById("extracted-el-3").addEventListener("mouseout", function (event) {
+        this.style.background = 'transparent'
+    });
+
+    document.getElementById("extracted-el-4").addEventListener("mouseout", function (event) {
+        this.style.background = 'white'
+    });
+
+    document.getElementById("extracted-el-5").addEventListener("mouseout", function (event) {
+        this.style.background = 'white'
+    });
+
+    // Back to Group Button in Task Detail
+    const btnBackToGroup = document.getElementById('btn-back-to-group');
+    if (btnBackToGroup) {
+        btnBackToGroup.addEventListener('click', goBackToProjectDetail);
+    }
+
+    // Homework 1 card click
+    const hw1Card = document.getElementById('hw1-card');
+    if (hw1Card) {
+        hw1Card.addEventListener('click', showHomework1View);
+    }
+
+    // Back to listing from Homework 1 view
+    const btnBackToListing = document.getElementById('btn-back-to-listing');
+    if (btnBackToListing) {
+        btnBackToListing.addEventListener('click', showDashboardListingView);
+    }
+
+    // Student row click → populate right-side grading panel
+    // Data for each student row: [element-id-or-null, name, status, grade]
+    const hw1StudentData = [
+        { selector: '#hw1-row-graded-1', name: 'Phinnawat Yaemsanguan', status: 'Graded', grade: '10', showFile: true },
+        { selector: '#hw1-row-graded-2', name: 'Napha Mongkolwittayakul', status: 'Graded', grade: '8', showFile: true }
+    ];
+
+    // Generic click for ALL .hw1-student-row elements
+    document.querySelectorAll('.hw1-student-row').forEach(row => {
+        row.addEventListener('click', function () {
+            // Remove active from all rows
+            document.querySelectorAll('.hw1-student-row').forEach(r => r.classList.remove('active'));
+            this.classList.add('active');
+
+            // Determine name + status from row content
+            const nameEl = this.querySelector('.hw1-student-name');
+            const gradeEl = this.querySelector('.hw1-grade-badge');
+            const name = nameEl ? nameEl.textContent.trim() : 'Student';
+            const gradeText = gradeEl ? gradeEl.textContent.trim() : null;
+
+            // Determine status from the section heading closest ancestor
+            const section = this.closest('.hw1-student-section');
+            const sectionTitleEl = section ? section.querySelector('.hw1-section-title') : null;
+            let status = 'Assigned';
+            if (sectionTitleEl) {
+                const titleText = sectionTitleEl.childNodes[0].textContent.trim();
+                if (titleText.toLowerCase().includes('grade')) status = 'Graded';
+                else if (titleText.toLowerCase().includes('turned')) status = 'Turned in';
+                else status = 'Assigned';
+            }
+
+            // Show side panel
+            const sideEmpty = document.getElementById('hw1-side-empty');
+            const sideDetail = document.getElementById('hw1-side-detail');
+            if (sideEmpty) sideEmpty.style.display = 'none';
+            if (sideDetail) sideDetail.style.display = '';
+
+            // Populate fields
+            const sideName = document.getElementById('hw1-side-name');
+            const sideStatus = document.getElementById('hw1-side-status');
+            const sideWorkStatus = document.getElementById('hw1-side-work-status');
+            const gradeInput = document.getElementById('hw1-grade-input');
+
+            if (sideName) sideName.textContent = name;
+            if (sideStatus) {
+                sideStatus.textContent = status;
+                sideStatus.style.background = status === 'Graded' ? '#e0f7f6' :
+                    status === 'Turned in' ? '#fff3e0' : '#fce4ec';
+                sideStatus.style.color = status === 'Graded' ? '#0a7e8c' :
+                    status === 'Turned in' ? '#e65100' : '#c62828';
+            }
+            if (sideWorkStatus) sideWorkStatus.textContent = status;
+            if (gradeInput) {
+                if (gradeText) {
+                    const num = gradeText.split('/')[0].trim();
+                    gradeInput.value = num;
+                } else {
+                    gradeInput.value = '';
+                }
+            }
+
+            // Update the return button label
+            const returnBtn = document.getElementById('hw1-return-btn');
+            if (returnBtn) {
+                returnBtn.textContent = status === 'Graded' ? 'Unsubmit' : 'Return';
+            }
+        });
+    });
+}); // end DOMContentLoaded
+
+/**
+
+ * Utility to remove the parent of an element (used for chips)
+ * @param {HTMLElement} el 
+ */
+function removeParentElement(el) {
+    if (el && el.parentElement) {
+        el.parentElement.remove();
+    }
+}
+

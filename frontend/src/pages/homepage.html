@@ -58,7 +58,7 @@
                 <section class="stream-content">
                     <div id="posts-container" class="posts-container">
                         <!-- Initial Post 1 -->
-                        <div class="post-card">
+                        <div class="post-card" onclick="window.location.href='classwork.html?assignment=group'" style="cursor: pointer;">
                             <div class="post-icon-wrapper"
                                 style="background: #9ab4c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px;">
                                 <img src="../public/assets/checklist-icon.png" alt="Post Icon"
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                         <!-- Initial Post 2 -->
-                        <div class="post-card">
+                        <div class="post-card" onclick="window.location.href='dashboard.html?homework=1'" style="cursor: pointer;">
                             <div class="post-icon-wrapper"
                                 style="background: #9ab4c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px;">
                                 <img src="../public/assets/checklist-icon.png" alt="Post Icon"
@@ -127,11 +127,16 @@
                 <div class="modal-actions compose-actions">
                     <div class="compose-icons" style="display: flex; gap: 10px;">
                         <input type="file" id="file-upload" style="display: none;">
-                        <button type="button" class="icon-btn tool-btn" onclick="document.getElementById('file-upload').click()" style="background: transparent; border: none; padding: 0; cursor: pointer;">
-                            <img src="../public/assets/UploadSign.png" alt="Upload" style="width: 36px; height: 36px; object-fit: contain;">
+                        <button type="button" class="icon-btn tool-btn"
+                            onclick="document.getElementById('file-upload').click()"
+                            style="background: transparent; border: none; padding: 0; cursor: pointer;">
+                            <img src="../public/assets/UploadSign.png" alt="Upload"
+                                style="width: 36px; height: 36px; object-fit: contain;">
                         </button>
-                        <button type="button" class="icon-btn tool-btn" style="background: transparent; border: none; padding: 0; cursor: pointer;">
-                            <img src="../public/assets/LinkSign.png" alt="Link" style="width: 36px; height: 36px; object-fit: contain;">
+                        <button type="button" class="icon-btn tool-btn"
+                            style="background: transparent; border: none; padding: 0; cursor: pointer;">
+                            <img src="../public/assets/LinkSign.png" alt="Link"
+                                style="width: 36px; height: 36px; object-fit: contain;">
                         </button>
                     </div>
                     <div class="compose-btns">
