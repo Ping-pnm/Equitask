@@ -728,3 +728,22 @@ function removeParentElement(el) {
     }
 }
 
+
+
+/* Extracted from classwork.html */
+document.addEventListener("DOMContentLoaded", function () {
+    const el_cw_extracted_el_1 = document.getElementById("cw-extracted-el-1");
+    if (el_cw_extracted_el_1) {
+        el_cw_extracted_el_1.addEventListener("change", function (event) {
+            if(this.value) { const d = new Date(this.value); document.getElementById('due-display').innerText = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) }
+        });
+    }
+
+    const el_cw_extracted_el_2 = document.getElementById("cw-extracted-el-2");
+    if (el_cw_extracted_el_2) {
+        el_cw_extracted_el_2.addEventListener("change", function (event) {
+            if(this.value) { const d = new Date(this.value); document.getElementById('edit-due-display').innerText = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) }
+        });
+    }
+
+});

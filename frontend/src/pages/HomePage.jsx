@@ -1,10 +1,11 @@
 import React from 'react';
 
 import HeaderBar from '../components/HeaderBar';
-import Sidebar from '../components/Home/Sidebar';
+import Sidebar from '../components/Sidebar';
 import StreamPost from '../components/Home/StreamPost';
-import CreateClassModal from '../components/Home/createClassModal';
+import CreateClassModal from '../components/CreateClassModal';
 import ComposeModal from '../components/Home/composeModal';
+import TabHeader from '../components/TabHeader';
 
 import penIcon from '../assets/pen-icon.png';
 
@@ -23,14 +24,7 @@ export default function HomePage() {
                     {/* Main Content */}
                     <main className="main-content">
                         {/* Tabs Navbar */}
-                        <header className="top-nav">
-                            <nav className="tabs">
-                                <a href="homepage.html" className="tab-item active">Stream</a>
-                                <a href="classwork.html" className="tab-item">Work</a>
-                                <a href="people.html" className="tab-item">People</a>
-                                <a href="dashboard.html" className="tab-item">Dashboard</a>
-                            </nav>
-                        </header>
+                        <TabHeader activeAt='Stream' />
 
                         {/* Stream Content */}
                         <section className="stream-content">

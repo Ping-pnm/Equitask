@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../public/style.css">
+    <link rel="stylesheet" href="../index.css">
 </head>
 
 <body class="homepage-body">
@@ -19,10 +19,10 @@
             <div class="logo-area" style="display: flex; align-items: center; padding: 0;">
                 <div class="logo-icon-wrapper"
                     style="background: transparent; box-shadow: none; width: 65px; height: 65px;">
-                    <img src="../public/assets/logo-primary.png" alt="E Logo" class="side-logo-img"
+                    <img src="../assets/logo-primary.png" alt="E Logo" class="side-logo-img"
                         style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
-                <img src="../public/assets/logo-word.png" alt="Equitask" class="logo-text"
+                <img src="../assets/logo-word.png" alt="Equitask" class="logo-text"
                     style="height: 35px; object-fit: contain; margin-left: 10px;">
             </div>
         </header>
@@ -38,8 +38,7 @@
                     </ul>
                 </div>
 
-                <button id="btn-create-class" class="btn-create-class-sidebar"
-                    onclick="openModal('modal-create-class')">+ Create New Class</button>
+                <button id="btn-create-class" class="btn-create-class-sidebar">+ Create New Class</button>
             </aside>
 
             <!-- Main Content -->
@@ -58,31 +57,31 @@
                 <section class="stream-content" style="overflow-y: auto;">
                     <div id="assignments-container" class="posts-container">
                         <!-- Assignment 1 -->
-                        <div class="assignment-card" onclick="openAssignmentDetail()"
+                        <div class="assignment-card"
                             style="background: #f6f6f6; border-radius: 20px; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; gap: 20px; cursor: pointer;">
                             <div style="display: flex; align-items: center; gap: 15px;">
-                                <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                                <img src="../assets/checklist-icon.png" alt="Checklist"
                                     style="width: 24px; height: 24px; object-fit: contain;">
                                 <div class="post-title" style="font-weight: 700; margin-bottom: 0;">Group Project</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 15px; color: #444; font-size: 15px;">
                                 Due 31 Dec
-                                <img src="../public/assets/editSign.png" alt="Edit" onclick="openEditModal(event)"
+                                <img src="../assets/editSign.png" alt="Edit"
                                     style="width: 22px; height: 22px; object-fit: contain; cursor: pointer;">
                             </div>
                         </div>
 
                         <!-- Assignment 2 -->
-                        <div class="assignment-card" onclick="window.location.href='dashboard.html?homework=1'"
+                        <div class="assignment-card"
                             style="background: #f6f6f6; border-radius: 20px; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; gap: 20px; cursor: pointer;">
                             <div style="display: flex; align-items: center; gap: 15px;">
-                                <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                                <img src="../assets/checklist-icon.png" alt="Checklist"
                                     style="width: 24px; height: 24px; object-fit: contain;">
                                 <div class="post-title" style="font-weight: 700; margin-bottom: 0;">Homework 1</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 15px; color: #444; font-size: 15px;">
                                 Due 20 Nov
-                                <img src="../public/assets/editSign.png" alt="Edit" onclick="openEditModal(event)"
+                                <img src="../assets/editSign.png" alt="Edit"
                                     style="width: 22px; height: 22px; object-fit: contain; cursor: pointer;">
                             </div>
                         </div>
@@ -95,7 +94,7 @@
                         <div
                             style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 25px;">
                             <div style="display: flex; gap: 15px;">
-                                <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                                <img src="../assets/checklist-icon.png" alt="Checklist"
                                     style="width: 32px; height: 32px; object-fit: contain; margin-top: 5px;">
                                 <div>
                                     <h1 style="font-size: 26px; font-weight: 700; color: #222; margin-bottom: 5px;">
@@ -104,7 +103,7 @@
                                 </div>
                             </div>
                             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-                                <img src="../public/assets/editSign.png" alt="Edit" onclick="openEditModal(event)" style="width: 24px; height: 24px; cursor: pointer;">
+                                <img src="../assets/editSign.png" alt="Edit" style="width: 24px; height: 24px; cursor: pointer;">
                                 <div style="font-size: 14px; color: #63778f; font-weight: 600;">100 points</div>
                             </div>
                         </div>
@@ -152,7 +151,7 @@
 
                         <!-- Groups Section -->
                         <div style="display: flex; flex-direction: column; gap: 20px; max-width: 650px;">
-                            <button onclick="openModal('modal-create-group')"
+                            <button
                                 style="background: #a8bccb; color: #222; border: none; padding: 10px 25px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; align-self: flex-start; margin-bottom: 15px;">Create
                                 Group</button>
 
@@ -161,7 +160,7 @@
                                 <!-- Group 1 -->
                                 <div
                                     style="display: flex; align-items: center; justify-content: space-between; gap: 25px;">
-                                    <div class="group-nav-row" onclick="window.location.href='dashboard.html?group=Group 1'"
+                                    <div class="group-nav-row"
                                         style="background: #f6f6f6; border-radius: 20px; display: flex; align-items: center; padding: 12px 25px; flex-grow: 1; cursor: pointer; transition: background 0.2s;">
                                         <div style="font-weight: 700; font-size: 14px; color: #222; width: 120px;">Group 1</div>
                                         <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
@@ -174,13 +173,13 @@
                                             <span style="font-size: 11px; color: #333;">66%</span>
                                         </div>
                                     </div>
-                                    <div onclick="this.parentElement.remove()" style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
+                                    <div style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
                                         Delete</div>
                                 </div>
                                 <!-- Group 2 -->
                                 <div
                                     style="display: flex; align-items: center; justify-content: space-between; gap: 25px;">
-                                    <div class="group-nav-row" onclick="window.location.href='dashboard.html?group=Group 2'"
+                                    <div class="group-nav-row"
                                         style="background: #f6f6f6; border-radius: 20px; display: flex; align-items: center; padding: 12px 25px; flex-grow: 1; cursor: pointer; transition: background 0.2s;">
                                         <div style="font-weight: 700; font-size: 14px; color: #222; width: 120px;">Group 2</div>
                                         <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
@@ -193,13 +192,13 @@
                                             <span style="font-size: 11px; color: #333;">33%</span>
                                         </div>
                                     </div>
-                                    <div onclick="this.parentElement.remove()" style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
+                                    <div style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
                                         Delete</div>
                                 </div>
                                 <!-- Group 3 -->
                                 <div
                                     style="display: flex; align-items: center; justify-content: space-between; gap: 25px;">
-                                    <div class="group-nav-row" onclick="window.location.href='dashboard.html?group=Group 3'"
+                                    <div class="group-nav-row"
                                         style="background: #f6f6f6; border-radius: 20px; display: flex; align-items: center; padding: 12px 25px; flex-grow: 1; cursor: pointer; transition: background 0.2s;">
                                         <div style="font-weight: 700; font-size: 14px; color: #222; width: 120px;">Group 3</div>
                                         <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
@@ -212,7 +211,7 @@
                                             <span style="font-size: 11px; color: #333;">80%</span>
                                         </div>
                                     </div>
-                                    <div onclick="this.parentElement.remove()" style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
+                                    <div style="color: #4bc4de; font-weight: 500; cursor: pointer; font-size: 16px;">
                                         Delete</div>
                                 </div>
                             </div>
@@ -221,7 +220,7 @@
                 </section>
 
                 <!-- Assign Button -->
-                <button id="btn-assign" class="btn-compose" style="gap: 8px;" onclick="openModal('modal-assign')">
+                <button id="btn-assign" class="btn-compose" style="gap: 8px;">
                     <span style="font-size: 32px; font-weight: 400; line-height: 0.5;">+</span> Assign
                 </button>
             </main>
@@ -233,7 +232,7 @@
     <div id="modal-create-class" class="modal-overlay hidden">
         <div class="modal-content">
             <h2>Create class</h2>
-            <form id="form-create-class" onsubmit="handleCreateClass(event)">
+            <form id="form-create-class">
                 <div class="input-group">
                     <input type="text" id="class-name" placeholder="Class name (required)" required>
                 </div>
@@ -244,7 +243,7 @@
                     <input type="text" id="class-subject" placeholder="Subject">
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeModal('modal-create-class')">Cancel</button>
+                    <button type="button" class="btn-cancel">Cancel</button>
                     <button type="submit" class="btn-submit blue-text">Create</button>
                 </div>
             </form>
@@ -259,11 +258,11 @@
             <div
                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 20px;">
                 <div style="display: flex; align-items: center; gap: 10px; color: #3eb5cd;">
-                    <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                    <img src="../assets/checklist-icon.png" alt="Checklist"
                         style="width: 24px; height: 24px; object-fit: contain;">
                     <span style="font-size: 16px; font-weight: 700;">Assignment</span>
                 </div>
-                <button type="button" onclick="closeModal('modal-assign')"
+                <button type="button"
                     style="background: transparent; border: none; font-size: 24px; cursor: pointer; font-weight: 600; color: #333;">&times;</button>
             </div>
 
@@ -280,15 +279,15 @@
                         Rubrics
                         <div style="display: flex; align-items: center; gap: 8px; color: #000;">
                             Rows: 
-                            <svg onclick="updateRubric('assign', 'row', -1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                             <span id="rubric-rows-assign">3</span>
-                            <svg onclick="updateRubric('assign', 'row', 1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; color: #000;">
                             Columns: 
-                            <svg onclick="updateRubric('assign', 'col', -1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                             <span id="rubric-cols-assign">3</span>
-                            <svg onclick="updateRubric('assign', 'col', 1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                         </div>
                     </div>
                     <!-- Table -->
@@ -345,7 +344,7 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     Group work
-                    <div id="group-work-toggle" onclick="toggleGroupWork()"
+                    <div id="group-work-toggle"
                         style="width: 36px; height: 20px; background: #999; border-radius: 10px; display: flex; align-items: center; padding: 2px; cursor: pointer; transition: background 0.3s;"
                         data-toggled="false">
                         <div id="group-work-knob"
@@ -360,17 +359,17 @@
                 <div style="display: flex; gap: 10px;">
                     <button type="button"
                         style="background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        <img src="../public/assets/UploadSign.png" alt="Upload"
+                        <img src="../assets/UploadSign.png" alt="Upload"
                             style="width: 36px; height: 36px; object-fit: contain;">
                     </button>
                     <button type="button"
                         style="background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        <img src="../public/assets/LinkSign.png" alt="Link"
+                        <img src="../assets/LinkSign.png" alt="Link"
                             style="width: 36px; height: 36px; object-fit: contain;">
                     </button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 20px;">
-                    <button type="button" class="btn-cancel" onclick="closeModal('modal-assign')"
+                    <button type="button" class="btn-cancel"
                         style="font-weight: 600; color: #333; padding: 0; margin-right: 10px;">Cancle</button>
                     <button type="button"
                         style="background: #3eb5cd; color: white; border: none; padding: 0 24px; height: 36px; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; font-family: inherit;">Assign</button>
@@ -387,11 +386,11 @@
             <div
                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 20px;">
                 <div style="display: flex; align-items: center; gap: 10px; color: #3eb5cd;">
-                    <img src="../public/assets/checklist-icon.png" alt="Checklist"
+                    <img src="../assets/checklist-icon.png" alt="Checklist"
                         style="width: 24px; height: 24px; object-fit: contain;">
                     <span style="font-size: 16px; font-weight: 700;">Assignment</span>
                 </div>
-                <button type="button" onclick="closeModal('modal-edit-assignment')"
+                <button type="button"
                     style="background: transparent; border: none; font-size: 24px; cursor: pointer; font-weight: 600; color: #333;">&times;</button>
             </div>
 
@@ -415,15 +414,15 @@ For the project proposal, prepare your topic and answer these questions.
                         Rubrics
                         <div style="display: flex; align-items: center; gap: 8px; color: #000;">
                             Rows: 
-                            <svg onclick="updateRubric('edit', 'row', -1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                             <span id="rubric-rows-edit">3</span>
-                            <svg onclick="updateRubric('edit', 'row', 1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; color: #000;">
                             Columns: 
-                            <svg onclick="updateRubric('edit', 'col', -1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                             <span id="rubric-cols-edit">3</span>
-                            <svg onclick="updateRubric('edit', 'col', 1)" width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2" style="cursor: pointer;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                         </div>
                     </div>
                     <!-- Table -->
@@ -479,7 +478,7 @@ For the project proposal, prepare your topic and answer these questions.
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     Group work
-                    <div id="edit-group-work-toggle" onclick="toggleEditGroupWork()"
+                    <div id="edit-group-work-toggle"
                         style="width: 36px; height: 20px; background: #999; border-radius: 10px; display: flex; align-items: center; padding: 2px; cursor: pointer; transition: background 0.3s;"
                         data-toggled="false">
                         <div id="edit-group-work-knob"
@@ -494,17 +493,17 @@ For the project proposal, prepare your topic and answer these questions.
                 <div style="display: flex; gap: 10px;">
                     <button type="button"
                         style="background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        <img src="../public/assets/UploadSign.png" alt="Upload"
+                        <img src="../assets/UploadSign.png" alt="Upload"
                             style="width: 36px; height: 36px; object-fit: contain;">
                     </button>
                     <button type="button"
                         style="background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        <img src="../public/assets/LinkSign.png" alt="Link"
+                        <img src="../assets/LinkSign.png" alt="Link"
                             style="width: 36px; height: 36px; object-fit: contain;">
                     </button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 20px;">
-                    <button type="button" class="btn-cancel" onclick="closeModal('modal-edit-assignment')"
+                    <button type="button" class="btn-cancel"
                         style="font-weight: 600; color: #333; padding: 0; margin-right: 10px;">Cancel</button>
                     <button type="button"
                         style="background: #3eb5cd; color: white; border: none; padding: 0 24px; height: 36px; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; font-family: inherit;">Update</button>
@@ -521,7 +520,7 @@ For the project proposal, prepare your topic and answer these questions.
             <div
                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 15px; margin-bottom: 20px;">
                 <h2 style="font-size: 22px; font-weight: 700; color: #3eb5cd; margin: 0;">Create Group</h2>
-                <button type="button" onclick="closeModal('modal-create-group')"
+                <button type="button"
                     style="background: transparent; border: none; font-size: 24px; cursor: pointer; font-weight: 600; color: #333;">&times;</button>
             </div>
 
@@ -563,7 +562,7 @@ For the project proposal, prepare your topic and answer these questions.
                             </svg>
                         </div>
                         <span style="font-size: 14px; font-weight: 500; color: #222;">6622780268@g.siit.tu.ac.th</span>
-                        <span onclick="this.parentElement.remove()" style="font-weight: 600; cursor: pointer; color: #222; margin-left: 5px; font-size: 16px;">&times;</span>
+                        <span style="font-weight: 600; cursor: pointer; color: #222; margin-left: 5px; font-size: 16px;">&times;</span>
                     </div>
                 </div>
             </div>
