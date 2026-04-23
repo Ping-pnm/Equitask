@@ -33,10 +33,10 @@ export default function Classwork() {
                         <section className="stream-content stream-content-scrollable">
                             <div id="assignments-container" className="posts-container">
                                 {/* Assignment 1 */}
-                                <WorkPost />
+                                <WorkPost title='Group Project' date='31 DEC' />
 
                                 {/* Assignment 2 */}
-                                <WorkPost />
+                                <WorkPost title='Homework1' date='21 SEP' />
                             </div>
 
                             {/* Assignment Detail View */}
