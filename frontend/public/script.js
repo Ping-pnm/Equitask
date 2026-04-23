@@ -66,7 +66,7 @@ function handlePost(event) {
         newCard.className = 'post-card';
         newCard.innerHTML = `
             <div class="post-icon-wrapper" style="background: #9ab4c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px;">
-                <img src="../public/assets/checklist-icon.png" alt="Post Icon" style="width: 24px; height: 24px; object-fit: contain;">
+                <img src="../assets/checklist-icon.png" alt="Post Icon" style="width: 24px; height: 24px; object-fit: contain;">
             </div>
             <div class="post-info">
                 <div class="post-title">Sasiporn Usanavasin posted a new material: ${postContent}</div>
@@ -538,7 +538,7 @@ function initDashboardGroupProject() {
                     <!-- Right: AI Summary -->
                     <div class="ai-summary-container">
                         <div class="ai-summary-header">
-                            <img src="../public/assets/Ai-sign.png" alt="AI Icon">
+                            <img src="../assets/Ai-sign.png" alt="AI Icon">
                             <span class="ai-summary-text-gradient">AI Summary</span>
                         </div>
                         <div class="ai-summary-box">

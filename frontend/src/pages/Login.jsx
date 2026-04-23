@@ -1,4 +1,4 @@
-import FormInput from '../components/FormInput';
+import FormInput from '../components/LoginRegister/FormInput';
 import logoImg from '../assets/logo-primary.png';
 
 export default function Login() {

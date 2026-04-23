@@ -1,5 +1,5 @@
 import logoImg from '../assets/logo-primary.png';
-import FormInput from '../components/FormInput';
+import FormInput from '../components/LoginRegister/FormInput';
 
 
 export default function Register() {
