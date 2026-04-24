@@ -1,9 +1,8 @@
-import React from 'react';
+import { useState } from 'react';
 
 import HeaderBar from '../components/HeaderBar';
 import Sidebar from '../components/Sidebar';
 import StreamPost from '../components/Home/StreamPost';
-import CreateClassModal from '../components/CreateClassModal';
 import ComposeModal from '../components/Home/composeModal';
 import TabHeader from '../components/TabHeader';
 
@@ -11,6 +10,8 @@ import penIcon from '../assets/pen-icon.png';
 
 
 export default function HomePage() {
+    const [isCompose, setCompose] = useState(false)
+
     return (
         <div className="homepage-body">
             <div className="layout-container">
@@ -37,20 +38,14 @@ export default function HomePage() {
                         </section>
 
                         {/* Compose Button */}
-                        <button id="btn-compose" className="btn-compose" onClick="openModal('modal-compose')">
+                        <button id="btn-compose" className="btn-compose" onClick={() => setCompose(true)}>
                             <img src={penIcon} alt="Compose" className="pencil-icon" /> Compose
                         </button>
                     </main>
                 </div>
             </div>
-
-            {/* Modals */}
-            {/* Create Class Modal */}
-            <CreateClassModal />
-
-            {/* Compose Modal */}
-            <ComposeModal />
-
+            {isCompose && <ComposeModal onClose={() => setCompose(false)} />}
         </div>
+
     );
 }
