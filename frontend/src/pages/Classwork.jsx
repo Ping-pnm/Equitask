@@ -8,7 +8,7 @@ import CreateGroupModal from "../components/Work/CreateGroupModal";
 import Sidebar from "../components/Sidebar";
 
 
-import WorkPost from "../components/Work/WorkPost"
+import WorkPost from "../components/WorkPost"
 
 
 

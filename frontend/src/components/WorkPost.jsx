@@ -1,5 +1,5 @@
-import checkListIcon from '../../assets/checklist-icon.png'
-import editIcon from '../../assets/editSign.png'
+import checkListIcon from '../assets/checklist-icon.png'
+import editIcon from '../assets/editSign.png'
 
 export default function WorkPost({ title, date }) {
     return (
