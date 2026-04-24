@@ -3,11 +3,11 @@ import logoImg from '../assets/logo-primary.png';
 
 export default function Login() {
     return(
-        <div class="login-card">
+        <div className="login-card">
             {/* Logo */}
-            <div class="logo-wrapper">
-                <div class="logo-glow"></div>
-                <img src={logoImg} alt="Equitask Logo" id="logo-image" class="logo-image" />
+            <div className="logo-wrapper">
+                <div className="logo-glow"></div>
+                <img src={logoImg} alt="Equitask Logo" id="logo-image" className="logo-image" />
             </div>
 
             {/* Form */}
@@ -28,9 +28,9 @@ export default function Login() {
                 />
 
                 {/* Button */}
-                <div class="buttons-container">
-                    <a href="register.html" class="btn btn-register" id="register-btn">Register</a>
-                    <button type="submit" class="btn btn-login" id="login-btn">Login</button>
+                <div className="buttons-container">
+                    <a href="register.html" className="btn btn-register" id="register-btn">Register</a>
+                    <button type="submit" className="btn btn-login" id="login-btn">Login</button>
                 </div>
             </form>
         </div>

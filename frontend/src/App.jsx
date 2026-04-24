@@ -4,11 +4,12 @@ import Register from './pages/Register.jsx';
 import Login from './pages/Login.jsx';
 import HomePage from './pages/homepage.jsx';
 import Classwork from './pages/Classwork.jsx';
+import People from './pages/People.jsx';
 
 export default function App() {
     return (
         <>
-            <Classwork />
+            <People />
         </>
     );
 };

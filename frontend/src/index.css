@@ -2768,3 +2768,29 @@ body.homepage-body {
     flex-direction: column;
     background: #dfe3f0;
 }
+
+
+/* ===== Refactored Styles from People.jsx ===== */
+.people-content-area { padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; overflow-y: auto; }
+.people-section-spacing { margin-bottom: 40px; }
+.people-section-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #56c4df; padding-bottom: 5px; margin-bottom: 20px; }
+.people-section-title { color: #56c4df; font-size: 32px; font-weight: 700; margin: 0; }
+.add-user-icon { margin-bottom: 5px; cursor: pointer; }
+.people-list-container { display: flex; flex-direction: column; gap: 15px; }
+.person-row-content { display: flex; align-items: center; gap: 20px; }
+.person-name { font-size: 20px; font-weight: 700; color: #222; }
+.people-section-header-sm { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #56c4df; padding-bottom: 5px; margin-bottom: 15px; }
+.members-action-bar { display: flex; align-items: center; gap: 25px; margin-bottom: 25px; padding-left: 2px; }
+.members-action-btn { display: flex; align-items: center; gap: 8px; color: #56c4df; font-weight: 700; cursor: pointer; font-size: 15px; }
+.custom-checkbox-box { width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+.people-list-container-lg { display: flex; flex-direction: column; gap: 25px; }
+.custom-checkbox-box-interactive { width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.invite-modal-container { max-width: 500px; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.invite-modal-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #56c4df; padding-bottom: 15px; margin-bottom: 25px; }
+.invite-modal-heading { color: #56c4df; font-size: 24px; font-weight: 700; margin: 0; }
+.cursor-pointer-icon { cursor: pointer; }
+.invite-chips-area { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.invite-form-container { display: flex; align-items: flex-end; gap: 15px; }
+.invite-input-line { flex-grow: 1; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+.invite-email-input { width: 100%; border: none; outline: none; font-size: 15px; color: #333; background: transparent; padding: 5px 0; }
+.invite-submit-btn { background: none; border: none; color: #56c4df; font-size: 16px; font-weight: 700; cursor: pointer; padding-bottom: 10px; }

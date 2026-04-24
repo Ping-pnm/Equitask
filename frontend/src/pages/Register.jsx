@@ -4,7 +4,7 @@ import FormInput from '../components/LoginRegister/FormInput';
 
 export default function Register() {
     return(
-        <div class="register-page">
+        <div className="register-page">
             {/* Logo */}
             <div className="logo-wrapper">
                 <div className="logo-glow"></div>
