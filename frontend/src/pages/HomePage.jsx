@@ -13,39 +13,23 @@ export default function HomePage() {
     const [isCompose, setCompose] = useState(false)
 
     return (
-        <div className="homepage-body">
-            <div className="layout-container">
-                <HeaderBar />
-
-                {/* Bottom layer: Sidebar + Main */}
-                <div className="content-wrapper">
-                    {/* Sidebar */}
-                    <Sidebar />
-
-                    {/* Main Content */}
-                    <main className="main-content">
-                        {/* Tabs Navbar */}
-                        <TabHeader activeAt='Stream' />
-
-                        {/* Stream Content */}
-                        <section className="stream-content">
-                            <div id="posts-container" className="posts-container">
-                                {/* Initial Post 1 */}
-                                <StreamPost title='Group Project' author="Sasiporn Usanavasin" date='31 DEC' onClick />
-                                {/* Initial Post 2 */}
-                                <StreamPost title='Homework1' author="Sasiporn Usanavasin" date='20 DEC' />
-                            </div>
-                        </section>
-
-                        {/* Compose Button */}
-                        <button id="btn-compose" className="btn-compose" onClick={() => setCompose(true)}>
-                            <img src={penIcon} alt="Compose" className="pencil-icon" /> Compose
-                        </button>
-                    </main>
+        <>
+            {/* Stream Content */}
+            < section className="stream-content" >
+                <div id="posts-container" className="posts-container">
+                    {/* Initial Post 1 */}
+                    <StreamPost title='Group Project' author="Sasiporn Usanavasin" date='31 DEC' onClick />
+                    {/* Initial Post 2 */}
+                    <StreamPost title='Homework1' author="Sasiporn Usanavasin" date='20 DEC' />
                 </div>
-            </div>
-            {isCompose && <ComposeModal onClose={() => setCompose(false)} />}
-        </div>
+            </section >
+
+            {/* Compose Button */}
+            < button id="btn-compose" className="btn-compose" onClick={() => setCompose(true)
+            }>
+                <img src={penIcon} alt="Compose" className="pencil-icon" /> Compose
+            </button >
+        </>
 
     );
 }

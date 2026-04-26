@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react';
 
 import FormInput from '../components/LoginRegister/FormInput';
 import logoImg from '../assets/logo-primary.png';
@@ -15,7 +16,7 @@ export default function Login() {
     }
 
     async function handleSubmit(e) {
-        e.preventDafault();
+        e.preventDefault();
 
         try {
             const response = await fetch('http://localhost:3000/auth/login', {

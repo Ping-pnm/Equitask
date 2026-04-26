@@ -9,60 +9,36 @@ import InviteModal from "../components/People/InviteModal";
 
 export default function People() {
     return (
+        <section className="people-content-area people-content">
 
-        <body className="homepage-body">
-            <div className="layout-container">
-                {/**/}
-                <HeaderBar />
-                {/**/}
-                <div className="content-wrapper">
-                    {/**/}
-                    <Sidebar />
-
-                    {/**/}
-                    <main className="main-content">
-                        {/**/}
-                        <TabHeader activeAt='People' />
-
-                        {/**/}
-                        <section className="people-content-area people-content">
-
-                            {/**/}
-                            <div className="people-section-spacing people-section">
-                                <RoleHeader role='Leaders' />
-                                <div className="person-row-content person-row">
-                                    <PeopleRow name='Sasiporn' />
-                                </div>
-
-                            </div>
-
-                            {/**/}
-                            <div className="people-section">
-                                <RoleHeader role='Members' />
-
-                                <div className="members-action-bar members-actions">
-                                    <SelectDelete />
-                                </div>
-
-                                <div className="people-list-container-lg people-list">
-                                    {/**/}
-                                    <PeopleRow name='Phinnawat' isLeader />
-
-                                    {/**/}
-                                    <PeopleRow name='Phinnawat' isLeader />
-
-                                    {/**/}
-                                    <PeopleRow name='Phinnawat' isLeader />
-                                </div>
-                            </div>
-                        </section>
-                    </main>
+            {/**/}
+            <div className="people-section-spacing people-section">
+                <RoleHeader role='Leaders' />
+                <div className="person-row-content person-row">
+                    <PeopleRow name='Sasiporn' />
                 </div>
+
             </div>
 
-            {/* Invite Modal*/}
-            <InviteModal />
+            {/**/}
+            <div className="people-section">
+                <RoleHeader role='Members' />
 
-        </body>
+                <div className="members-action-bar members-actions">
+                    <SelectDelete />
+                </div>
+
+                <div className="people-list-container-lg people-list">
+                    {/**/}
+                    <PeopleRow name='Phinnawat' isLeader />
+
+                    {/**/}
+                    <PeopleRow name='Phinnawat' isLeader />
+
+                    {/**/}
+                    <PeopleRow name='Phinnawat' isLeader />
+                </div>
+            </div>
+        </section>
     );
 }

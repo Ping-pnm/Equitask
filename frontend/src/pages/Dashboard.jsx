@@ -14,53 +14,26 @@ import checkListIcon from '../assets/checklist-icon.png'
 
 export default function Dashboard() {
     return (
-        <div className="homepage-body">
-            <div className="layout-container extracted-style-1">
-                <HeaderBar />
+        < section id="dashboard-listing-view" className="stream-content" >
+            <div id="assignments-container" className="posts-container">
+                {/* Assignment 1: Group Project (clickable) */}
+                <WorkPost title='Group Project' date='31 DEC' />
 
-                {/* Bottom layer: Sidebar + Main */}
-                <div className="content-wrapper extracted-style-7">
-                    {/* Sidebar */}
-                    <Sidebar />
-
-                    {/* Main Content */}
-                    <main className="main-content">
-                        <TabHeader activeAt='Dashboard' />
-
-                        {/* VIEW 1: Assignment Listing */}
-                        <section id="dashboard-listing-view" className="stream-content">
-                            <div id="assignments-container" className="posts-container">
-                                {/* Assignment 1: Group Project (clickable) */}
-                                <WorkPost title='Group Project' date='31 DEC' />
-
-                                {/* Assignment 2: Homework 1 (clickable) */}
-                                <WorkPost title='Homework 1' date='20 NOV' />
-                            </div>
-                        </section>
-
-                        {/* VIEW 2: Group Project Detail (hidden by default) */}
-                        <ProjectOverview title='Group Project' />
-
-                        {/* VIEW 3: Specific Group detail (hidden by default) */}
-                        <GroupProjectDetail />
-
-                        {/* VIEW 4: Task detail (hidden by default) */}
-                        <TaskDetail />
-
-                        {/* VIEW 5: Homework 1 Detail (hidden by default) */}
-                        <Assignment />
-
-                    </main>
-                </div>
+                {/* Assignment 2: Homework 1 (clickable) */}
+                <WorkPost title='Homework 1' date='20 NOV' />
             </div>
+        </section >
 
-            {/* Modals */}
+        // {/* VIEW 2: Group Project Detail (hidden by default) */}
+        // <ProjectOverview title='Group Project' />
 
+        // {/* VIEW 3: Specific Group detail (hidden by default) */}
+        // <GroupProjectDetail />
 
-            <EditGroupModal />
+        // {/* VIEW 4: Task detail (hidden by default) */}
+        // <TaskDetail />
 
-            {/* Add Task Modal */}
-            <AddTaskModal />
-        </div>
+        // {/* VIEW 5: Homework 1 Detail (hidden by default) */}
+        // <Assignment />
     );
 }
