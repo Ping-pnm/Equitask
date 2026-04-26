@@ -1,5 +1,3 @@
-
-
-export default function ClassButton({ isActive, children }) {
-    return <li><a href="#" className={"class-item " + (isActive ? "active" : "")}>{children}</a></li>;
+export default function ClassButton({ onClick, isActive, children }) {
+    return <li><a href="#" onClick={onClick} className={"class-item " + (isActive ? "active" : "")}>{children}</a></li>;
 }

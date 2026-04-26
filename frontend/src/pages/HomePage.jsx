@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getAllClasses } from '../services/classService';
+import { useAuth } from '../components/AuthContext';
 
-import HeaderBar from '../components/HeaderBar';
-import Sidebar from '../components/Sidebar';
 import StreamPost from '../components/Home/StreamPost';
 import ComposeModal from '../components/Home/composeModal';
-import TabHeader from '../components/TabHeader';
 
 import penIcon from '../assets/pen-icon.png';
 
 
 export default function HomePage() {
+    const { userId } = useAuth();
     const [isCompose, setCompose] = useState(false)
 
     return (
