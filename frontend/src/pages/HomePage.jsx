@@ -31,7 +31,7 @@ export default function HomePage() {
                         <section className="stream-content">
                             <div id="posts-container" className="posts-container">
                                 {/* Initial Post 1 */}
-                                <StreamPost title='Group Project' author="Sasiporn Usanavasin" date='31 DEC' />
+                                <StreamPost title='Group Project' author="Sasiporn Usanavasin" date='31 DEC' onClick />
                                 {/* Initial Post 2 */}
                                 <StreamPost title='Homework1' author="Sasiporn Usanavasin" date='20 DEC' />
                             </div>

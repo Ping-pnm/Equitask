@@ -39,8 +39,6 @@ export default function Classwork() {
                                 <WorkPost title='Homework1' date='21 SEP' />
                             </div>
 
-                            {/* Assignment Detail View */}
-                            <AssingmentDetail />
                         </section>
 
                         {/* Assign Button */}
@@ -50,19 +48,6 @@ export default function Classwork() {
                     </main>
                 </div>
             </div>
-
-            {/* Modals */}
-            {/* Create Class Modal */}
-            <CreateClassModal />
-
-            {/* Assign Modal */}
-            <AssignModal />
-
-            {/* Edit Assignment Modal */}
-            <EditAssignmentModal />
-
-            {/* Create Group Modal */}
-            <CreateGroupModal />
         </div>
     )
 }

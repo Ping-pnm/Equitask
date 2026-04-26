@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logoImg from '../assets/logo-primary.png';
 import FormInput from '../components/LoginRegister/FormInput';
 
 
 export default function Register() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -12,11 +14,11 @@ export default function Register() {
         confirmPassword: ''
     });
 
-    const handleChange = (id, value) => {
+    function handleChange(id, value) {
         setFormData(prev => ({ ...prev, [id]: value }));
-    };
+    }
 
-    const handleSubmit = async (e) => {
+    async function handleSubmit(e) {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
@@ -32,7 +34,8 @@ export default function Register() {
                     firstName: formData.firstName,
                     lastName: formData.lastName,
                     email: formData.email,
-                    password: formData.password
+                    password: formData.password,
+                    confirmPassword: formData.confirmPassword
                 })
             });
 
@@ -40,7 +43,7 @@ export default function Register() {
 
             if (response.ok) {
                 alert("Registration successful!");
-                //window.loaction.href = 'auth/login';
+                navigate('/login');
             } else {
                 alert(data.message || "Registration failed");
             }
@@ -48,7 +51,7 @@ export default function Register() {
             console.error("Error:", error);
             alert("An error occurred. Check if the server is running.");
         }
-    };
+    }
 
     return (
         <div className="register-page">
