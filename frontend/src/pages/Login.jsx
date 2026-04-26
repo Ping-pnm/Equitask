@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '../components/AuthContext';
 
 import FormInput from '../components/LoginRegister/FormInput';
+import MessageModal from '../components/MessageModal';
 import logoImg from '../assets/logo-primary.png';
 
 export default function Login() {
@@ -12,6 +13,7 @@ export default function Login() {
         email: '',
         password: '',
     });
+    const [modalConfig, setModalConfig] = useState({ show: false, message: '', theme: 'red' });
 
     function handleChange(id, value) {
         setLoginFormData(prev => ({ ...prev, [id]: value }));
@@ -33,54 +35,67 @@ export default function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                alert("Login successful!");
+                setModalConfig({ show: true, message: 'Login Successful!', theme: 'green' });
                 login(data.user.id);
-                navigate('/');
+                // Wait a moment so the user sees the success message before redirecting
+                setTimeout(() => navigate('/'), 1500);
             } else {
-                alert(data.message || "Login failed");
+                setModalConfig({ show: true, message: data.message || 'Login Failed', theme: 'red' });
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred. Check if the server is running.");
+            setModalConfig({ show: true, message: 'An error occurred. Check if the server is running', theme: 'red' });
         }
     }
 
     return (
-        <div className="login-card">
-            {/* Logo */}
-            <div className="logo-wrapper">
-                <div className="logo-glow"></div>
-                <img src={logoImg} alt="Equitask Logo" className="logo-image" />
+        <>
+            <div className="login-card">
+                {/* ... existing card content ... */}
+                {/* Logo */}
+                <div className="logo-wrapper">
+                    <div className="logo-glow"></div>
+                    <img src={logoImg} alt="Equitask Logo" className="logo-image" />
+                </div>
+
+                {/* Form */}
+                <form id="login-form" onSubmit={handleSubmit}>
+                    <FormInput
+                        type="email"
+                        id="email-input"
+                        placeholder="Your email......."
+                        autoComplete="email"
+                        value={loginformData.email}
+                        onChange={(e) => handleChange("email", e.target.value)}
+                    />
+
+
+                    <FormInput
+                        type="password"
+                        id="password-input"
+                        placeholder="Password......."
+                        autoComplete="current-password"
+                        value={loginformData.password}
+                        onChange={(e) => handleChange("password", e.target.value)}
+                    />
+
+                    {/* Button */}
+                    <div className="buttons-container">
+                        <Link to="/register" className="btn btn-register" id="register-btn">Register</Link>
+                        <button type="submit" className="btn btn-login" id="login-btn">Login</button>
+                    </div>
+                </form>
             </div>
 
-            {/* Form */}
-            <form id="login-form" onSubmit={handleSubmit}>
-                <FormInput
-                    type="email"
-                    id="email-input"
-                    placeholder="Your email......."
-                    autoComplete="email"
-                    value={loginformData.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                />
-
-
-                <FormInput
-                    type="password"
-                    id="password-input"
-                    placeholder="Password......."
-                    autoComplete="current-password"
-                    value={loginformData.password}
-                    onChange={(e) => handleChange("password", e.target.value)}
-                />
-
-                {/* Button */}
-                <div className="buttons-container">
-                    <Link to="/register" className="btn btn-register" id="register-btn">Register</Link>
-                    <button type="submit" className="btn btn-login" id="login-btn">Login</button>
-                </div>
-            </form>
-        </div>
-    )
+            {modalConfig.show && (
+                <MessageModal 
+                    theme={modalConfig.theme} 
+                    onClose={() => setModalConfig({ ...modalConfig, show: false })}
+                >
+                    {modalConfig.message}
+                </MessageModal>
+            )}
+        </>
+    );
 }
 

@@ -2795,3 +2795,90 @@ body.homepage-body {
 .invite-input-line { flex-grow: 1; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
 .invite-email-input { width: 100%; border: none; outline: none; font-size: 15px; color: #333; background: transparent; padding: 5px 0; }
 .invite-submit-btn { background: none; border: none; color: #56c4df; font-size: 16px; font-weight: 700; cursor: pointer; padding-bottom: 10px; }
+
+/* ===== Message Toast (Success/Error) ===== */
+.modal-overlay.top-aligned {
+    background: transparent;
+    pointer-events: none; /* Allows clicking through to the page */
+    align-items: flex-start;
+    padding-top: 30px;
+    z-index: 10000;
+}
+
+.message-modal-card {
+    pointer-events: auto; /* Makes the notification itself clickable */
+    background: #e4e8f4;
+    padding: 15px 30px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 10px 10px 30px #bebebe, -10px -10px 30px #ffffff;
+    animation: modalSlideDown 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.message-modal-card.success {
+    border-left: 6px solid #4CAF50;
+}
+
+.message-modal-card.error {
+    border-left: 6px solid #ff4d4d;
+}
+
+.modal-icon-circle {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff;
+}
+
+.success .modal-icon-circle {
+    color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.error .modal-icon-circle {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+}
+
+.modal-message-content {
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    flex-grow: 1;
+    text-align: left;
+}
+
+.modal-close-btn {
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: none;
+    background: #e4e8f4;
+    box-shadow: 4px 4px 8px #bebebe, -4px -4px 8px #ffffff;
+    color: #888;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.modal-close-btn:hover {
+    color: #333;
+}
+
+@keyframes modalSlideDown {
+    from { transform: translateY(-100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

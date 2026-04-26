@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoImg from '../assets/logo-primary.png';
 import FormInput from '../components/LoginRegister/FormInput';
+import MessageModal from '../components/MessageModal';
 
 
 export default function Register() {
@@ -14,6 +15,8 @@ export default function Register() {
         confirmPassword: ''
     });
 
+    const [modalConfig, setModalConfig] = useState({ show: false, message: '', theme: 'red' });
+
     function handleChange(id, value) {
         setFormData(prev => ({ ...prev, [id]: value }));
     }
@@ -22,7 +25,7 @@ export default function Register() {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match!");
+            setModalConfig({ show: true, message: 'Passwords do not match!', theme: 'red' });
             return;
         }
 
@@ -42,74 +45,85 @@ export default function Register() {
             const data = await response.json();
 
             if (response.ok) {
-                alert("Registration successful!");
-                navigate('/login');
+                setModalConfig({ show: true, message: 'Registration Successful!', theme: 'green' });
+                setTimeout(() => navigate('/login'), 1500);
             } else {
-                alert(data.message || "Registration failed");
+                setModalConfig({ show: true, message: data.message || 'Registration Failed', theme: 'red' });
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred. Check if the server is running.");
+            setModalConfig({ show: true, message: 'An error occurred. Check if the server is running', theme: 'red' });
         }
     }
 
     return (
-        <div className="register-page">
-            <div className="logo-wrapper">
-                <div className="logo-glow"></div>
-                <img src={logoImg} alt="Equitask Logo" id="logo-image" className="logo-image" />
+        <>
+            <div className="register-page">
+                <div className="logo-wrapper">
+                    <div className="logo-glow"></div>
+                    <img src={logoImg} alt="Equitask Logo" id="logo-image" className="logo-image" />
+                </div>
+
+                <div className="register-card">
+                    <h1 className="register-title" id="register-title">Please Enter Your Personal Information</h1>
+
+                    <form id="register-form" onSubmit={handleSubmit}>
+                        <FormInput
+                            id='first-name' labelClass='register-label'
+                            label='First Name' type='text'
+                            placeholder='Enter your first name'
+                            value={formData.firstName}
+                            onChange={(e) => handleChange('firstName', e.target.value)}
+                        />
+
+                        <FormInput
+                            id='last-name' labelClass='register-label'
+                            label='Last Name' type='text'
+                            placeholder='Enter your last name'
+                            value={formData.lastName}
+                            onChange={(e) => handleChange('lastName', e.target.value)}
+                        />
+
+                        <FormInput
+                            id='email-input' labelClass='register-label'
+                            label='Email' type='email'
+                            placeholder='Enter your email'
+                            value={formData.email}
+                            onChange={(e) => handleChange('email', e.target.value)}
+                        />
+
+                        <FormInput
+                            id='password-input' labelClass='register-label'
+                            label='Password' type='password'
+                            placeholder='Enter your password'
+                            value={formData.password}
+                            onChange={(e) => handleChange('password', e.target.value)}
+                        />
+
+                        <FormInput
+                            id='confirm-password' labelClass='register-label'
+                            label='Confirm Password' type='password'
+                            placeholder='Re enter your password'
+                            value={formData.confirmPassword}
+                            onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                        />
+
+                        <div className="register-btn-container">
+                            <button type='submit' className="btn btn-login" id="register-btn">Register</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <div className="register-card">
-                <h1 className="register-title" id="register-title">Please Enter Your Personal Information</h1>
-
-                <form id="register-form" onSubmit={handleSubmit}>
-                    <FormInput
-                        id='first-name' labelClass='register-label'
-                        label='First Name' type='text'
-                        placeholder='Enter your first name'
-                        value={formData.firstName}
-                        onChange={(e) => handleChange('firstName', e.target.value)}
-                    />
-
-                    <FormInput
-                        id='last-name' labelClass='register-label'
-                        label='Last Name' type='text'
-                        placeholder='Enter your last name'
-                        value={formData.lastName}
-                        onChange={(e) => handleChange('lastName', e.target.value)}
-                    />
-
-                    <FormInput
-                        id='email-input' labelClass='register-label'
-                        label='Email' type='email'
-                        placeholder='Enter your email'
-                        value={formData.email}
-                        onChange={(e) => handleChange('email', e.target.value)}
-                    />
-
-                    <FormInput
-                        id='password-input' labelClass='register-label'
-                        label='Password' type='password'
-                        placeholder='Enter your password'
-                        value={formData.password}
-                        onChange={(e) => handleChange('password', e.target.value)}
-                    />
-
-                    <FormInput
-                        id='confirm-password' labelClass='register-label'
-                        label='Confirm Password' type='password'
-                        placeholder='Re enter your password'
-                        value={formData.confirmPassword}
-                        onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                    />
-
-                    <div className="register-btn-container">
-                        <button type='submit' className="btn btn-login" id="register-btn">Register</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            {modalConfig.show && (
+                <MessageModal 
+                    theme={modalConfig.theme} 
+                    onClose={() => setModalConfig({ ...modalConfig, show: false })}
+                >
+                    {modalConfig.message}
+                </MessageModal>
+            )}
+        </>
     );
 }
 
