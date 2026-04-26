@@ -1,18 +1,20 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
+import { useAuth } from '../components/AuthContext';
 
 import FormInput from '../components/LoginRegister/FormInput';
 import logoImg from '../assets/logo-primary.png';
 
 export default function Login() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
+    const { login } = useAuth();
+    const [loginformData, setLoginFormData] = useState({
         email: '',
         password: '',
     });
 
     function handleChange(id, value) {
-        setFormData(prev => ({ ...prev, [id]: value }));
+        setLoginFormData(prev => ({ ...prev, [id]: value }));
     }
 
     async function handleSubmit(e) {
@@ -23,18 +25,19 @@ export default function Login() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
+                    email: loginformData.email,
+                    password: loginformData.password,
                 })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                alert("Registration successful!");
+                alert("Login successful!");
+                login(data.user.id);
                 navigate('/');
             } else {
-                alert(data.message || "Registration failed");
+                alert(data.message || "Login failed");
             }
         } catch (error) {
             console.error("Error:", error);
@@ -47,7 +50,7 @@ export default function Login() {
             {/* Logo */}
             <div className="logo-wrapper">
                 <div className="logo-glow"></div>
-                <img src={logoImg} alt="Equitask Logo" id="logo-image" className="logo-image" />
+                <img src={logoImg} alt="Equitask Logo" className="logo-image" />
             </div>
 
             {/* Form */}
@@ -57,7 +60,8 @@ export default function Login() {
                     id="email-input"
                     placeholder="Your email......."
                     autoComplete="email"
-                    onChange={(e) => handleChange("email-input", e.target.value)}
+                    value={loginformData.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
                 />
 
 
@@ -66,7 +70,8 @@ export default function Login() {
                     id="password-input"
                     placeholder="Password......."
                     autoComplete="current-password"
-                    onChange={(e) => handleChange("password-input", e.target.value)}
+                    value={loginformData.password}
+                    onChange={(e) => handleChange("password", e.target.value)}
                 />
 
                 {/* Button */}

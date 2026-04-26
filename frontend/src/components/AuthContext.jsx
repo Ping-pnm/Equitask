@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
 
     function login(id) {
         setUserId(id);
+
     };
 
     function logout() {
