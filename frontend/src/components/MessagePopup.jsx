@@ -1,10 +1,10 @@
-export default function MessageModal({ theme, children, onClose }) {
+export default function MessagePopup({ theme, children, onClose }) {
     if (!children) return null;
 
     return (
         <div className="modal-overlay top-aligned">
-            <div 
-                className={`message-modal-card ${theme === 'green' ? 'success' : 'error'}`} 
+            <div
+                className={`message-modal-card ${theme === 'green' ? 'success' : 'error'}`}
             >
                 <div className="modal-icon-circle">
                     {theme === 'green' ? '✓' : '!'}

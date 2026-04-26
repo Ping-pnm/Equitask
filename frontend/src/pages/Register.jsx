@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoImg from '../assets/logo-primary.png';
 import FormInput from '../components/LoginRegister/FormInput';
-import MessageModal from '../components/MessageModal';
+import MessagePopup from '../components/MessagePopup';
 
 
 export default function Register() {
@@ -116,12 +116,12 @@ export default function Register() {
             </div>
 
             {modalConfig.show && (
-                <MessageModal 
-                    theme={modalConfig.theme} 
+                <MessagePopup
+                    theme={modalConfig.theme}
                     onClose={() => setModalConfig({ ...modalConfig, show: false })}
                 >
                     {modalConfig.message}
-                </MessageModal>
+                </MessagePopup>
             )}
         </>
     );

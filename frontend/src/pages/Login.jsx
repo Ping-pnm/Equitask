@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '../components/AuthContext';
 
 import FormInput from '../components/LoginRegister/FormInput';
-import MessageModal from '../components/MessageModal';
+import MessagePopup from '../components/MessagePopup';
 import logoImg from '../assets/logo-primary.png';
 
 export default function Login() {
@@ -88,12 +88,12 @@ export default function Login() {
             </div>
 
             {modalConfig.show && (
-                <MessageModal 
-                    theme={modalConfig.theme} 
+                <MessagePopup
+                    theme={modalConfig.theme}
                     onClose={() => setModalConfig({ ...modalConfig, show: false })}
                 >
                     {modalConfig.message}
-                </MessageModal>
+                </MessagePopup>
             )}
         </>
     );
