@@ -47,3 +47,26 @@ export async function createClass(userId, title, section, subject) {
         throw err;
    }
 }
+
+export async function getStreamFeed(classId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/feed/${classId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch announcements and assignments');
+        }
+
+        const data = await response.json();
+        return data;
+        
+    } catch(err) {
+        console.error("classService Error", err);
+        throw err;
+    }
+}

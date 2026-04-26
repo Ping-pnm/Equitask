@@ -1,6 +1,7 @@
 import { createClass } from "../services/classService";
 import { useState } from 'react';
 import { useAuth } from "./AuthContext";
+import { createPortal } from 'react-dom';
 
 export default function CreateClassModal({ onClassCreated, onClose }) {
     const { userId } = useAuth();
@@ -27,7 +28,7 @@ export default function CreateClassModal({ onClassCreated, onClose }) {
 
             // Since the service returns the data, we check for the ID
             if (response && response.classId) {
-                onClassCreated();
+                if (onClassCreated) onClassCreated();
                 onClose();
             }
         } catch (err) {
@@ -35,7 +36,7 @@ export default function CreateClassModal({ onClassCreated, onClose }) {
         }
     }
 
-    return (
+    return createPortal(
         <div id="modal-create-class" className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>Create class</h2>
@@ -62,6 +63,6 @@ export default function CreateClassModal({ onClassCreated, onClose }) {
                 </form>
             </div>
         </div>
-    );
+        , document.getElementById('portal-root'));
 
 }

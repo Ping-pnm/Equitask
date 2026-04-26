@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
+import { useClass } from './ClassContext';
 import { getAllClasses } from '../services/classService';
 
 import ClassButton from './ClassButton';
@@ -12,7 +13,7 @@ export default function Sidebar() {
     const [isCreateClass, setCreateClass] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [classes, setClasses] = useState([]);
-    const [activeClassId, setActiveClassId] = useState(null);
+    const { activeClassId, setActiveClassId } = useClass();
 
     //run once when the page loads
     const fetchClasses = useCallback(() => {

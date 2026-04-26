@@ -34,9 +34,7 @@ const authController = {
             if (!isMatch) {
                 return res.status(400).json({ message: "Invalid password" });
             }
-
-            console.log("Database user found:", user);
-
+            
             res.status(200).json({ 
                 message: "Login successful", 
                 user: { 

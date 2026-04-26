@@ -1,13 +1,3 @@
-import HeaderBar from "../components/HeaderBar";
-import CreateClassModal from "../components/CreateClassModal";
-import TabHeader from "../components/TabHeader";
-import AssingmentDetail from "../components/Work/AssignmentDetail";
-import AssignModal from "../components/Work/AssignModal";
-import EditAssignmentModal from "../components/Work/EditAssignmentModal";
-import CreateGroupModal from "../components/Work/CreateGroupModal";
-import Sidebar from "../components/Sidebar";
-
-
 import WorkPost from "../components/WorkPost"
 
 
