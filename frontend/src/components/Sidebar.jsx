@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { getAllClasses } from '../services/classService';
 
 import ClassButton from './ClassButton';
 import CreateClassModal from './CreateClassModal';
+import LoadingSpinner from './LoadingSpinner';
 
 export default function Sidebar() {
     const { userId } = useAuth();
@@ -14,7 +15,7 @@ export default function Sidebar() {
     const [activeClassId, setActiveClassId] = useState(null);
 
     //run once when the page loads
-    useEffect(() => {
+    const fetchClasses = useCallback(() => {
         async function loadData() {
             try {
                 const data = await getAllClasses(userId);
@@ -30,7 +31,11 @@ export default function Sidebar() {
         loadData();
     }, [userId]);
 
-    if (isLoading) return null;
+    useEffect(() => {
+        fetchClasses();
+    }, [userId, fetchClasses]);
+
+    if (isLoading) return <LoadingSpinner />;
 
     return (
         <aside className="sidebar">
@@ -50,7 +55,7 @@ export default function Sidebar() {
 
             <button id="btn-create-class" className="btn-create-class-sidebar" onClick={() => setCreateClass(true)}> + Create New Class</button>
 
-            {isCreateClass && <CreateClassModal onClose={() => setCreateClass(false)} />}
+            {isCreateClass && <CreateClassModal onClassCreated={fetchClasses} onClose={() => setCreateClass(false)} />}
         </aside>
     );
 }

@@ -17,6 +17,17 @@ const ClassController = {
             console.error("List Classes Error:", err);
             res.status(500).json({ message: "Server error fetching classes" });
         }
+    },
+    createClass: async (req, res) => {
+        try{
+            const { userId, title, section, subject } = req.body;
+
+            const newClassId = await ClassModel.createClass(userId, title, section, subject);
+            res.status(200).json({ classId: newClassId, message: "Class created successfully" });
+        } catch(err) {
+            console.error("Create Class Error:", err);
+            res.status(500).json({ message: "Server error fetching classes"});
+        }
     }
 };
 

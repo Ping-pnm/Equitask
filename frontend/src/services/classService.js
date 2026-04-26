@@ -19,3 +19,31 @@ export async function getAllClasses(userId) {
         throw error;
     }
 }
+
+export async function createClass(userId, title, section, subject) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId,
+                title,
+                section,
+                subject
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to create class');
+        }
+
+        const newClassId = await response.json();
+        return newClassId;
+   } catch(err) {
+        console.error("classService Error", err);
+        throw err;
+   }
+}

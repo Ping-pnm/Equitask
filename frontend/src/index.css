@@ -2882,3 +2882,46 @@ body.homepage-body {
     from { transform: translateY(-100px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+
+/* ===== Loading Spinner ===== */
+.loading-spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    gap: 15px;
+    width: 100%;
+}
+
+.spinner-ring {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e4e8f4;
+    border-top: 4px solid #56c4df;
+    border-radius: 50%;
+    box-shadow: 4px 4px 10px #bebebe, -4px -4px 10px #ffffff;
+    animation: spin 1s linear infinite;
+}
+
+.spinner-glow {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #56c4df;
+    filter: blur(20px);
+    opacity: 0.5;
+}
+
+.loading-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #56c4df;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
