@@ -4,19 +4,30 @@ import { useAuth } from '../AuthContext';
 import { useClass } from '../ClassContext';
 import { postAnnouncement } from '../../services/classService';
 import uploadIcon from '../../assets/UploadSign.png';
-import linkIcon from '../../assets/LinkSign.png';
 
 export default function ComposeModal({ fetchFeeds, onClose }) {
     const { userId } = useAuth();
     const { activeClassId } = useClass();
     const [content, setContent] = useState("");
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        setSelectedFiles(prev => [...prev, ...files]);
+        e.target.value = "";
+    };
+
+    const removeFile = (index) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    };
 
     const handlePost = async (e) => {
         e.preventDefault();
-        if (!content.trim()) return;
+
+        if (!content.trim() && selectedFiles.length === 0) return;
 
         try {
-            const response = await postAnnouncement(content, userId, activeClassId);
+            const response = await postAnnouncement(content, userId, activeClassId, selectedFiles);
 
             if (response) {
                 if (fetchFeeds) fetchFeeds();
@@ -33,23 +44,45 @@ export default function ComposeModal({ fetchFeeds, onClose }) {
                 <h2>Post</h2>
                 <form id="form-compose" onSubmit={handlePost}>
                     <div className="compose-area">
-                        <textarea 
-                            id="post-content" 
-                            placeholder="Announce something to your class" 
+                        <textarea
+                            id="post-content"
+                            placeholder="Announce something to your class"
                             required
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                         ></textarea>
                     </div>
+
+                    {/* File Preview List */}
+                    {selectedFiles.length > 0 && (
+                        <div className="selected-files-list">
+                            {selectedFiles.map((file, index) => (
+                                <div key={index} className="file-chip">
+                                    <span className="file-name">{file.name}</span>
+                                    <button
+                                        type="button"
+                                        className="btn-remove-file"
+                                        onClick={() => removeFile(index)}
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     <div className="modal-actions compose-actions">
                         <div className="compose-icons">
-                            <input type="file" id="file-upload" style={{ display: 'none' }} />
+                            <input
+                                type="file"
+                                id="file-upload"
+                                style={{ display: 'none' }}
+                                multiple
+                                onChange={handleFileChange}
+                            />
                             <button type="button" className="icon-btn tool-btn"
                                 onClick={() => document.getElementById('file-upload').click()}>
                                 <img src={uploadIcon} alt="Upload" />
-                            </button>
-                            <button type="button" className="icon-btn tool-btn">
-                                <img src={linkIcon} alt="Link" />
                             </button>
                         </div>
                         <div className="compose-btns">

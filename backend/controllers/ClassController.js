@@ -1,6 +1,7 @@
 import ClassModel from "../models/ClassModel.js";
 import AnnouncementModel from "../models/AnnouncementModel.js";
 import AssignmentModel from "../models/AssignmentModel.js";
+import FilesModel from "../models/FilesModel.js";
 
 const ClassController = {
     listClasses: async (req, res) => {
@@ -40,7 +41,12 @@ const ClassController = {
 
             // Tag each item to distinguish them on the frontend
             const taggedAssignments = assignments.map(a => ({ ...a, type: 'assignment' }));
-            const taggedAnnouncements = announcements.map(a => ({ ...a, type: 'announcement' }));
+            
+            // Fetch files for each announcement in parallel
+            const taggedAnnouncements = await Promise.all(announcements.map(async (a) => {
+                const files = await FilesModel.getAnnouncementFiles(a.announcementId);
+                return { ...a, type: 'announcement', files };
+            }));
 
             // Combine and sort by date (Newest first)
             const combinedFeed = [...taggedAssignments, ...taggedAnnouncements].sort((a, b) => {
@@ -68,10 +74,22 @@ const ClassController = {
     },
     postAnnouncement: async (req, res) => {
         try {
-            const { content, creatorId} = req.body;
+            // Debugging: See exactly what is arriving
+            console.log("--- New Announcement Request ---");
+            console.log("Body:", req.body);
+            console.log("Files:", req.files);
+
+            const { content, creatorId } = req.body;
             const { classId } = req.params;
+            const files = req.files; 
+            
+            if (!content && (!files || files.length === 0)) {
+                return res.status(400).json({ message: "Content or files are required" });
+            }
 
             const newAnnouncementId = await AnnouncementModel.createAnnouncement(content, creatorId, classId);
+
+            await FilesModel.AttachFilesToAnnouncement(newAnnouncementId, files);
 
             res.status(200).json(newAnnouncementId);
         } catch (err) {

@@ -52,6 +52,7 @@ export default function HomePage() {
                                 author={`${feed.firstName} ${feed.lastName}`}
                                 date={feed.createdAt}
                                 content={feed.content}
+                                files={feed.files}
                             />
                         ) : (
                             <StreamPost

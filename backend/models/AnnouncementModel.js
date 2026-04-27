@@ -3,12 +3,12 @@ import pool from "../db.js";
 const AnnouncementModel = {
     createAnnouncement: async (content, creatorId, classId) => {
         try {
-            const sql = `
+            const announcementSql = `
                 INSERT INTO announcements (content, creatorId, classId)
                 VALUES (?, ?, ?);
             `;
 
-            const [announcementRes] = await pool.query(sql, [content, creatorId, classId]);
+            const [announcementRes] = await pool.query(announcementSql, [content, creatorId, classId]);
             const newAnnouncementId = announcementRes.insertId;
 
             return newAnnouncementId;

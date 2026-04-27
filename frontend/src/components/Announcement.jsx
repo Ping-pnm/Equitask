@@ -1,4 +1,4 @@
-export default function Announcement({ author, date, content }) {
+export default function Announcement({ author, date, content, files = [] }) {
     return (
         <div className="announcement-card">
             <div className="announcement-header">
@@ -18,6 +18,25 @@ export default function Announcement({ author, date, content }) {
             <div className="announcement-body">
                 <p>{content}</p>
             </div>
+
+            {/* File Attachments Display */}
+            {files.length > 0 && (
+                <div className="announcement-attachments">
+                    {files.map((file, index) => (
+                        <a
+                            key={index}
+                            href={`http://localhost:3000/${file.fileUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="attachment-pill"
+                        >
+                            <span className="attachment-name">
+                                {file.fileUrl.split('-').slice(1).join('-') || 'Attachment'}
+                            </span>
+                        </a>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

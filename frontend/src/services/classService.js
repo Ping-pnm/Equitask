@@ -71,17 +71,21 @@ export async function getStreamFeed(classId) {
     }
 }
 
-export async function postAnnouncement(content, creatorId, classId) {
+export async function postAnnouncement(content, creatorId, classId, files) {
     try {
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('creatorId', creatorId);
+        
+        // Append all files to the 'files' field
+        files.forEach((file, index) => {
+            console.log(`Appending file ${index}:`, file.name);
+            formData.append('files', file);
+        });
+
         const response = await fetch(`http://localhost:3000/api/class/announce/${classId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                content: content,
-                creatorId: creatorId,
-            })
+            body: formData
         });
 
         if (!response.ok) {
