@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../components/AuthContext';
 import { useClass } from '../components/ClassContext';
 import { getStreamFeed } from '../services/classService';
@@ -15,10 +15,10 @@ export default function HomePage() {
     const { userId } = useAuth();
     const { activeClassId } = useClass();
     const [feeds, setFeeds] = useState([]);
-    const [isCompose, setCompose] = useState(false);
+    const [isCompose, setIsCompose] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
+    const fetchStreamFeeds = useCallback(() => {
         async function loadStreamFeed() {
             if (!activeClassId) return; // Don't fetch if no class is selected
             setIsLoading(true);
@@ -34,6 +34,10 @@ export default function HomePage() {
         loadStreamFeed();
     }, [userId, activeClassId]); // Added activeClassId here
 
+    useEffect(() => {
+        fetchStreamFeeds();
+    }, [userId, activeClassId]);
+
     if (isLoading) return <LoadingSpinner />;
 
     return (
@@ -43,18 +47,18 @@ export default function HomePage() {
                 <div id="posts-container" className="posts-container">
                     {feeds.map((feed) => (
                         feed.type === 'announcement' ? (
-                            <Announcement 
+                            <Announcement
                                 key={feed.announcementId || feed.id}
                                 author={`${feed.firstName} ${feed.lastName}`}
-                                date={feed.createdAt} 
-                                content={feed.content} 
+                                date={feed.createdAt}
+                                content={feed.content}
                             />
                         ) : (
-                            <StreamPost 
+                            <StreamPost
                                 key={feed.assignmentId || feed.id}
-                                title={feed.title} 
+                                title={feed.title}
                                 author={`${feed.firstName} ${feed.lastName}`}
-                                date={feed.createdAt} 
+                                date={feed.createdAt}
                             />
                         )
                     ))}
@@ -64,10 +68,12 @@ export default function HomePage() {
             {/* Compose Button */}
             < button id="btn-compose"
                 className="btn-compose"
-                onClick={() => setCompose(true)
+                onClick={() => setIsCompose(true)
                 }>
                 <img src={penIcon} alt="Compose" className="pencil-icon" /> Compose
             </button >
+
+            {isCompose && <ComposeModal fetchFeeds={fetchStreamFeeds} onClose={() => setIsCompose(false)} />}
         </>
 
     );

@@ -70,3 +70,30 @@ export async function getStreamFeed(classId) {
         throw err;
     }
 }
+
+export async function postAnnouncement(content, creatorId, classId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/announce/${classId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                content: content,
+                creatorId: creatorId,
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to post announcement');
+        }
+
+        const newAnnouncementId = await response.json();
+        return newAnnouncementId;
+        
+    } catch(err) {
+        console.error("classService Error", err);
+        throw err;
+    }
+}

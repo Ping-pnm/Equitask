@@ -2926,6 +2926,29 @@ body.homepage-body {
     100% { transform: rotate(360deg); }
 }
 
+/* ===== CTA Buttons ===== */
+.btn-post-cta {
+    background: linear-gradient(135deg, #a8bccb 0%, #8b9db5 100%) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    padding: 10px 24px !important;
+    border-radius: 20px !important; /* Matched the rounded style */
+    border: none !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(139, 157, 181, 0.4);
+}
+
+.btn-post-cta:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(139, 157, 181, 0.5);
+}
+
+.btn-post-cta:active {
+    transform: translateY(0);
+}
+
 /* ===== Announcement Card (Stream Feed) ===== */
 .announcement-card {
     background: #ffffff;

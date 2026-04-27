@@ -65,6 +65,19 @@ const ClassController = {
             console.error("Get Stream Feed Error:", err);
             res.status(500).json({ message: "Server error fetching feed" });
         }
+    },
+    postAnnouncement: async (req, res) => {
+        try {
+            const { content, creatorId} = req.body;
+            const { classId } = req.params;
+
+            const newAnnouncementId = await AnnouncementModel.createAnnouncement(content, creatorId, classId);
+
+            res.status(200).json(newAnnouncementId);
+        } catch (err) {
+            console.error("List Classes Error:", err);
+            res.status(500).json({ message: "Server error fetching classes" });
+        }
     }
 };
 

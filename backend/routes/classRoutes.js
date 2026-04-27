@@ -9,4 +9,6 @@ router.post('/create', ClassController.createClass);
 
 router.get('/feed/:classId', ClassController.getStreamFeed);
 
+router.post('/announce/:classId', ClassController.postAnnouncement);
+
 export default router;
