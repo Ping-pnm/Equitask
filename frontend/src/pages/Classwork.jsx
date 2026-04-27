@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useClass } from "../components/ClassContext";
-import { getWorkFeed } from "../services/classService";
+import { getWorkFeed } from "../services/workService";
 import WorkPost from "../components/WorkPost";
 import LoadingSpinner from "../components/LoadingSpinner";
+import AssignModal from "../components/Work/AssignModal";
 
 export default function Classwork() {
     const { activeClassId, isLeader } = useClass();
     const [assignments, setAssignments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isAssign, setIsAssign] = useState(false);
 
     const fetchWork = useCallback(async () => {
         if (!activeClassId) return;
@@ -26,6 +28,11 @@ export default function Classwork() {
         fetchWork();
     }, [fetchWork]);
 
+    function onClose(refresh = false) {
+        setIsAssign(false);
+        if (refresh) fetchWork();
+    }
+
     return (
         <>
             {/* Classwork Content */}
@@ -35,10 +42,10 @@ export default function Classwork() {
                         <LoadingSpinner />
                     ) : assignments.length > 0 ? (
                         assignments.map((work) => (
-                            <WorkPost 
+                            <WorkPost
                                 key={work.assignmentId}
-                                title={work.title} 
-                                date={new Date(work.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase()} 
+                                title={work.title}
+                                date={new Date(work.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase()}
                                 isGroupWork={!!work.isGroupWork}
                             />
                         ))
@@ -50,9 +57,13 @@ export default function Classwork() {
 
             {/* Assign Button */}
             {isLeader && (
-                <button id="btn-assign" className="btn-compose btn-assign-custom">
+                <button id="btn-assign" className="btn-compose btn-assign-custom" onClick={() => { setIsAssign(true) }}>
                     <span className="btn-assign-icon">+</span> Assign
                 </button>
+            )}
+
+            {isAssign && (
+                <AssignModal onClose={onClose} classId={activeClassId} />
             )}
         </>
     );

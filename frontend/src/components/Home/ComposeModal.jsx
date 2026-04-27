@@ -4,6 +4,7 @@ import { useAuth } from '../AuthContext';
 import { useClass } from '../ClassContext';
 import { postAnnouncement } from '../../services/classService';
 import uploadIcon from '../../assets/UploadSign.png';
+import AttachmentDisplay from '../AttachmentDisplay.jsx';
 
 export default function ComposeModal({ fetchFeeds, onClose }) {
     const { userId } = useAuth();
@@ -54,22 +55,9 @@ export default function ComposeModal({ fetchFeeds, onClose }) {
                     </div>
 
                     {/* File Preview List */}
-                    {selectedFiles.length > 0 && (
-                        <div className="selected-files-list">
-                            {selectedFiles.map((file, index) => (
-                                <div key={index} className="file-chip">
-                                    <span className="file-name">{file.name}</span>
-                                    <button
-                                        type="button"
-                                        className="btn-remove-file"
-                                        onClick={() => removeFile(index)}
-                                    >
-                                        &times;
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <div className="selected-files-list">
+                        <AttachmentDisplay files={selectedFiles} onDelete={removeFile} />
+                    </div>
 
                     <div className="modal-actions compose-actions">
                         <div className="compose-icons">

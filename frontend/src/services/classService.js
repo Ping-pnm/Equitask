@@ -196,26 +196,3 @@ export async function inviteToClass(email, classId, type) {
         throw err;
     }
 }
-
-export async function getWorkFeed(classId) {
-    try {
-        const response = await fetch(`http://localhost:3000/api/work/feed/${classId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to fetch work feeds');
-        }
-
-        const data = await response.json();
-        return data;
-        
-    } catch(err) {
-        console.error("classService Error", err);
-        throw err;
-    }
-}

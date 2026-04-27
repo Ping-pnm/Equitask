@@ -4,7 +4,7 @@ import { useClass } from '../components/ClassContext';
 import { getStreamFeed } from '../services/classService';
 
 import StreamPost from '../components/Home/StreamPost';
-import Announcement from '../components/Announcement';
+import Announcement from '../components/Home/Announcement';
 import ComposeModal from '../components/Home/composeModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 
