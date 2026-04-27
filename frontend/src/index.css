@@ -2778,7 +2778,16 @@ body.homepage-body {
 .people-section-title { color: #56c4df; font-size: 32px; font-weight: 700; margin: 0; }
 .add-user-icon { margin-bottom: 5px; cursor: pointer; }
 .people-list-container { display: flex; flex-direction: column; gap: 15px; }
-.person-row-content { display: flex; align-items: center; gap: 20px; }
+.person-row-content { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+.person-item-horizontal { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: 100%; padding: 8px 0; }
+.person-details-left { display: flex; align-items: center; gap: 20px; }
+
+.person-action-right { opacity: 0; transition: opacity 0.2s ease; }
+.person-item-horizontal:hover .person-action-right { opacity: 1; }
+
+.btn-delete-member { background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; border-radius: 50%; transition: background 0.2s; }
+.btn-delete-member:hover { background: #f0f0f0; }
+.btn-delete-member svg { stroke: #ff4d4d; } /* Change delete icon to red on People page */
 .person-name { font-size: 20px; font-weight: 700; color: #222; }
 .people-section-header-sm { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #56c4df; padding-bottom: 5px; margin-bottom: 15px; }
 .members-action-bar { display: flex; align-items: center; gap: 25px; margin-bottom: 25px; padding-left: 2px; }

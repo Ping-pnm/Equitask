@@ -5,7 +5,7 @@ export default function LeaderHeader({ role }) {
         <div className="people-section-header section-header">
             <h2 className="people-section-title">{role}</h2>
 
-            <svg onclick="openInviteModal('Invite leader')" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#56c4df"
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#56c4df"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="add-user-icon">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="8.5" cy="7" r="4"></circle>

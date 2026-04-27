@@ -10,7 +10,12 @@ router.post('/create', ClassController.createClass);
 
 router.get('/feed/:classId', ClassController.getStreamFeed);
 
-// Changed to accept multiple files with the field name 'files'
 router.post('/announce/:classId', upload.array('files'), ClassController.postAnnouncement);
+
+router.get('/leaders/:classId', ClassController.getClassLeaders);
+
+router.get('/members/:classId', ClassController.getClassMembers);
+
+router.delete('/member/delete', ClassController.removeMember);
 
 export default router;

@@ -9,11 +9,11 @@ import LoadingSpinner from './LoadingSpinner';
 
 export default function Sidebar() {
     const { userId } = useAuth();
+    const { activeClassId, setActiveClassId, updateRole } = useClass();
 
     const [isCreateClass, setCreateClass] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [classes, setClasses] = useState([]);
-    const { activeClassId, setActiveClassId } = useClass();
 
     //run once when the page loads
     const fetchClasses = useCallback(() => {
@@ -35,6 +35,16 @@ export default function Sidebar() {
     useEffect(() => {
         fetchClasses();
     }, [userId, fetchClasses]);
+
+    // Update the global isLeader state whenever the active class changes
+    useEffect(() => {
+        if (activeClassId && classes.length > 0) {
+            const currentClass = classes.find(c => c.classId === activeClassId);
+            if (currentClass) {
+                updateRole(currentClass.role);
+            }
+        }
+    }, [activeClassId, classes, updateRole]);
 
     if (isLoading) return <LoadingSpinner />;
 

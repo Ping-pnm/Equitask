@@ -1,13 +1,26 @@
 import PeopleIcon from "./PeopleIcon.";
+import DeleteIcon from "./DeleteIcon";
+import { useClass } from "../ClassContext";
+import { useAuth } from "../AuthContext";
 
-export default function PeopleRow({ name, isLeader }) {
+export default function PeopleRow({ name, memberId, onDelete }) {
+    const { isLeader } = useClass();
+    const { userId } = useAuth();
+
     return (
-        <div className="person-row-content person-row">
-            {isLeader && <div className="custom-checkbox-box-interactive member-checkbox" data-selected="false"></div>}
+        <div className="person-item-horizontal">
+            <div className="person-details-left">
+                <PeopleIcon />
+                <span className="person-name">{name}</span>
+            </div>
 
-            <PeopleIcon />
-
-            <span className="person-name">{name}</span>
+            {(isLeader && Number(memberId) !== Number(userId)) && (
+                <div className="person-action-right">
+                    <button className="btn-delete-member" title="Remove from class" onClick={onDelete}>
+                        <DeleteIcon />
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

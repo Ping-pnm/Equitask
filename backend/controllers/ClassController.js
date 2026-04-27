@@ -2,6 +2,7 @@ import ClassModel from "../models/ClassModel.js";
 import AnnouncementModel from "../models/AnnouncementModel.js";
 import AssignmentModel from "../models/AssignmentModel.js";
 import FilesModel from "../models/FilesModel.js";
+import UserModel from "../models/UserModel.js";
 
 const ClassController = {
     listClasses: async (req, res) => {
@@ -95,6 +96,43 @@ const ClassController = {
         } catch (err) {
             console.error("List Classes Error:", err);
             res.status(500).json({ message: "Server error fetching classes" });
+        }
+    },
+
+    getClassLeaders: async (req, res) => {
+        try {
+            const { classId } = req.params;
+            const leaders = await UserModel.getLeaders(classId);
+            res.status(200).json(leaders);
+        } catch(err) {
+            console.error("Error fetching leaders:", err);
+            res.status(500).json({ message: "Server error fetching leaders" });
+        }
+    },
+
+    getClassMembers: async (req, res) => {
+       try {
+            const { classId } = req.params;
+            const members = await UserModel.getMembers(classId);
+            res.status(200).json(members);
+        } catch(err) {
+            console.error("Error fetching members:", err);
+            res.status(500).json({ message: "Server error fetching members" });
+        } 
+    },
+
+    removeMember: async (req, res) => {
+        try {
+            const { userId, classId } = req.body;
+            if (!userId || !classId) {
+                return res.status(400).json({ message: "User ID and Class ID are required" });
+            }
+
+            await UserModel.removeMemberFromClass(userId, classId);
+            res.status(200).json({ message: "Member removed successfully" });
+        } catch (err) {
+            console.error("Error removing member:", err);
+            res.status(500).json({ message: "Server error removing member" });
         }
     }
 };

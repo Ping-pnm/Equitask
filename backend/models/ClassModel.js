@@ -5,20 +5,23 @@ const ClassModel = {
         try {
             const sql = `
                 SELECT 
-                    e.userId,
+                    uc.userId,
+                    MIN(uc.role) AS role,
                     c.classId, 
                     c.title,
                     c.section, 
                     c.subject
-                FROM 
-                    enrollments e
+                FROM (
+                    SELECT userId, classId, 'member' AS role FROM enrollments WHERE userId = ?
+                    UNION
+                    SELECT userId, classId, 'leader' AS role FROM owners WHERE userId = ?
+                ) AS uc
                 JOIN 
-                    classes c ON e.classId = c.classId
-                WHERE 
-                    e.userId = ?;
+                    classes c ON uc.classId = c.classId
+                GROUP BY uc.userId, c.classId;
             `;
 
-            const [res] = await pool.query(sql, [userId]);
+            const [res] = await pool.query(sql, [userId, userId]);
             return res;
         } catch(err) {
             console.error("Database Error (getAllClasses):", err);

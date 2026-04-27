@@ -101,3 +101,76 @@ export async function postAnnouncement(content, creatorId, classId, files) {
         throw err;
     }
 }
+
+export async function getLeaders(classId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/leaders/${classId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch leaders');
+        }
+
+        const data = await response.json();
+        return data;
+        
+    } catch(err) {
+        console.error("classService Error", err);
+        throw err;
+    }
+}
+
+export async function getMembers(classId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/members/${classId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch members');
+        }
+
+        const data = await response.json();
+        return data;
+        
+    } catch(err) {
+        console.error("classService Error", err);
+        throw err;
+    }
+}
+
+export async function deleteMembers(userId, classId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/member/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId,
+                classId
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete member');
+        }
+
+        const data = await response.json();
+        return data;
+        
+    } catch(err) {
+        console.error("classService Error", err);
+        throw err;
+    }
+}
