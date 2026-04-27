@@ -47,6 +47,8 @@ export default function Classwork() {
                                 title={work.title}
                                 date={new Date(work.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase()}
                                 isGroupWork={!!work.isGroupWork}
+                                assignmentId={work.assignmentId}
+                                onUpdate={fetchWork}
                             />
                         ))
                     ) : (
@@ -55,7 +57,6 @@ export default function Classwork() {
                 </div>
             </section>
 
-            {/* Assign Button */}
             {isLeader && (
                 <button id="btn-assign" className="btn-compose btn-assign-custom" onClick={() => { setIsAssign(true) }}>
                     <span className="btn-assign-icon">+</span> Assign
@@ -63,7 +64,7 @@ export default function Classwork() {
             )}
 
             {isAssign && (
-                <AssignModal onClose={onClose} classId={activeClassId} />
+                <AssignModal onClose={onClose} classId={activeClassId} isCreate={true} />
             )}
         </>
     );

@@ -4,11 +4,12 @@ import checkListIcon from '../../assets/checklist-icon.png';
 import { useState, useRef } from 'react';
 import Rubric from '../Rubric.jsx';
 import AttachmentDisplay from '../AttachmentDisplay.jsx';
-import { assignWork } from '../../services/workService.js';
+import { assignWork, updateWork, getAssignment } from '../../services/workService.js';
 import { useAuth } from '../AuthContext.jsx';
+import { useEffect } from 'react';
 
 
-export default function AssignModal({ onClose, classId }) {
+export default function AssignModal({ onClose, classId, isCreate, assignmentId }) {
     const fileInputRef = useRef(null);
     const { userId } = useAuth();
 
@@ -31,6 +32,38 @@ export default function AssignModal({ onClose, classId }) {
         dueDateTime: getTodayDateTimeString(),
         isGroupWork: false
     });
+
+    useEffect(() => {
+        if (!isCreate && assignmentId) {
+            const loadAssignmentData = async () => {
+                try {
+                    const data = await getAssignment(assignmentId);
+                    const fetchedCriterias = data.criteria?.length > 0 ? data.criteria.map(c => c.title) : Array(2).fill('');
+                    const fetchedLevels = data.levels?.length > 0 ? data.levels.map(l => l.title) : Array(2).fill('');
+
+                    setModalData({
+                        title: data.title || '',
+                        instruction: data.instructions || '',
+                        points: data.points || 100,
+                        dueDateTime: data.dueDate ? data.dueDate.split('.')[0].replace(' ', 'T') : getTodayDateTimeString(),
+                        isGroupWork: !!data.isGroupWork,
+                        rubricCriterias: fetchedCriterias,
+                        rubricLevels: fetchedLevels,
+                        rubricCells: data.rubricCells && data.rubricCells.length > 0 ? data.rubricCells : Array.from({ length: fetchedCriterias.length }, () => Array(fetchedLevels.length).fill('')),
+                        files: data.files ? data.files.map(f => ({
+                            name: f.fileName || f.fileUrl.split('-').slice(1).join('-'),
+                            fileUrl: f.fileUrl,
+                            isExisting: true
+                        })) : []
+                    });
+                } catch (err) {
+                    console.error("Failed to load assignment:", err);
+                    alert("Error loading assignment details");
+                }
+            };
+            loadAssignmentData();
+        }
+    }, [isCreate, assignmentId]);
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
@@ -61,18 +94,28 @@ export default function AssignModal({ onClose, classId }) {
             formData.append('points', modalData.points);
             formData.append('dueDate', modalData.dueDateTime);
             formData.append('isGroupWork', modalData.isGroupWork);
-            
+
             // Send arrays as JSON strings
             formData.append('rubricCriterias', JSON.stringify(modalData.rubricCriterias));
             formData.append('rubricLevels', JSON.stringify(modalData.rubricLevels));
             formData.append('rubricCells', JSON.stringify(modalData.rubricCells));
+            
+            // Separate existing files from new ones
+            const existingFiles = modalData.files.filter(f => f.isExisting);
+            formData.append('existingFiles', JSON.stringify(existingFiles));
 
-            // Append all files
+            // Append all new files
             modalData.files.forEach((file) => {
-                formData.append('files', file);
+                if (!file.isExisting) {
+                    formData.append('files', file);
+                }
             });
 
-            await assignWork(formData);
+            if (isCreate) {
+                await assignWork(formData);
+            } else {
+                await updateWork(assignmentId, formData);
+            }
             onClose(true); // Close and refresh
         } catch (err) {
             console.error("Assign Error:", err);

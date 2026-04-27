@@ -2676,7 +2676,6 @@ body.homepage-body {
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    margin-bottom: 20px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid transparent;
 }
@@ -2690,6 +2689,35 @@ body.homepage-body {
 
 .post-card-work:active {
     transform: translateY(0) scale(0.99);
+}
+
+.post-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: 20px;
+}
+
+.btn-delete-post {
+    background: #ff4d4d15;
+    color: #ff4d4d;
+    border: 1.5px solid #ff4d4d30;
+    padding: 6px 16px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-delete-post:hover {
+    background: #ff4d4d;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.25);
+    border-color: transparent;
 }
 
 .post-card-stream {
