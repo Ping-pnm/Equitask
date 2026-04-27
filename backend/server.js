@@ -6,6 +6,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import classRoutes from './routes/classRoutes.js';
 import workRoutes from './routes/workRoutes.js';
+import groupRoutes from './routes/groupRoutes.js';
 
 const app = express();
 dotenv.config();
@@ -20,6 +21,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/auth', authRoutes);
 app.use('/api/class', classRoutes);
 app.use('/api/work', workRoutes);
+app.use('/api/group', groupRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

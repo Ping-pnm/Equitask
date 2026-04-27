@@ -1,6 +1,6 @@
 import RubricButton from "./Work/RubricButton";
 
-export default function Rubric({ criterias, levels, cells, setModalData }) {
+export default function Rubric({ criterias, levels, cells, setModalData, readOnly = false }) {
     const rowCount = criterias.length + 1;
     const colCount = levels.length + 1;
 
@@ -61,26 +61,30 @@ export default function Rubric({ criterias, levels, cells, setModalData }) {
 
     return (
         <div className="rubrics-config-section">
-            <div className="rubrics-config-header">
-                Rubrics
-                <div className="rubrics-config-controls">
-                    Rows:
-                    <RubricButton onClick={() => handleUpdateSize(true, false)} />
-                    <span id="rubric-rows-assign">{rowCount}</span>
-                    <RubricButton isPlus onClick={() => handleUpdateSize(true, true)} />
-                </div>
-                <div className="rubrics-config-controls">
-                    Columns:
-                    <RubricButton onClick={() => handleUpdateSize(false, false)} />
-                    <span id="rubric-cols-assign">{colCount}</span>
-                    <RubricButton isPlus onClick={() => handleUpdateSize(false, true)} />
-                </div>
-            </div>
+            {!readOnly && (
+                <>
+                    <div className="rubrics-config-header">
+                        Rubrics
+                        <div className="rubrics-config-controls">
+                            Rows:
+                            <RubricButton onClick={() => handleUpdateSize(true, false)} />
+                            <span id="rubric-rows-assign">{rowCount}</span>
+                            <RubricButton isPlus onClick={() => handleUpdateSize(true, true)} />
+                        </div>
+                        <div className="rubrics-config-controls">
+                            Columns:
+                            <RubricButton onClick={() => handleUpdateSize(false, false)} />
+                            <span id="rubric-cols-assign">{colCount}</span>
+                            <RubricButton isPlus onClick={() => handleUpdateSize(false, true)} />
+                        </div>
+                    </div>
 
-            <p className="rubric-tip">
-                <b>Tip:</b> Rows represent <b>Criteria</b>, while columns represent <b>Levels</b>.
-                <br /> (Left columns = Good / Right columns = Bad)
-            </p>
+                    <p className="rubric-tip">
+                        <b>Tip:</b> Rows represent <b>Criteria</b>, while columns represent <b>Levels</b>.
+                        <br /> (Left columns = Good / Right columns = Bad)
+                    </p>
+                </>
+            )}
 
             {/* Table */}
             <div className="rubrics-table-wrapper">
@@ -102,9 +106,9 @@ export default function Rubric({ criterias, levels, cells, setModalData }) {
                                     return (
                                         <td
                                             key={colIndex}
-                                            contentEditable={!isOrigin}
+                                            contentEditable={!readOnly && !isOrigin}
                                             className={`rubrics-input-cell ${isOrigin ? 'rubric-origin' : (isCriteria || isLevel) ? 'rubric-header' : ''}`}
-                                            onBlur={(e) => handleBlur(rowIndex, colIndex, e.currentTarget.innerText)}
+                                            onBlur={(e) => !readOnly && handleBlur(rowIndex, colIndex, e.currentTarget.innerText)}
                                             suppressContentEditableWarning={true}
                                         >
                                             {content}

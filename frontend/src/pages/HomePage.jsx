@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import { useClass } from '../components/ClassContext';
 import { getStreamFeed } from '../services/classService';
 
-import StreamPost from '../components/Home/StreamPost';
+import WorkPost from '../components/WorkPost';
 import Announcement from '../components/Home/Announcement';
 import ComposeModal from '../components/Home/composeModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -17,6 +18,7 @@ export default function HomePage() {
     const [feeds, setFeeds] = useState([]);
     const [isCompose, setIsCompose] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     const fetchStreamFeeds = useCallback(() => {
         async function loadStreamFeed() {
@@ -55,11 +57,13 @@ export default function HomePage() {
                                 files={feed.files}
                             />
                         ) : (
-                            <StreamPost
+                            <WorkPost
                                 key={feed.assignmentId || feed.id}
                                 title={feed.title}
                                 author={`${feed.firstName} ${feed.lastName}`}
-                                date={feed.createdAt}
+                                date={new Date(feed.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                assignmentId={feed.assignmentId || feed.id}
+                                onClick={(id) => navigate(`/assignment/${id}`, { state: { from: 'Stream' } })}
                             />
                         )
                     ))}

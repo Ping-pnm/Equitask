@@ -2637,6 +2637,90 @@ body.homepage-body {
     transform: translateY(-1px);
 }
 
+/* ===== Group Status Display ===== */
+.group-status-container {
+    background: #f8f9fa;
+    border-radius: 40px;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+    width: 100%;
+}
+
+.group-info-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+
+.group-name-display {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    min-width: 120px;
+}
+
+.group-progress-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    max-width: 400px;
+}
+
+.progress-bar-bg {
+    height: 12px;
+    background: #c1c5cc;
+    border-radius: 6px;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #63778f;
+    border-radius: 6px;
+    transition: width 0.4s ease;
+}
+
+.progress-percentage-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    min-width: 40px;
+}
+
+.btn-delete-group {
+    background: transparent;
+    border: none;
+    color: #3eb5cd;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: all 0.2s;
+}
+
+.btn-delete-group:hover {
+    color: #2da1b8;
+    transform: scale(1.05);
+}
+
+.group-leader-badge {
+    background: #3eb5cd;
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
 /* Add comment button */
 .hw1-add-comment-btn {
     display: block;
@@ -2801,6 +2885,8 @@ body.homepage-body {
 .stream-content-scrollable { overflow-y: auto; }
 .edit-icon-small { cursor: pointer; height: 22px; object-fit: contain; width: 22px; }
 .assignment-detail-wrapper { align-self: center; display: none; max-width: 800px; width: 100%; }
+.assignment-detail-page { padding: 40px; width: 100%; overflow-y: auto; box-sizing: border-box; }
+.assignment-detail-container { width: 100%; }
 .assignment-detail-header { align-items: flex-start; border-bottom: 2px solid #ccc; display: flex; justify-content: space-between; margin-bottom: 25px; padding-bottom: 10px; }
 .assignment-title-group { display: flex; gap: 15px; }
 .assignment-title-icon { height: 32px; margin-top: 5px; object-fit: contain; width: 32px; }
@@ -2836,10 +2922,10 @@ body.homepage-body {
 .modal-body-section { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
 .input-title-large { background: #f4f6fa; border-radius: 6px; border: none; font-family: inherit; font-size: 14px; outline: none; padding: 15px; width: 100%; }
 .input-instructions-large { background: #f4f6fa; border-radius: 6px; border: none; font-family: inherit; font-size: 14px; height: 120px; outline: none; padding: 15px; resize: none; width: 100%; }
-.rubrics-config-section { background: #f4f6fa; border-radius: 6px; display: flex; flex-direction: column; gap: 10px; padding: 15px; }
+.rubrics-config-section { background: #f4f6fa; border-radius: 6px; display: flex; flex-direction: column; gap: 10px; padding: 15px; width: fit-content; max-width: 100%; }
 .rubrics-config-header { align-items: center; color: #b3b9c6; display: flex; font-size: 14px; font-weight: 700; gap: 15px; }
 .rubrics-config-controls { align-items: center; color: #000; display: flex; gap: 8px; }
-.rubrics-table-wrapper { border-radius: 4px; overflow-x: auto; width: 100%; display: block; margin-bottom: 1px; }
+.rubrics-table-wrapper { border-radius: 4px; overflow-x: auto; width: 100%; max-width: 1000px; display: block; margin-bottom: 1px; }
 
 /* Custom Scrollbar Styling */
 .rubrics-table-wrapper::-webkit-scrollbar {
@@ -2859,9 +2945,9 @@ body.homepage-body {
 }
 
 .rubrics-input-table { background: white; border-collapse: collapse; min-width: 100%; width: max-content; }
-.rubrics-input-cell { border: 1px solid #000; font-size: 14px; height: 40px; min-width: 120px; outline: none; padding: 10px; vertical-align: top; transition: background-color 0.2s; }
+.rubrics-input-cell { border: 1px solid #000; font-size: 14px; height: 40px; min-width: 200px; outline: none; padding: 10px; vertical-align: top; transition: background-color 0.2s; }
 .rubric-header { background-color: #e3f2fd; } /* Light blue for first row/column */
-.rubric-origin { background-color: #374b75; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; text-align: center; }
+.rubric-origin { background-color: #374b75; color: white; font-weight: 700; font-size: 11px; text-align: center; vertical-align: middle; border: none; }
 .rubric-tip { font-size: 12px; color: #666; margin: 5px 0 15px; line-height: 1.5; border-left: 3px solid #374b75; padding-left: 10px; font-style: italic; }
 .modal-footer-icon { width: 26px; height: 26px; object-fit: contain; cursor: pointer; }
 .modal-options-row { align-items: center; color: #888; display: flex; font-size: 14px; font-weight: 600; gap: 30px; margin-bottom: 30px; }
@@ -2879,6 +2965,29 @@ body.homepage-body {
 .modal-actions-right { align-items: center; display: flex; gap: 20px; }
 .btn-cancel-custom { color: #333; font-weight: 600; margin-right: 10px; padding: 0; }
 .btn-submit-custom { background: #3eb5cd; border-radius: 6px; border: none; color: white; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; height: 36px; padding: 0 24px; }
+
+.btn-detail-close {
+    background: #374b75;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(55, 75, 117, 0.2);
+}
+
+.btn-detail-close:hover {
+    background: #4a6296;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(55, 75, 117, 0.3);
+}
+
+.btn-detail-close:active {
+    transform: translateY(0);
+}
 .input-label-floating { color: #888; font-size: 12px; left: 15px; position: absolute; top: 10px; }
 .input-title-floating { background: transparent; border: none; color: #222; font-family: inherit; font-size: 18px; font-weight: 700; outline: none; padding: 28px 15px 10px; width: 100%; }
 .input-instructions-floating { background: #f4f6fa; border-radius: 6px; border: none; font-family: inherit; font-size: 14px; height: 160px; line-height: 1.5; outline: none; padding: 15px; resize: none; width: 100%; }

@@ -1,70 +1,177 @@
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { useAuth } from "../AuthContext";
+import { getGroupMembers, createGroup } from "../../services/workService";
+import LoadingSpinner from "../LoadingSpinner";
 
+export default function CreateGroupModal({ onClose, onSuccess, assignmentId, classId }) {
+    const { userId } = useAuth();
+    const [groupName, setGroupName] = useState("");
+    const [meetLink, setMeetLink] = useState("");
+    const [allMembers, setAllMembers] = useState([]);
+    const [selectedMembers, setSelectedMembers] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-export default function CreateGroupModal() {
-    return (
-        <div id="modal-create-group" className="modal-overlay hidden">
-            <div className="modal-content modal-edit-content">
-                {/* Header */}
-                <div
-                    className="modal-title-row">
-                    <h2 className="modal-title-text">Create Group</h2>
-                    <button type="button"
-                        className="modal-close-symbol">&times;</button>
-                </div>
+    useEffect(() => {
+        async function fetchMembers() {
+            try {
+                setIsLoading(true);
+                const members = await getGroupMembers(classId, assignmentId);
+                // Filter out the creator themselves from the selection list
+                setAllMembers(members.filter(m => m.userId !== userId));
+            } catch (err) {
+                console.error("Failed to fetch members:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchMembers();
+    }, [classId, assignmentId, userId]);
 
-                {/* Body */}
-                <div className="create-group-body">
-                    {/* Group Name Input */}
-                    <div className="modal-input-wrapper">
-                        <div className="modal-input-label">Group Name</div>
-                        <input type="text"
-                            className="input-group-name" />
-                    </div>
+    const handleAddMember = (e) => {
+        const memberId = parseInt(e.target.value);
+        if (!memberId) return;
 
-                    {/* Members Box */}
-                    <div className="members-section">
-                        <div className="members-label">Members</div>
+        const member = allMembers.find(m => m.userId === memberId);
+        if (!member) return;
 
-                        {/* Search / Dropdown Input Mockup */}
-                        <div className="member-select-wrapper">
-                            <select className="member-select">
-                                <option value="" disabled selected></option>
-                                <option value="1">6622780268@g.siit.tu.ac.th</option>
-                                <option value="2">student.two@g.siit.tu.ac.th</option>
-                                <option value="3">student.three@g.siit.tu.ac.th</option>
-                            </select>
-                            <div className="select-divider"></div>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
-                                stroke-linecap="round" stroke-linejoin="round" className="select-chevron">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
+        // Check if already selected
+        if (selectedMembers.find(m => m.userId === memberId)) return;
+
+        // Check if member already has a group
+        if (member.hasGroup) {
+            alert(`${member.firstName} is already in another group for this assignment.`);
+            return;
+        }
+
+        setSelectedMembers([...selectedMembers, member]);
+        e.target.value = ""; // Reset select
+    };
+
+    const handleRemoveMember = (memberId) => {
+        setSelectedMembers(selectedMembers.filter(m => m.userId !== memberId));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!groupName.trim()) {
+            alert("Group Name is required");
+            return;
+        }
+
+        try {
+            setIsSubmitting(true);
+            const groupData = {
+                groupName,
+                assignmentId,
+                classId,
+                creatorId: userId,
+                meetLink,
+                memberIds: selectedMembers.map(m => m.userId)
+            };
+
+            await createGroup(groupData);
+            if (onSuccess) onSuccess();
+            onClose();
+        } catch (err) {
+            alert(err.message || "Failed to create group");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return createPortal(
+        <div id="modal-create-group" className="modal-overlay" onClick={onClose}>
+            <div className="modal-content modal-edit-content" onClick={(e) => e.stopPropagation()} style={{ minHeight: '400px' }}>
+                {isLoading ? (
+                    <LoadingSpinner />
+                ) : (
+                    <form onSubmit={handleSubmit}>
+                        {/* Header */}
+                        <div className="modal-title-row">
+                            <h2 className="modal-title-text">Create Group</h2>
+                            <button type="button" className="modal-close-symbol" onClick={onClose}>&times;</button>
                         </div>
 
-                        {/* Member Chip */}
-                        <div className="member-chip">
-                            {/* Avatar */}
-                            <div className="member-chip-avatar">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
+                        {/* Body */}
+                        <div className="create-group-body">
+                            {/* Group Name Input */}
+                            <div className="modal-input-wrapper">
+                                <div className="modal-input-label">Group Name *</div>
+                                <input 
+                                    type="text"
+                                    className="input-group-name" 
+                                    value={groupName}
+                                    onChange={(e) => setGroupName(e.target.value)}
+                                    placeholder="Enter your group name"
+                                    required
+                                />
                             </div>
-                            <span className="member-chip-email">6622780268@g.siit.tu.ac.th</span>
-                            <span className="member-chip-remove">&times;</span>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Footer */}
-                <div className="modal-footer-row">
-                    <div className="meet-link-wrapper">
-                        Google Meet Link
-                        <input type="text" className="meet-link-input" />
-                    </div>
-                    <button type="button"
-                        className="modal-submit-btn">Create</button>
-                </div>
+                            {/* Members Box */}
+                            <div className="members-section" style={{ marginTop: '20px' }}>
+                                <div className="members-label">Add Members</div>
+
+                                {/* Search / Dropdown Input */}
+                                <div className="member-select-wrapper">
+                                    <select className="member-select" onChange={handleAddMember} defaultValue="">
+                                        <option value="" disabled>Select a classmate...</option>
+                                        {allMembers.map(member => (
+                                            <option key={member.userId} value={member.userId}>
+                                                {member.firstName} {member.lastName} ({member.email})
+                                                {member.hasGroup ? " - [ALREADY IN GROUP]" : ""}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="select-divider"></div>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"
+                                        strokeLinecap="round" strokeLinejoin="round" className="select-chevron">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+
+                                {/* Selected Members Chips */}
+                                <div className="selected-members-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '15px' }}>
+                                    {selectedMembers.map(member => (
+                                        <div key={member.userId} className="member-chip">
+                                            <div className="member-chip-avatar">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="12" cy="7" r="4"></circle>
+                                                </svg>
+                                            </div>
+                                            <span className="member-chip-email">{member.firstName}</span>
+                                            <span className="member-chip-remove" onClick={() => handleRemoveMember(member.userId)}>&times;</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="modal-footer-row" style={{ marginTop: '30px' }}>
+                            <div className="meet-link-wrapper">
+                                Google Meet Link (Optional)
+                                <input 
+                                    type="text" 
+                                    className="meet-link-input" 
+                                    value={meetLink}
+                                    onChange={(e) => setMeetLink(e.target.value)}
+                                    placeholder="https://meet.google.com/..."
+                                />
+                            </div>
+                            <button 
+                                type="submit"
+                                className="modal-submit-btn"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? "Creating..." : "Create"}
+                            </button>
+                        </div>
+                    </form>
+                )}
             </div>
         </div>
-    );
+        , document.getElementById('portal-root'));
 }

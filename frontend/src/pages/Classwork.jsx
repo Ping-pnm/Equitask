@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useClass } from "../components/ClassContext";
 import { getWorkFeed } from "../services/workService";
 import WorkPost from "../components/WorkPost";
@@ -10,6 +11,7 @@ export default function Classwork() {
     const [assignments, setAssignments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isAssign, setIsAssign] = useState(false);
+    const navigate = useNavigate();
 
     const fetchWork = useCallback(async () => {
         if (!activeClassId) return;
@@ -49,6 +51,7 @@ export default function Classwork() {
                                 isGroupWork={!!work.isGroupWork}
                                 assignmentId={work.assignmentId}
                                 onUpdate={fetchWork}
+                                onClick={(id) => navigate(`/assignment/${id}`, { state: { from: 'Work' } })}
                             />
                         ))
                     ) : (
