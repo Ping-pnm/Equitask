@@ -2669,7 +2669,6 @@ body.homepage-body {
     align-items: center;
     gap: 12px;
     flex: 1;
-    max-width: 400px;
 }
 
 .progress-bar-bg {
@@ -3366,4 +3365,175 @@ body.homepage-body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* ===== Group Overview Card (Dashboard) ===== */
+.group-overview-card {
+    background: #f8f9fa;
+    border-radius: 40px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.group-card-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.group-card-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.group-card-divider {
+    height: 2px;
+    background: #ddd;
+    width: 85%;
+    margin: 0 auto;
+}
+
+.group-card-middle {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.circular-progress-container {
+    flex-shrink: 0;
+}
+
+.circular-progress {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.circular-progress-inner {
+    width: 90px;
+    height: 90px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+}
+
+.ai-summary-box {
+    background: #ffffff;
+    border: 1px solid #999;
+    padding: 12px;
+    border-radius: 4px;
+    flex: 1;
+    min-height: 100px;
+    font-size: 13px;
+}
+
+.ai-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.ai-sparkle {
+    color: #63778f;
+    font-size: 16px;
+}
+
+.ai-summary-label {
+    color: #3eb5cd;
+    font-weight: 700;
+}
+
+.ai-summary-content p {
+    color: #555;
+    line-height: 1.4;
+}
+
+.read-more-link {
+    color: #333;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.group-card-members {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.student-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.student-name {
+    font-size: 13px;
+    color: #555;
+    width: 70px;
+}
+
+.student-progress-bar-bg {
+    flex: 1;
+    height: 14px;
+    background: #c1c5cc;
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.student-progress-bar-fill {
+    height: 100%;
+    background: #63778f;
+    border-radius: 7px;
+}
+
+.student-progress-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    width: 35px;
+    text-align: right;
+}
+
+.btn-group-more {
+    background: #63778f;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 45px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-group-more:hover {
+    background: #52637a;
+    transform: translateY(-2px);
 }

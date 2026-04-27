@@ -56,8 +56,33 @@ const GroupController = {
     getAllGroupsForAssignment: async (req, res) => {
         try {
             const { assignmentId } = req.params;
-            const groups = await GroupModel.getAllGroupsForAssignment(assignmentId);
-            res.status(200).json(groups);
+            const rows = await GroupModel.getAllGroupsForAssignment(assignmentId);
+            
+            // Group the rows by groupId
+            const groupsMap = new Map();
+            rows.forEach(row => {
+                if (!groupsMap.has(row.groupId)) {
+                    groupsMap.set(row.groupId, {
+                        groupId: row.groupId,
+                        groupName: row.groupName,
+                        assignmentId: row.assignmentId,
+                        classId: row.classId,
+                        meetLink: row.meetLink,
+                        createdAt: row.createdAt,
+                        members: []
+                    });
+                }
+                if (row.userId) {
+                    groupsMap.get(row.groupId).members.push({
+                        userId: row.userId,
+                        firstName: row.firstName,
+                        lastName: row.lastName,
+                        email: row.email
+                    });
+                }
+            });
+
+            res.status(200).json(Array.from(groupsMap.values()));
         } catch (err) {
             console.error("GroupController.getAllGroupsForAssignment Error:", err);
             res.status(500).json({ message: "Error fetching all groups" });

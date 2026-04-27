@@ -84,7 +84,13 @@ const GroupModel = {
     },
 
     getAllGroupsForAssignment: async (assignmentId) => {
-        const sql = `SELECT * FROM groups WHERE assignmentId = ?`;
+        const sql = `
+            SELECT g.*, u.userId, u.firstName, u.lastName, u.email
+            FROM groups g
+            LEFT JOIN memberships m ON g.groupId = m.groupId
+            LEFT JOIN users u ON m.userId = u.userId
+            WHERE g.assignmentId = ?
+        `;
         const [rows] = await pool.query(sql, [assignmentId]);
         return rows;
     },

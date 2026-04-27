@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAssignment, getUserGroup, deleteGroup, getAllGroupsForAssignment } from '../../services/workService';
-import checkListIcon from '../../assets/checklist-icon.png';
-import LoadingSpinner from '../LoadingSpinner';
-import Rubric from '../Rubric';
-import CreateGroupModal from './CreateGroupModal';
-import MessagePopup from '../MessagePopup';
-import { useAuth } from '../../components/AuthContext';
-import { useClass } from '../../components/ClassContext';
+import { getAssignment, getUserGroup, deleteGroup, getAllGroupsForAssignment } from '../services/workService';
+import checkListIcon from '../assets/checklist-icon.png';
+import LoadingSpinner from '../components/LoadingSpinner';
+import Rubric from '../components/Rubric';
+import CreateGroupModal from '../components/Work/CreateGroupModal';
+import MessagePopup from '../components/MessagePopup';
+import { useAuth } from '../components/AuthContext';
+import { useClass } from '../components/ClassContext';
+import ProgressBar from '../components/ProgressBar';
 
 export default function AssignmentDetail() {
     const { assignmentId } = useParams();
@@ -136,12 +137,7 @@ export default function AssignmentDetail() {
                                     <div key={group.groupId} className="group-status-container">
                                         <div className="group-info-left">
                                             <span className="group-name-display">{group.groupName}</span>
-                                            <div className="group-progress-bar-wrapper">
-                                                <div className="progress-bar-bg">
-                                                    <div className="progress-bar-fill" style={{ width: '0%' }}></div>
-                                                </div>
-                                                <span className="progress-percentage-text">0%</span>
-                                            </div>
+                                            <ProgressBar progress={0} />
                                         </div>
                                         {isLeader && (
                                             <button className="btn-delete-group" onClick={() => handleDeleteGroup(group.groupId)}>Delete</button>
