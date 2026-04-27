@@ -77,6 +77,21 @@ const UserModel = {
             console.error("Database Error (removeMemberFromClass):", err);
             throw err;
         }
+    },
+
+    findUserByEmail: async (email) => {
+        const [res] = await pool.query('SELECT userId FROM users WHERE email = ?', [email]);
+        return res[0];
+    },
+
+    addMemberToClass: async (userId, classId) => {
+        const sql = 'INSERT IGNORE INTO enrollments (userId, classId) VALUES (?, ?)';
+        await pool.query(sql, [userId, classId]);
+    },
+
+    addOwnerToClass: async (userId, classId) => {
+        const sql = 'INSERT IGNORE INTO owners (userId, classId) VALUES (?, ?)';
+        await pool.query(sql, [userId, classId]);
     }
 };
 

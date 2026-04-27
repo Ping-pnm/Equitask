@@ -134,6 +134,30 @@ const ClassController = {
             console.error("Error removing member:", err);
             res.status(500).json({ message: "Server error removing member" });
         }
+    },
+
+    inviteToClass: async (req, res) => {
+        try {
+            const { email, classId, type } = req.body; // type: 'leader' or 'member'
+
+            // 1. Find user by email
+            const user = await UserModel.findUserByEmail(email);
+            if (!user) {
+                return res.status(404).json({ message: "User not found with this email" });
+            }
+
+            // 2. Add to appropriate table
+            if (type === 'leader') {
+                await UserModel.addOwnerToClass(user.userId, classId);
+            } else {
+                await UserModel.addMemberToClass(user.userId, classId);
+            }
+
+            res.status(200).json({ message: `User invited as ${type}` });
+        } catch (err) {
+            console.error("Error inviting user:", err);
+            res.status(500).json({ message: "Server error during invitation" });
+        }
     }
 };
 

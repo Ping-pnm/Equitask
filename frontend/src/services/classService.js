@@ -174,3 +174,25 @@ export async function deleteMembers(userId, classId) {
         throw err;
     }
 }
+
+export async function inviteToClass(email, classId, type) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/invite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, classId, type })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to send invite');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("classService Error", err);
+        throw err;
+    }
+}

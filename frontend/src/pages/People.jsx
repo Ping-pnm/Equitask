@@ -6,7 +6,6 @@ import { getLeaders, getMembers, deleteMembers } from "../services/classService"
 
 import RoleHeader from "../components/People/RoleHeader";
 import PeopleRow from "../components/People/PeopleRow";
-import DeleteIcon from "../components/People/DeleteIcon";
 import InviteModal from "../components/People/InviteModal";
 
 export default function People() {
@@ -89,7 +88,7 @@ export default function People() {
         <section className="people-content-area people-content">
 
             <div className="people-section-spacing people-section">
-                <RoleHeader role='Leaders' />
+                <RoleHeader role='Leaders' onRefresh={fetchLeaders} />
                 <div className="person-row-content person-row">
                     {allMembers
                         .filter(block => block.type === 'leader')
@@ -107,7 +106,7 @@ export default function People() {
 
             </div>
             <div className="people-section">
-                <RoleHeader role='Members' />
+                <RoleHeader role='Members' onRefresh={fetchMembers} />
 
                 <div className="people-list-container-lg people-list">
                     {allMembers

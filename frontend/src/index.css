@@ -1800,11 +1800,23 @@ body.homepage-body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.sidebar-card-header {
+.sidebar-card-header.invite-modal-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    border-bottom: 2px solid #56c4df;
+}
+
+.invite-modal-heading {
+    margin: 0;
+    color: #222;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.cursor-pointer-icon {
+    cursor: pointer;
+    margin-top: -12px; /* Shift close button upward */
 }
 
 .sidebar-card-title {
@@ -1977,7 +1989,6 @@ body.homepage-body {
     align-items: center;
     border-bottom: 2px solid #ccc;
     padding-bottom: 15px;
-    margin-bottom: 20px;
 }
 
 .modal-title-text {
@@ -2796,9 +2807,10 @@ body.homepage-body {
 .people-list-container-lg { display: flex; flex-direction: column; gap: 25px; }
 .custom-checkbox-box-interactive { width: 22px; height: 22px; border: 2.5px solid #56c4df; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .invite-modal-container { max-width: 500px; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-.invite-modal-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #56c4df; padding-bottom: 15px; margin-bottom: 25px; }
+.invite-modal-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #56c4df; margin-bottom: 25px; }
 .invite-modal-heading { color: #56c4df; font-size: 24px; font-weight: 700; margin: 0; }
-.cursor-pointer-icon { cursor: pointer; }
+#invite-modal-title { margin-bottom: 10px; padding: 0px; } 
+.cursor-pointer-icon { cursor: pointer; transform: translateY(-8px); }
 .invite-chips-area { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 .invite-form-container { display: flex; align-items: flex-end; gap: 15px; }
 .invite-input-line { flex-grow: 1; border-bottom: 2px solid #ccc; padding-bottom: 5px; }

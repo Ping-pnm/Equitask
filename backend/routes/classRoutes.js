@@ -18,4 +18,6 @@ router.get('/members/:classId', ClassController.getClassMembers);
 
 router.delete('/member/delete', ClassController.removeMember);
 
+router.post('/invite', ClassController.inviteToClass);
+
 export default router;
