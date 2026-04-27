@@ -2606,13 +2606,25 @@ body.homepage-body {
 .post-card-work {
     background: #f6f6f6;
     border-radius: 20px;
-    padding: 15px 25px;
+    padding: 24px 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    margin-bottom: 15px;
-    transition: background 0.2s, transform 0.1s;
+    margin-bottom: 20px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+}
+
+.post-card-work:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #e0e0e0;
+}
+
+.post-card-work:active {
+    transform: translateY(0) scale(0.99);
 }
 
 .post-card-stream {

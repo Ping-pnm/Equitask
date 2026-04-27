@@ -46,7 +46,7 @@ export default function Register() {
 
             if (response.ok) {
                 setModalConfig({ show: true, message: 'Registration Successful!', theme: 'green' });
-                setTimeout(() => navigate('/login'), 1500);
+                setTimeout(() => navigate('/login'), 1000);
             } else {
                 setModalConfig({ show: true, message: data.message || 'Registration Failed', theme: 'red' });
             }

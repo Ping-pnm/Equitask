@@ -6,7 +6,6 @@ import { getLeaders, getMembers, deleteMembers } from "../services/classService"
 
 import RoleHeader from "../components/People/RoleHeader";
 import PeopleRow from "../components/People/PeopleRow";
-import InviteModal from "../components/People/InviteModal";
 
 export default function People() {
     const { userId } = useAuth();

@@ -1,13 +1,14 @@
-import pool from "../db.js";
+import pool from '../db.js';
 
-export const AssignmentModel =  {
+const AssignmentModel = {
     getAllByClassId: async (classId) => {
         try {
             const sql = `
-                SELECT * FROM assignments a
+                SELECT a.*, u.firstName, u.lastName 
+                FROM assignments a
                 JOIN users u ON a.creatorId = u.userId
-                WHERE classId = ?;
-
+                WHERE a.classId = ?
+                ORDER BY a.dueDate ASC;
             `;
 
             const [assignmentRes] = await pool.query(sql, [classId]);
@@ -15,7 +16,7 @@ export const AssignmentModel =  {
         } catch(err) {
             console.error("Database Error (getAllByClassId)");
         };
+        }
     }
-}
 
 export default AssignmentModel;

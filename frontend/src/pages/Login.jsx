@@ -38,7 +38,7 @@ export default function Login() {
                 setModalConfig({ show: true, message: 'Login Successful!', theme: 'green' });
                 login(data.user.id);
                 // Wait a moment so the user sees the success message before redirecting
-                setTimeout(() => navigate('/'), 1500);
+                setTimeout(() => navigate('/'), 1000);
             } else {
                 setModalConfig({ show: true, message: data.message || 'Login Failed', theme: 'red' });
             }
