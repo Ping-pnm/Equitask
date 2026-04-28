@@ -8,10 +8,10 @@ export default function TabHeader() {
     return (
         <header className="top-nav">
             <nav className="tabs">
-                <Link to="/" className={`tab-item ${location.pathname === "/" || (isAssignment && from === "Stream") ? "active" : ""}`}>Stream</Link>
-                <Link to="/classwork" className={`tab-item ${location.pathname === "/classwork" || (isAssignment && from === "Work") ? "active" : ""}`}>Work</Link>
+                <Link to="/" className={`tab-item ${location.pathname === "/" ? "active" : ""}`}>Stream</Link>
+                <Link to="/classwork" className={`tab-item ${location.pathname === "/classwork" || isAssignment ? "active" : ""}`}>Work</Link>
                 <Link to="/people" className={`tab-item ${location.pathname === "/people" ? "active" : ""}`}>People</Link>
-                <Link to="/dashboard" className={`tab-item ${location.pathname === "/dashboard" || location.pathname.startsWith('/project/') ? "active" : ""}`}>Dashboard</Link>
+                <Link to="/dashboard" className={`tab-item ${location.pathname === "/dashboard" || location.pathname.startsWith('/project/') || location.pathname.startsWith('/group-project/') ? "active" : ""}`}>Dashboard</Link>
             </nav>
         </header>
     );

@@ -753,6 +753,10 @@ body.homepage-body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+#modal-assign .modal-content {
+    max-width: 900px;
+}
+
 .modal-content h2 {
     font-size: 16px;
     margin-bottom: 25px;
@@ -1811,19 +1815,23 @@ body.homepage-body {
 .detail-content-grid {
     display: flex;
     gap: 40px;
+    flex-wrap: wrap;
 }
 
 .column-main {
-    flex: 1;
+    flex: 1 1 500px;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .column-sidebar {
     width: 320px;
+    flex: 1 1 300px;
     display: flex;
     flex-direction: column;
     gap: 25px;
+    max-width: 100%;
 }
 
 /* Breadcrumbs */
@@ -2018,6 +2026,24 @@ body.homepage-body {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 40px;
+}
+
+/* No Group Display Dashboard */
+.no-group-display {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+}
+
+.no-group-notice {
+    color: #6b7280;
+    font-size: 15px;
 }
 
 .task-history-table th {
@@ -2690,21 +2716,29 @@ body.homepage-body {
 
 /* ===== Group Status Display ===== */
 .group-status-container {
-    background: #f8f9fa;
+    background: linear-gradient(to right, #ffffff, #fdfdfe);
+    border: 1px solid #edf1f7;
     border-radius: 40px;
-    padding: 15px 30px;
+    padding: 10px 25px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 20px;
-    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.04);
     width: 100%;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.group-status-container:hover {
+    background: #ffffff;
+    border-color: #3eb5cd;
+    box-shadow: 0 5px 15px rgba(62, 181, 205, 0.12);
+    transform: translateX(6px);
 }
 
 .group-info-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
     flex: 1;
 }
 
@@ -2712,7 +2746,6 @@ body.homepage-body {
     font-size: 18px;
     font-weight: 700;
     color: #333;
-    min-width: 120px;
 }
 
 .group-progress-bar-wrapper {
@@ -2720,6 +2753,7 @@ body.homepage-body {
     align-items: center;
     gap: 12px;
     flex: 1;
+    width: 100%;
 }
 
 .progress-bar-bg {
@@ -2994,8 +3028,34 @@ body.homepage-body {
     background: #7070828c;
 }
 
-.rubrics-input-table { background: white; border-collapse: collapse; min-width: 100%; width: max-content; }
-.rubrics-input-cell { border: 1px solid #000; font-size: 14px; height: 40px; min-width: 200px; outline: none; padding: 10px; vertical-align: top; transition: background-color 0.2s; }
+.rubrics-input-table { 
+    background: white; 
+    border-collapse: collapse; 
+    width: auto; 
+    min-width: 100%; 
+    table-layout: fixed; /* Fixed layout for predictable small width scrolling */
+}
+.rubrics-input-table.full-stretch {
+    width: 100%;
+    table-layout: auto; /* Auto layout for stretching side-to-side */
+}
+.rubrics-input-cell { 
+    border: 1px solid #000; 
+    font-size: 14px; 
+    min-height: 40px; 
+    min-width: 180px; /* Force some width to enable horizontal scroll if many cols */
+    width: 180px;
+    outline: none; 
+    padding: 10px; 
+    vertical-align: top; 
+    transition: background-color 0.2s; 
+    white-space: pre-wrap; 
+    word-break: break-word; 
+}
+.rubrics-input-table.full-stretch .rubrics-input-cell {
+    width: auto;
+    min-width: 120px; /* Allow smaller cells when stretching */
+}
 .rubric-header { background-color: #e3f2fd; } /* Light blue for first row/column */
 .rubric-origin { background-color: #374b75; color: white; font-weight: 700; font-size: 11px; text-align: center; vertical-align: middle; border: 1px solid #000; }
 .rubric-tip { font-size: 12px; color: #666; margin: 5px 0 15px; line-height: 1.5; border-left: 3px solid #374b75; padding-left: 10px; font-style: italic; }

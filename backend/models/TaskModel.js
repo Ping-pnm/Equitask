@@ -100,6 +100,46 @@ const TaskModel = {
         `;
         const [rows] = await pool.query(sql, [groupId, assignmentId]);
         return rows;
+    },
+
+    getById: async (taskId) => {
+        // Fetch task info
+        const taskSql = `SELECT * FROM tasks WHERE taskId = ?`;
+        const [tasks] = await pool.query(taskSql, [taskId]);
+        if (tasks.length === 0) return null;
+        
+        const task = tasks[0];
+
+        // Fetch associated files
+        const filesSql = `SELECT * FROM files WHERE taskId = ?`;
+        const [files] = await pool.query(filesSql, [taskId]);
+        task.files = files;
+
+        return task;
+    },
+
+    uploadTaskFile: async (taskId, groupId, assignmentId, fileUrl) => {
+        const sql = `
+            INSERT INTO files (fileUrl, taskId, groupId, assignmentId)
+            VALUES (?, ?, ?, ?)
+        `;
+        const [result] = await pool.query(sql, [fileUrl, taskId, groupId, assignmentId]);
+        return result.insertId;
+    },
+
+    deleteFile: async (fileId) => {
+        const sql = "DELETE FROM files WHERE fileId = ?";
+        const [result] = await pool.query(sql, [fileId]);
+        return result.affectedRows > 0;
+    },
+
+    submitTask: async (taskId, isSubmitted) => {
+        let sql = "UPDATE tasks SET isSubmitted = ? WHERE taskId = ?";
+        if (isSubmitted) {
+            sql = "UPDATE tasks SET isSubmitted = ?, attemptCount = attemptCount + 1 WHERE taskId = ?";
+        }
+        const [result] = await pool.query(sql, [isSubmitted ? 1 : 0, taskId]);
+        return result.affectedRows > 0;
     }
 };
 

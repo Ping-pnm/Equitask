@@ -1,8 +1,8 @@
 import RubricButton from "./Work/RubricButton";
 
-export default function Rubric({ criterias, levels, cells, setModalData, useRubric = true, readOnly = false }) {
-    const rowCount = criterias.length + 1;
-    const colCount = levels.length + 1;
+export default function Rubric({ criterias, levels, cells, setModalData, useRubric = true, readOnly = false, fullWidth = false }) {
+    const rowCount = (criterias?.length || 0) + 1;
+    const colCount = (levels?.length || 0) + 1;
 
     const handleUpdateSize = (isRow, isPlus) => {
         setModalData(p => {
@@ -104,7 +104,7 @@ export default function Rubric({ criterias, levels, cells, setModalData, useRubr
 
                     {/* Table */}
                     <div className="rubrics-table-wrapper">
-                        <table className="rubrics-input-table">
+                        <table className={`rubrics-input-table ${fullWidth ? 'full-stretch' : ''}`}>
                             <tbody id="rubric-table-assign">
                                 {[...Array(rowCount)].map((_, rowIndex) => (
                                     <tr key={rowIndex}>

@@ -1,6 +1,6 @@
-export async function getWorkFeed(classId) {
+export async function getWorkFeed(classId, userId) {
     try {
-        const response = await fetch(`http://localhost:3000/api/work/feed/${classId}`, {
+        const response = await fetch(`http://localhost:3000/api/work/feed/${classId}?userId=${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -309,6 +309,79 @@ export async function submitGroupWork(groupId, assignmentId, isSubmitted) {
         return await response.json();
     } catch (err) {
         console.error("workService.submitGroupWork Error:", err);
+        throw err;
+    }
+}
+
+export async function getTaskDetail(taskId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}`);
+        if (!response.ok) throw new Error("Failed to fetch task detail");
+        return await response.json();
+    } catch (err) {
+        console.error("workService.getTaskDetail Error:", err);
+        throw err;
+    }
+}
+
+export async function uploadTaskWork(taskId, groupId, assignmentId, files) {
+    try {
+        const formData = new FormData();
+        formData.append('groupId', groupId);
+        formData.append('assignmentId', assignmentId);
+        files.forEach(file => formData.append('files', file));
+
+        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to upload task work');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.uploadTaskWork Error:", err);
+        throw err;
+    }
+}
+
+export async function deleteTaskWork(fileId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/tasks/work-file/${fileId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete task work file');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.deleteTaskWork Error:", err);
+        throw err;
+    }
+}
+
+export async function submitTaskWork(taskId, isSubmitted) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isSubmitted })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to submit task work');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.submitTaskWork Error:", err);
         throw err;
     }
 }

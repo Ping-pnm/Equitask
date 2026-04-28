@@ -33,6 +33,15 @@ const AnnouncementModel = {
             console.error("Database Error (getAllByClassId):", err);
             throw err;
         }
+    },
+    deleteAnnouncement: async (announcementId) => {
+        try {
+            const sql = "DELETE FROM announcements WHERE announcementId = ?;";
+            await pool.query(sql, [announcementId]);
+        } catch (err) {
+            console.error("Database Error (deleteAnnouncement):", err);
+            throw err;
+        }
     }
 }
 

@@ -18,6 +18,10 @@ router.get('/members/:classId', ClassController.getClassMembers);
 
 router.delete('/member/delete', ClassController.removeMember);
 
+router.delete('/announce/:announcementId', ClassController.deleteAnnouncement);
+
+router.delete('/file/:fileId', ClassController.deleteFile);
+
 router.post('/invite', ClassController.inviteToClass);
 
 export default router;

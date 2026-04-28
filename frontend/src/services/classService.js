@@ -196,3 +196,45 @@ export async function inviteToClass(email, classId, type) {
         throw err;
     }
 }
+
+export async function deleteFile(fileId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/file/${fileId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete file');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("classService Error", err);
+        throw err;
+    }
+}
+
+export async function deleteAnnouncement(announcementId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/class/announce/${announcementId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete announcement');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("classService Error", err);
+        throw err;
+    }
+}

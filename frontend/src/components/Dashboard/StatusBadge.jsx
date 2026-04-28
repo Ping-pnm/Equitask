@@ -1,12 +1,5 @@
 import React from 'react';
 
-/**
- * StatusBadge Component
- * 
- * Displays a task status badge based on the progress percentage.
- * 
- * @param {number} progress - The progress percentage (0 - 100)
- */
 const StatusBadge = ({ progress }) => {
     let text = 'WAITING';
     let styles = {
@@ -72,7 +65,7 @@ const StatusBadge = ({ progress }) => {
     }
 
     return (
-        <div 
+        <div
             className="status-badge"
             style={{
                 ...styles,

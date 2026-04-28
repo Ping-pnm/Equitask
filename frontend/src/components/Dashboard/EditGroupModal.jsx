@@ -1,5 +1,5 @@
 
-
+// currently not used
 export default function EditGroupModal() {
     return (
         <div id="modal-edit-group" className="modal-overlay hidden">

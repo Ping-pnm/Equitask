@@ -29,18 +29,27 @@ export default function GroupCard({ groupId, assignmentId, groupName, overallPro
                         <img src={aiLogo} alt="Ai summary logo" /> AI Summary
                     </div>
                     <div className="ai-summary-content">
-                        <p>This group is {summary}... <span className="read-more-link">read more</span></p>
+                        <p>
+                            {summary ? `${summary}... ` : "No summary available for this group yet. "}
+                            {summary && <span className="read-more-link">read more</span>}
+                        </p>
                     </div>
                 </div>
             </div>
 
             <div className="group-card-members">
-                {members.map((student, idx) => (
-                    <div key={idx} className="student-progress-row">
-                        <span className="student-name">{student.name}</span>
-                        <ProgressBar progress={student.progress} />
-                    </div>
-                ))}
+                {members && members.length > 0 ? (
+                    members.map((student, idx) => (
+                        <div key={idx} className="student-progress-row">
+                            <span className="student-name">{student.name}</span>
+                            <ProgressBar progress={student.progress} />
+                        </div>
+                    ))
+                ) : (
+                    <p className="no-members-msg" style={{ fontSize: '12px', color: '#999', textAlign: 'center' }}>
+                        Join this group to see member progress.
+                    </p>
+                )}
             </div>
 
             <button 

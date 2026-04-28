@@ -7,22 +7,50 @@ const AssignmentModel = {
                 SELECT 
                     a.*, 
                     u.firstName, u.lastName,
-                    COALESCE(ua.isSubmitted, g.isSubmitted, 0) as isSubmitted,
-                    COALESCE(ua.grades, g.grades) as grades
+                    COALESCE(ua.isSubmitted, g_info.isSubmitted, 0) as isSubmitted,
+                    COALESCE(ua.grades, g_info.grades) as grades,
+                    g_info.groupId,
+                    g_info.groupName,
+                    g_info.groupProgress,
+                    g_info.members
                 FROM assignments a
                 JOIN users u ON a.creatorId = u.userId
                 LEFT JOIN userAssignments ua ON a.assignmentId = ua.assignmentId AND ua.userId = ?
                 LEFT JOIN (
-                    SELECT m.userId, g.groupId, g.assignmentId, g.isSubmitted, g.grades
+                    SELECT 
+                        m.userId as current_user_id,
+                        g.groupId,
+                        g.groupName,
+                        g.assignmentId,
+                        g.isSubmitted,
+                        g.grades,
+                        (SELECT AVG(t.progress) FROM tasks t WHERE t.groupId = g.groupId AND t.assignmentId = g.assignmentId) as groupProgress,
+                        (
+                            SELECT JSON_ARRAYAGG(
+                                JSON_OBJECT(
+                                    'userId', m2.userId,
+                                    'name', CONCAT(u2.firstName, ' ', u2.lastName),
+                                    'progress', (SELECT COALESCE(AVG(t2.progress), 0) FROM tasks t2 WHERE t2.userId = m2.userId AND t2.groupId = g.groupId AND t2.assignmentId = g.assignmentId)
+                                )
+                            )
+                            FROM memberships m2
+                            JOIN users u2 ON m2.userId = u2.userId
+                            WHERE m2.groupId = g.groupId
+                        ) as members
                     FROM memberships m
                     JOIN groups g ON m.groupId = g.groupId
-                ) g ON a.assignmentId = g.assignmentId AND g.userId = ?
+                ) g_info ON a.assignmentId = g_info.assignmentId AND g_info.current_user_id = ?
                 WHERE a.classId = ?
                 ORDER BY a.createdAt DESC;
             `;
 
             const [assignmentRes] = await pool.query(sql, [userId, userId, classId]);
-            return assignmentRes;
+            
+            // Parse members JSON string if necessary
+            return assignmentRes.map(item => ({
+                ...item,
+                members: typeof item.members === 'string' ? JSON.parse(item.members) : (item.members || [])
+            }));
         } catch(err) {
             console.error("Database Error (getAllByClassId)", err);
             throw err;

@@ -6,7 +6,7 @@ import StatusBadge from './StatusBadge';
 const TaskItem = ({ studentName, task, onOpenDetail }) => {
 
     return (
-        <div onClick={() => onOpenDetail(studentName, task.name)}
+        <div onClick={() => onOpenDetail(studentName, task)}
             style={{ background: 'white', borderRadius: '12px', padding: '15px', marginBottom: '15px', cursor: 'pointer' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

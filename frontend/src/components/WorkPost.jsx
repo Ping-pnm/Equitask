@@ -15,29 +15,31 @@ export default function WorkPost({ author, title, date, assignmentId, onUpdate, 
     const isStreamType = !!author;
 
     return (
-        <div className={`post-card-work ${isStreamType ? 'post-card-stream' : ''}`} onClick={() => onClick && onClick(assignmentId)}>
-            <div className="post-card-left">
-                {isStreamType ? <div className="post-icon-wrapper"><img src={checkListIcon} alt="Checklist" className="post-card-icon" /></div> : <img src={checkListIcon} alt="Checklist" className="post-card-icon" />
-                }
-                <div className="post-info">
-                    <span className="post-card-title">
-                        {isStreamType ? `${author} posted a new assignment: ${title}` : title}
-                    </span>
-                    {isStreamType && <div className="post-date">{date}</div>}
+        <>
+            <div className={`post-card-work ${isStreamType ? 'post-card-stream' : ''}`} onClick={() => onClick && onClick(assignmentId)}>
+                <div className="post-card-left">
+                    {isStreamType ? <div className="post-icon-wrapper"><img src={checkListIcon} alt="Checklist" className="post-card-icon" /></div> : <img src={checkListIcon} alt="Checklist" className="post-card-icon" />
+                    }
+                    <div className="post-info">
+                        <span className="post-card-title">
+                            {isStreamType ? `${author} posted a new assignment: ${title}` : title}
+                        </span>
+                        {isStreamType && <div className="post-date">{date}</div>}
+                    </div>
                 </div>
+                {!isStreamType && (
+                    <div className="post-card-right">
+                        <span className="post-card-due">Due {date}</span>
+                        {isLeader && (
+                            <div className="post-card-actions">
+                                <img src={editIcon} alt="Edit"
+                                    className="post-card-edit-icon"
+                                    onClick={(e) => { e.stopPropagation(); setIsEditing(true); }} />
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
-            {!isStreamType && (
-                <div className="post-card-right">
-                    <span className="post-card-due">Due {date}</span>
-                    {isLeader && (
-                        <div className="post-card-actions">
-                            <img src={editIcon} alt="Edit"
-                                className="post-card-edit-icon"
-                                onClick={(e) => { e.stopPropagation(); setIsEditing(true); }} />
-                        </div>
-                    )}
-                </div>
-            )}
             {isEditing && <AssignModal
                 onClose={(refresh) => {
                     setIsEditing(false);
@@ -47,6 +49,6 @@ export default function WorkPost({ author, title, date, assignmentId, onUpdate, 
                 isCreate={false}
                 assignmentId={assignmentId}
             />}
-        </div>
+        </>
     );
 }

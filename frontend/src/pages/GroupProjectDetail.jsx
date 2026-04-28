@@ -35,7 +35,7 @@ export default function GroupProjectDetail() {
     const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState('');
     const [selectedMember, setSelectedMember] = useState(null);
-    const [selectedTaskName, setSelectedTaskName] = useState('');
+    const [selectedTask, setSelectedTask] = useState(null);
     const [popupMessage, setPopupMessage] = useState(null);
 
     // Work Section States
@@ -174,7 +174,7 @@ export default function GroupProjectDetail() {
 
     const openTaskDetail = (student, task) => {
         setSelectedStudent(student);
-        setSelectedTaskName(task);
+        setSelectedTask(task);
         setIsTaskDetailOpen(true);
     };
 
@@ -192,12 +192,7 @@ export default function GroupProjectDetail() {
             name: `${member.firstName} ${member.lastName}`,
             member: member,
             overallProgress: overallProgress,
-            tasks: member.tasks?.map(t => ({
-                name: t.name,
-                status: t.status,
-                progress: t.progress,
-                aiSummary: t.aiSummary
-            })) || []
+            tasks: member.tasks || []
         };
     }) || [];
 
@@ -261,7 +256,7 @@ export default function GroupProjectDetail() {
                         {/* Group Members Section */}
                         <div className="extracted-style-23">
                             <h2 className="extracted-style-24">Group Members</h2>
-                            <div className="member-table-wrapper">
+                            <div className="member-table-wrapper" style={{ overflowX: 'auto' }}>
                                 <table className="member-list-table">
                                     <tbody>
                                         {group.members && group.members.length > 0 ? (
@@ -279,28 +274,6 @@ export default function GroupProjectDetail() {
                                         )}
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-
-
-
-                        {/* AI Rubric Summary Section */}
-                        <div className="extracted-style-44">
-                            <div className="extracted-style-45">
-                                <img src={aiSign} alt="AI Icon" className="extracted-style-46" />
-                                <h2 className="ai-summary-text-gradient ai-summary-text-gradient-large" style={{ margin: '0', lineHeight: '1.2' }}>AI Group Rubric Summary</h2>
-                            </div>
-                            <div className="extracted-style-48" style={{ overflowX: 'auto', maxWidth: '100%' }}>
-                                {assignment && assignment.criteria && assignment.criteria.length > 0 ? (
-                                    <Rubric
-                                        criterias={assignment.criteria.map(c => c.title)}
-                                        levels={assignment.levels.map(l => l.title)}
-                                        cells={assignment.rubricCells}
-                                        readOnly={true}
-                                    />
-                                ) : (
-                                    <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>No rubric defined for this assignment.</p>
-                                )}
                             </div>
                         </div>
                     </div>
@@ -435,6 +408,27 @@ export default function GroupProjectDetail() {
                     </div>
                 </div>
 
+                {/* AI Rubric Summary Section (Full Width) */}
+                <div className="extracted-style-44" style={{ marginTop: '30px', width: '100%' }}>
+                    <div className="extracted-style-45">
+                        <img src={aiSign} alt="AI Icon" className="extracted-style-46" />
+                        <h2 className="ai-summary-text-gradient ai-summary-text-gradient-large" style={{ margin: '0', lineHeight: '1.2' }}>AI Group Rubric Summary</h2>
+                    </div>
+                    <div className="extracted-style-48" style={{ overflowX: 'auto', width: '100%' }}>
+                        {assignment && assignment.criteria && assignment.criteria.length > 0 ? (
+                            <Rubric
+                                criterias={assignment.criteria.map(c => c.title)}
+                                levels={assignment.levels.map(l => l.title)}
+                                cells={assignment.rubricCells}
+                                readOnly={true}
+                                fullWidth={true}
+                            />
+                        ) : (
+                            <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>No rubric defined for this assignment.</p>
+                        )}
+                    </div>
+                </div>
+
                 {/* AI Summary & Chart Section */}
                 <div className="detail-content-grid" style={{ marginTop: '40px', alignItems: 'flex-start', }}>
                     {/* AI Summary Box */}
@@ -445,7 +439,10 @@ export default function GroupProjectDetail() {
                                 style={{ width: '24px', height: '24px', }} />
                             <span className="ai-summary-text-gradient ai-summary-text-gradient-large">AI Summary</span>
                         </div>
-                        {/* Placeholder content */}
+                        {/* AI Summary Placeholder */}
+                        <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.5' }}>
+                            The group has completed most tasks on time. Cooperation is high, but technical hurdles in task #3 required additional meetings.
+                        </p>
                     </div>
 
                     {/* Pie Chart Column */}
@@ -459,14 +456,11 @@ export default function GroupProjectDetail() {
                             background: 'conic-gradient(#71E2Db 0% 33.3%, #47BBD6 33.3% 77.7%, #2F8EBA 77.7% 100%)'
                         }}>
                             {/* Labels */}
-                            <div
-                                style={{ position: 'absolute', top: '15%', right: '-50px', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
+                            <div style={{ position: 'absolute', top: '15%', right: '-50px', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
                                 Student 1<br />33.3%</div>
-                            <div
-                                style={{ position: 'absolute', bottom: '-25px', left: '50%', transform: 'translateX(-50%)', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
+                            <div style={{ position: 'absolute', bottom: '-25px', left: '50%', transform: 'translateX(-50%)', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
                                 Student 2<br />44.4%</div>
-                            <div
-                                style={{ position: 'absolute', top: '5%', left: '-50px', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
+                            <div style={{ position: 'absolute', top: '5%', left: '-50px', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
                                 Student 3<br />22.2%</div>
                         </div>
                     </div>
@@ -515,7 +509,6 @@ export default function GroupProjectDetail() {
                     onAddTask={openAddTaskModal}
                     onOpenDetail={openTaskDetail}
                 />
-
             </div>
 
             {isEditModalOpen && (
@@ -542,8 +535,9 @@ export default function GroupProjectDetail() {
                 isOpen={isTaskDetailOpen}
                 onClose={() => setIsTaskDetailOpen(false)}
                 studentName={selectedStudent}
-                taskName={selectedTaskName}
+                task={selectedTask}
                 groupName={group.groupName}
+                assignment={assignment}
             />
 
             {popupMessage && (

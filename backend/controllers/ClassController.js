@@ -158,6 +158,34 @@ const ClassController = {
             console.error("Error inviting user:", err);
             res.status(500).json({ message: "Server error during invitation" });
         }
+    },
+    deleteAnnouncement: async (req, res) => {
+        try {
+            const { announcementId } = req.params;
+            if (!announcementId) {
+                return res.status(400).json({ message: "Announcement ID is required" });
+            }
+
+            await AnnouncementModel.deleteAnnouncement(announcementId);
+            res.status(200).json({ message: "Announcement deleted successfully" });
+        } catch (err) {
+            console.error("Error deleting announcement:", err);
+            res.status(500).json({ message: "Server error deleting announcement" });
+        }
+    },
+    deleteFile: async (req, res) => {
+        try {
+            const { fileId } = req.params;
+            if (!fileId) {
+                return res.status(400).json({ message: "File ID is required" });
+            }
+
+            await FilesModel.deleteFile(fileId);
+            res.status(200).json({ message: "File deleted successfully" });
+        } catch (err) {
+            console.error("Error deleting file:", err);
+            res.status(500).json({ message: "Server error deleting file" });
+        }
     }
 };
 

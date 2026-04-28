@@ -41,6 +41,15 @@ const FilesModel = {
             console.error("Database Error (getAnnouncementFiles):", err);
             throw err;
         }
+    },
+    deleteFile: async (fileId) => {
+        try {
+            const sql = "DELETE FROM files WHERE fileId = ?;";
+            await pool.query(sql, [fileId]);
+        } catch (err) {
+            console.error("Database Error (deleteFile):", err);
+            throw err;
+        }
     }
 }
 

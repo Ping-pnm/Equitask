@@ -9,6 +9,9 @@ import MessagePopup from '../components/MessagePopup';
 import { useAuth } from '../components/AuthContext';
 import { useClass } from '../components/ClassContext';
 import ProgressBar from '../components/ProgressBar';
+import AssignModal from '../components/Work/AssignModal';
+import editIcon from '../assets/editSign.png';
+import groupSign from '../assets/groupSign.png';
 
 export default function AssignmentDetail() {
     const { assignmentId } = useParams();
@@ -20,6 +23,7 @@ export default function AssignmentDetail() {
     const [allGroups, setAllGroups] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const [modalConfig, setModalConfig] = useState({ show: false, message: '', theme: 'green' });
 
     const fetchData = useCallback(async () => {
@@ -80,8 +84,16 @@ export default function AssignmentDetail() {
                             </div>
                         </div>
                     </div>
-                    <div className="assignment-points-group">
+                    <div className="assignment-points-group" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <div className="assignment-points-text">{assignment.points} points</div>
+                        {isLeader && (
+                            <div className="post-card-actions">
+                                <img src={editIcon} alt="Edit"
+                                    className="post-card-edit-icon"
+                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                    onClick={() => setIsEditing(true)} />
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -131,24 +143,30 @@ export default function AssignmentDetail() {
                             <button className="btn-create-group" onClick={() => setIsGroupModalOpen(true)}>Join / Create Group</button>
                         </div>
 
-                        <div className="groups-list" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <div className="groups-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {groupsToDisplay.length > 0 ? (
                                 groupsToDisplay.map(group => (
-                                    <div key={group.groupId} className="group-status-container">
+                                    <div
+                                        key={group.groupId}
+                                        className="group-status-container"
+                                        onClick={() => navigate(`/group-project/${group.groupId}`)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
                                         <div className="group-info-left">
-                                            <span className="group-name-display">{group.groupName}</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: '100px' }}>
+                                                <img src={groupSign} alt="Group" style={{ width: '32px', height: '32px', opacity: 0.8 }} />
+                                                <span className="group-name-display" style={{ fontSize: '16px' }}>{group.groupName}</span>
+                                            </div>
                                             <ProgressBar progress={group.progress || 0} />
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <button 
-                                                className="btn-view-group" 
-                                                onClick={() => navigate(`/group-project/${group.groupId}`)}
-                                                style={{ padding: '6px 15px', background: '#e0f7fa', color: '#00796b', border: '1px solid #00796b', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
-                                            >
-                                                View
-                                            </button>
                                             {isLeader && (
-                                                <button className="btn-delete-group" onClick={() => handleDeleteGroup(group.groupId)}>Delete</button>
+                                                <button
+                                                    className="btn-delete-group"
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group.groupId); }}
+                                                >
+                                                    Delete
+                                                </button>
                                             )}
                                         </div>
                                     </div>
@@ -167,6 +185,18 @@ export default function AssignmentDetail() {
                     onSuccess={fetchData}
                     assignmentId={assignmentId}
                     classId={assignment.classId}
+                />
+            )}
+
+            {isEditing && (
+                <AssignModal
+                    onClose={(refresh) => {
+                        setIsEditing(false);
+                        if (refresh) fetchData();
+                    }}
+                    classId={assignment.classId}
+                    isCreate={false}
+                    assignmentId={assignmentId}
                 />
             )}
 

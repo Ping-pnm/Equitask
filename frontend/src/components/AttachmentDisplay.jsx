@@ -21,14 +21,16 @@ export default function AttachmentDisplay({ files = [], onDelete }) {
                                 {fileName}
                             </span>
                         </a>
-                        <button
-                            type="button"
-                            className="btn-delete-file"
-                            onClick={() => onDelete(index)}
-                            aria-label="Delete attachment"
-                        >
-                            &times;
-                        </button>
+                        {typeof onDelete === 'function' && (
+                            <button
+                                type="button"
+                                className="btn-delete-file"
+                                onClick={() => onDelete(index)}
+                                aria-label="Delete attachment"
+                            >
+                                &times;
+                            </button>
+                        )}
                     </div>
                 );
             })}

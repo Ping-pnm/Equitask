@@ -14,7 +14,7 @@ export default function Classwork() {
     const navigate = useNavigate();
 
     const fetchWork = useCallback(async () => {
-        if (!activeClassId) return;
+        if (!activeClassId) { setIsLoading(false); return; }
         try {
             setIsLoading(true);
             const data = await getWorkFeed(activeClassId);
