@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import aiLogo from '../../assets/Ai-sign.png';
 import ProgressBar from '../ProgressBar';
 
-export default function GroupCard({ groupName, overallProgress, members, summary }) {
+export default function GroupCard({ groupId, assignmentId, groupName, overallProgress, members, summary }) {
+    const navigate = useNavigate();
     return (
         <div className="group-overview-card">
             <div className="group-card-header">
@@ -41,7 +43,12 @@ export default function GroupCard({ groupName, overallProgress, members, summary
                 ))}
             </div>
 
-            <button className="btn-group-more">More</button>
+            <button 
+                className="btn-group-more" 
+                onClick={() => navigate(`/group-project/${groupId}`)}
+            >
+                More
+            </button>
         </div>
     );
 }

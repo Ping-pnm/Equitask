@@ -45,6 +45,8 @@ export default function ProjectOverview() {
                     groups.map(group => (
                         <GroupCard
                             key={group.groupId}
+                            groupId={group.groupId}
+                            assignmentId={assignmentId}
                             groupName={group.groupName}
                             overallProgress={Math.floor(Math.random() * 100)} // Placeholder
                             members={group.members.map(m => ({

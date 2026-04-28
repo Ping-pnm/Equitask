@@ -1,25 +1,30 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "../AuthContext";
-import { getGroupMembers, createGroup } from "../../services/workService";
+import { getGroupMembers, createGroup, updateGroup } from "../../services/workService";
 import LoadingSpinner from "../LoadingSpinner";
 
-export default function CreateGroupModal({ onClose, onSuccess, assignmentId, classId }) {
+export default function CreateGroupModal({ onClose, onSuccess, assignmentId, classId, initialGroup }) {
     const { userId } = useAuth();
-    const [groupName, setGroupName] = useState("");
-    const [meetLink, setMeetLink] = useState("");
+    const [groupName, setGroupName] = useState(initialGroup?.groupName || "");
+    const [meetLink, setMeetLink] = useState(initialGroup?.meetLink || "");
     const [allMembers, setAllMembers] = useState([]);
-    const [selectedMembers, setSelectedMembers] = useState([]);
+    const [selectedMembers, setSelectedMembers] = useState(
+        initialGroup?.members ? initialGroup.members.filter(m => m.userId !== userId) : []
+    );
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const isEditMode = !!initialGroup;
 
     useEffect(() => {
         async function fetchMembers() {
             try {
                 setIsLoading(true);
                 const members = await getGroupMembers(classId, assignmentId);
-                // Filter out the creator themselves from the selection list
-                setAllMembers(members.filter(m => m.userId !== userId));
+                // Filter out the current user and anyone already in the group
+                const currentMemberIds = selectedMembers.map(m => m.userId);
+                setAllMembers(members.filter(m => m.userId !== userId && !currentMemberIds.includes(m.userId)));
             } catch (err) {
                 console.error("Failed to fetch members:", err);
             } finally {
@@ -36,21 +41,26 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
         const member = allMembers.find(m => m.userId === memberId);
         if (!member) return;
 
-        // Check if already selected
+        // Check if already selected (should be filtered out but just in case)
         if (selectedMembers.find(m => m.userId === memberId)) return;
 
-        // Check if member already has a group
+        // Check if member already has a group (for new members being invited)
         if (member.hasGroup) {
             alert(`${member.firstName} is already in another group for this assignment.`);
             return;
         }
 
         setSelectedMembers([...selectedMembers, member]);
+        setAllMembers(allMembers.filter(m => m.userId !== memberId)); // Remove from available
         e.target.value = ""; // Reset select
     };
 
     const handleRemoveMember = (memberId) => {
+        const removedMember = selectedMembers.find(m => m.userId === memberId);
         setSelectedMembers(selectedMembers.filter(m => m.userId !== memberId));
+        if (removedMember) {
+            setAllMembers([...allMembers, removedMember]); // Put back to available
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -71,11 +81,16 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
                 memberIds: selectedMembers.map(m => m.userId)
             };
 
-            await createGroup(groupData);
+            if (isEditMode) {
+                await updateGroup(initialGroup.groupId, groupData);
+            } else {
+                await createGroup(groupData);
+            }
+            
             if (onSuccess) onSuccess();
             onClose();
         } catch (err) {
-            alert(err.message || "Failed to create group");
+            alert(err.message || `Failed to ${isEditMode ? 'update' : 'create'} group`);
         } finally {
             setIsSubmitting(false);
         }
@@ -90,7 +105,7 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
                     <form onSubmit={handleSubmit}>
                         {/* Header */}
                         <div className="modal-title-row">
-                            <h2 className="modal-title-text">Create Group</h2>
+                            <h2 className="modal-title-text">{isEditMode ? "Update Group" : "Create Group"}</h2>
                             <button type="button" className="modal-close-symbol" onClick={onClose}>&times;</button>
                         </div>
 
@@ -111,7 +126,7 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
 
                             {/* Members Box */}
                             <div className="members-section" style={{ marginTop: '20px' }}>
-                                <div className="members-label">Add Members</div>
+                                <div className="members-label">{isEditMode ? "Edit Members" : "Add Members"}</div>
 
                                 {/* Search / Dropdown Input */}
                                 <div className="member-select-wrapper">
@@ -137,7 +152,7 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
                                         <div key={member.userId} className="member-chip">
                                             <div className="member-chip-avatar">
                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                                     <circle cx="12" cy="7" r="4"></circle>
                                                 </svg>
                                             </div>
@@ -166,7 +181,7 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
                                 className="modal-submit-btn"
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? "Creating..." : "Create"}
+                                {isSubmitting ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Update" : "Create")}
                             </button>
                         </div>
                     </form>

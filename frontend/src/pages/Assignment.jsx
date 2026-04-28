@@ -1,8 +1,9 @@
-
+import checkListIcon from '../assets/checklist-icon.png';
+import gearEditIcon from '../assets/gearEditSign.png';
 
 export default function Assignment() {
     return (
-        <section id="dashboard-hw1-view" className="stream-content hw1-section" style={{ display: 'none', }}>
+        <section id="dashboard-hw1-view" className="stream-content hw1-section">
 
             {/* Two-column layout wrapper */}
             <div className="hw1-layout">
@@ -23,14 +24,14 @@ export default function Assignment() {
                     {/* Header: Icon + Title + Gear + Points */}
                     <div className="hw1-header-row">
                         <div className="hw1-title-group">
-                            <img src="../public/assets/checklist-icon.png" alt="Checklist" className="hw1-checklist-icon" />
+                            <img src={checkListIcon} alt="Checklist" className="hw1-checklist-icon" />
                             <div>
                                 <h1 className="hw1-title">Homework 1</h1>
                                 <div className="hw1-due">Due 20 NOV</div>
                             </div>
                         </div>
                         <div className="hw1-header-right">
-                            <img src="../public/assets/gearEditSign.png" alt="Edit Settings" className="hw1-gear-icon"
+                            <img src={gearEditIcon} alt="Edit Settings" className="hw1-gear-icon"
                                 title="Edit Assignment" />
                             <span className="hw1-points">10 points</span>
                         </div>

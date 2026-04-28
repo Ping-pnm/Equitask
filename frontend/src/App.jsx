@@ -7,6 +7,8 @@ import People from './pages/People.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import AssignmentDetail from './pages/AssignmentDetail.jsx';
 import ProjectOverview from './pages/ProjectOverview.jsx';
+import Assignment from './pages/Assignment.jsx';
+import GroupProjectDetail from './pages/GroupProjectDetail.jsx';
 
 import RootLayout from './components/RootLayout.jsx';
 import ProtectedLayout from './components/ProtectedLayout.jsx';
@@ -31,7 +33,9 @@ const router = createBrowserRouter([
                     { path: "/people", element: <People /> },
                     { path: "/dashboard", element: <Dashboard /> },
                     { path: "/assignment/:assignmentId", element: <AssignmentDetail /> },
-                    { path: "/project/:assignmentId", element: <ProjectOverview /> }
+                    { path: "/project/:assignmentId", element: <ProjectOverview /> },
+                    { path: "/group-assignment/:assignmentId", element: <Assignment /> },
+                    { path: "/group-project/:groupId", element: <GroupProjectDetail /> }
                 ]
             }
         ]

@@ -98,6 +98,107 @@ const GroupController = {
             console.error("GroupController.deleteGroup Error:", err);
             res.status(500).json({ message: "Error deleting group" });
         }
+    },
+
+    getGroupById: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const group = await GroupModel.getGroupById(groupId);
+            if (!group) {
+                return res.status(404).json({ message: "Group not found" });
+            }
+            res.status(200).json(group);
+        } catch (err) {
+            console.error("GroupController.getGroupById Error:", err);
+            res.status(500).json({ message: "Error fetching group details" });
+        }
+    },
+
+    updateGroup: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const { groupName, meetLink, memberIds, creatorId } = req.body;
+
+            if (!groupName) {
+                return res.status(400).json({ message: "Group name is required" });
+            }
+
+            // Get group to know the assignmentId
+            const group = await GroupModel.getGroupById(groupId);
+            if (!group) {
+                return res.status(404).json({ message: "Group not found" });
+            }
+
+            // Check if any added members are already in ANOTHER group
+            for (const userId of memberIds) {
+                const hasAnother = await GroupModel.checkUserHasAnotherGroup(userId, group.assignmentId, groupId);
+                if (hasAnother) {
+                    return res.status(400).json({ message: `One or more selected members are already in another group.` });
+                }
+            }
+
+            await GroupModel.updateGroup(groupId, groupName, meetLink, memberIds, creatorId);
+            res.status(200).json({ message: "Group updated successfully" });
+        } catch (err) {
+            console.error("GroupController.updateGroup Error:", err);
+            res.status(500).json({ message: "Error updating group" });
+        }
+    },
+
+    getGroupComments: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const comments = await GroupModel.getGroupComments(groupId);
+            res.status(200).json(comments);
+        } catch (err) {
+            console.error("GroupController.getGroupComments Error:", err);
+            res.status(500).json({ message: "Error fetching group comments" });
+        }
+    },
+
+    addGroupComment: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const { userId, comment } = req.body;
+
+            if (!userId || !comment) {
+                return res.status(400).json({ message: "User ID and comment text are required" });
+            }
+
+            const commentId = await GroupModel.addGroupComment(groupId, userId, comment);
+            res.status(201).json({ message: "Comment added successfully", commentId });
+        } catch (err) {
+            console.error("GroupController.addGroupComment Error:", err);
+            res.status(500).json({ message: "Error adding group comment" });
+        }
+    },
+
+    trackMeetJoin: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const { userId } = req.body;
+
+            if (!userId) {
+                return res.status(400).json({ message: "User ID is required" });
+            }
+
+            await GroupModel.trackMeetJoin(userId, groupId);
+            res.status(200).json({ message: "Meet join tracked successfully" });
+        } catch (err) {
+            console.error("GroupController.trackMeetJoin Error:", err);
+            res.status(500).json({ message: "Error tracking meet join" });
+        }
+    },
+
+    getMeetTracking: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const tracking = await GroupModel.getMeetTracking(groupId);
+            res.status(200).json(tracking);
+        } catch (err) {
+            console.error("GroupController.getMeetTracking Error:", err);
+            res.status(500).json({ message: "Error fetching meet tracking" });
+        }
     }
 };
 

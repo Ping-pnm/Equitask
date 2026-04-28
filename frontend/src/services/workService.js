@@ -159,3 +159,95 @@ export async function getAllGroupsForAssignment(assignmentId) {
         throw err;
     }
 }
+
+export async function getGroup(groupId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch group details');
+        }
+        return await response.json();
+    } catch (err) {
+        console.error("workService.getGroup Error:", err);
+        throw err;
+    }
+}
+
+export async function updateGroup(groupId, groupData) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(groupData),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update group');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.updateGroup Error:", err);
+        throw err;
+    }
+}
+
+export async function getGroupComments(groupId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}/comments`);
+        if (!response.ok) throw new Error("Failed to fetch group comments");
+        return await response.json();
+    } catch (err) {
+        console.error("workService.getGroupComments Error:", err);
+        throw err;
+    }
+}
+
+export async function addGroupComment(groupId, userId, comment) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, comment }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add comment');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.addGroupComment Error:", err);
+        throw err;
+    }
+}
+
+export async function trackMeetJoin(groupId, userId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}/track-meet`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId }),
+        });
+
+        if (!response.ok) throw new Error("Failed to track meet join");
+        return await response.json();
+    } catch (err) {
+        console.error("workService.trackMeetJoin Error:", err);
+        throw err;
+    }
+}
+
+export async function getMeetTracking(groupId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}/track-meet`);
+        if (!response.ok) throw new Error("Failed to fetch meet tracking");
+        return await response.json();
+    } catch (err) {
+        console.error("workService.getMeetTracking Error:", err);
+        throw err;
+    }
+}
