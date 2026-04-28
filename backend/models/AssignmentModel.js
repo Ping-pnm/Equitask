@@ -1,17 +1,27 @@
 import pool from '../db.js';
 
 const AssignmentModel = {
-    getAllByClassId: async (classId) => {
+    getAllByClassId: async (classId, userId) => {
         try {
             const sql = `
-                SELECT a.*, u.firstName, u.lastName 
+                SELECT 
+                    a.*, 
+                    u.firstName, u.lastName,
+                    COALESCE(ua.isSubmitted, g.isSubmitted, 0) as isSubmitted,
+                    COALESCE(ua.grades, g.grades) as grades
                 FROM assignments a
                 JOIN users u ON a.creatorId = u.userId
+                LEFT JOIN userAssignments ua ON a.assignmentId = ua.assignmentId AND ua.userId = ?
+                LEFT JOIN (
+                    SELECT m.userId, g.groupId, g.assignmentId, g.isSubmitted, g.grades
+                    FROM memberships m
+                    JOIN groups g ON m.groupId = g.groupId
+                ) g ON a.assignmentId = g.assignmentId AND g.userId = ?
                 WHERE a.classId = ?
-                ORDER BY a.dueDate ASC;
+                ORDER BY a.createdAt DESC;
             `;
 
-            const [assignmentRes] = await pool.query(sql, [classId]);
+            const [assignmentRes] = await pool.query(sql, [userId, userId, classId]);
             return assignmentRes;
         } catch(err) {
             console.error("Database Error (getAllByClassId)", err);
@@ -27,8 +37,8 @@ const AssignmentModel = {
             const assignmentSql = `
                 INSERT INTO assignments (
                     title, instructions, points, dueDate, 
-                    isGroupWork, creatorId, classId, isGraded, isSubmitted
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+                    isGroupWork, creatorId, classId
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
             `;
             const assignmentParams = [
                 data.title,
@@ -54,13 +64,16 @@ const AssignmentModel = {
             // 3. Insert into criteria (Rows)
             const criteriaIds = [];
             if (data.rubrics && data.rubrics.criterias) {
+                const numCriteria = data.rubrics.criterias.length;
+                const maxPct = numCriteria > 0 ? (100 / numCriteria) : 0;
+                
                 const criteriaSql = `
-                    INSERT INTO criteria (title, sort_order, rubricId)
-                    VALUES (?, ?, ?)
+                    INSERT INTO criteria (title, sort_order, rubricId, maxPercentage)
+                    VALUES (?, ?, ?, ?)
                 `;
                 for (let i = 0; i < data.rubrics.criterias.length; i++) {
                     const criteriaTitle = data.rubrics.criterias[i];
-                    const [res] = await connection.query(criteriaSql, [criteriaTitle || '', i, rubricId]);
+                    const [res] = await connection.query(criteriaSql, [criteriaTitle || '', i, rubricId, maxPct]);
                     criteriaIds.push(res.insertId);
                 }
             }
@@ -108,6 +121,23 @@ const AssignmentModel = {
                 }
             }
 
+            // 6. Handle linking tables (Group vs Individual)
+            if (!data.isGroupWork) {
+                // If individual, link all students in class to this assignment
+                const enrollmentSql = `SELECT userId FROM enrollments WHERE classId = ?`;
+                const [students] = await connection.query(enrollmentSql, [data.classId]);
+                
+                if (students.length > 0) {
+                    const userAssignmentSql = `
+                        INSERT INTO userAssignments (userId, assignmentId, isSubmitted, grades)
+                        VALUES (?, ?, 0, NULL)
+                    `;
+                    for (const student of students) {
+                        await connection.query(userAssignmentSql, [student.userId, assignmentId]);
+                    }
+                }
+            }
+
             await connection.commit();
             return assignmentId;
         } catch (err) {
@@ -118,11 +148,31 @@ const AssignmentModel = {
             connection.release();
         }
     },
-    getById: async (assignmentId) => {
+    getById: async (assignmentId, userId = null) => {
         try {
             // 1. Get Assignment
-            const assignmentSql = `SELECT * FROM assignments WHERE assignmentId = ?`;
-            const [assignments] = await pool.query(assignmentSql, [assignmentId]);
+            let assignmentSql = `SELECT * FROM assignments WHERE assignmentId = ?`;
+            let assignmentParams = [assignmentId];
+
+            if (userId) {
+                assignmentSql = `
+                    SELECT 
+                        a.*,
+                        COALESCE(ua.isSubmitted, g.isSubmitted, 0) as isSubmitted,
+                        COALESCE(ua.grades, g.grades) as grades
+                    FROM assignments a
+                    LEFT JOIN userAssignments ua ON a.assignmentId = ua.assignmentId AND ua.userId = ?
+                    LEFT JOIN (
+                        SELECT m.userId, g.groupId, g.assignmentId, g.isSubmitted, g.grades
+                        FROM memberships m
+                        JOIN groups g ON m.groupId = g.groupId
+                    ) g ON a.assignmentId = g.assignmentId AND g.userId = ?
+                    WHERE a.assignmentId = ?
+                `;
+                assignmentParams = [userId, userId, assignmentId];
+            }
+
+            const [assignments] = await pool.query(assignmentSql, assignmentParams);
             if (assignments.length === 0) return null;
             const assignment = assignments[0];
 
@@ -299,7 +349,10 @@ const AssignmentModel = {
             // 4. Delete Files
             await connection.query(`DELETE FROM files WHERE assignmentId = ?`, [assignmentId]);
 
-            // 5. Delete Assignment itself
+            // 5. Delete linking table entries
+            await connection.query(`DELETE FROM userAssignments WHERE assignmentId = ?`, [assignmentId]);
+
+            // 6. Delete Assignment itself
             const [result] = await connection.query(`DELETE FROM assignments WHERE assignmentId = ?`, [assignmentId]);
 
             await connection.commit();

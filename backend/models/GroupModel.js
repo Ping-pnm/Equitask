@@ -85,7 +85,10 @@ const GroupModel = {
 
     getAllGroupsForAssignment: async (assignmentId) => {
         const sql = `
-            SELECT g.*, u.userId, u.firstName, u.lastName, u.email
+            SELECT g.*, u.userId, u.firstName, u.lastName, u.email,
+                   (SELECT AVG(t.progress) 
+                    FROM tasks t 
+                    WHERE t.groupId = g.groupId AND t.assignmentId = g.assignmentId) as groupProgress
             FROM groups g
             LEFT JOIN memberships m ON g.groupId = m.groupId
             LEFT JOIN users u ON m.userId = u.userId
@@ -130,19 +133,47 @@ const GroupModel = {
             classId: rows[0].classId,
             meetLink: rows[0].meetLink,
             createdAt: rows[0].createdAt,
-            members: []
+            isSubmitted: rows[0].isSubmitted,
+            grades: rows[0].grades,
+            members: [],
+            files: []
         };
 
         rows.forEach(row => {
             if (row.userId) {
-                group.members.push({
-                    userId: row.userId,
-                    firstName: row.firstName,
-                    lastName: row.lastName,
-                    email: row.email
-                });
+                const alreadyAdded = group.members.some(m => m.userId === row.userId);
+                if (!alreadyAdded) {
+                    group.members.push({
+                        userId: row.userId,
+                        firstName: row.firstName,
+                        lastName: row.lastName,
+                        email: row.email
+                    });
+                }
             }
         });
+
+        // Fetch Group Work Files
+        const filesSql = `SELECT * FROM files WHERE groupId = ?`;
+        const [files] = await pool.query(filesSql, [groupId]);
+        group.files = files;
+
+        // Fetch Tasks for each member
+        for (const member of group.members) {
+            const taskSql = `
+                SELECT t.*,
+                       CASE 
+                           WHEN t.progress = 100 THEN 'COMPLETED'
+                           WHEN t.progress >= 50 THEN 'IN PROGRESS'
+                           WHEN t.progress > 0 THEN 'AT RISK'
+                           ELSE 'WAITING'
+                       END as status
+                FROM tasks t 
+                WHERE t.groupId = ? AND t.userId = ? AND t.assignmentId = ?
+            `;
+            const [tasks] = await pool.query(taskSql, [groupId, member.userId, group.assignmentId]);
+            member.tasks = tasks;
+        }
 
         return group;
     },
@@ -233,6 +264,31 @@ const GroupModel = {
         `;
         const [rows] = await pool.query(sql, [groupId]);
         return rows;
+    },
+
+    uploadGroupFile: async (groupId, assignmentId, fileUrl) => {
+        const sql = `
+            INSERT INTO files (fileUrl, groupId, assignmentId)
+            VALUES (?, ?, ?)
+        `;
+        const [result] = await pool.query(sql, [fileUrl, groupId, assignmentId]);
+        return result.insertId;
+    },
+
+    deleteGroupFile: async (fileId) => {
+        const sql = `DELETE FROM files WHERE fileId = ?`;
+        const [result] = await pool.query(sql, [fileId]);
+        return result.affectedRows > 0;
+    },
+
+    submitGroupWork: async (groupId, assignmentId, isSubmitted) => {
+        const sql = `
+            UPDATE groups 
+            SET isSubmitted = ? 
+            WHERE groupId = ?
+        `;
+        const [result] = await pool.query(sql, [isSubmitted ? 1 : 0, groupId]);
+        return result.affectedRows > 0;
     }
 };
 

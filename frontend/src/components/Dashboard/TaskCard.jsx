@@ -1,22 +1,9 @@
 import React from 'react';
 import taskSign from '../../assets/taskSign.png';
 import aiSign from '../../assets/Ai-sign.png';
+import StatusBadge from './StatusBadge';
 
 const TaskItem = ({ studentName, task, onOpenDetail }) => {
-    const getStatusStyles = (status) => {
-        switch (status?.toUpperCase()) {
-            case 'IN PROGRESS':
-                return { background: '#fae489', color: '#111', fontWeight: '700' };
-            case 'AT RISK':
-                return { background: '#fcb0a3', color: '#111', fontWeight: '700' };
-            case 'SUCCESS':
-                return { background: '#5ec390', color: 'white', fontWeight: '700' };
-            default:
-                return { background: 'transparent', color: '#111', fontWeight: '600' };
-        }
-    };
-
-    const statusStyle = getStatusStyles(task.status);
 
     return (
         <div onClick={() => onOpenDetail(studentName, task.name)}
@@ -28,9 +15,7 @@ const TaskItem = ({ studentName, task, onOpenDetail }) => {
                         {task.name} <span style={{ fontWeight: '800' }}>&gt;</span>
                     </span>
                 </div>
-                <div style={{ fontSize: '10px', padding: '4px 8px', borderRadius: '4px', textTransform: 'uppercase', ...statusStyle }}>
-                    {task.status || 'WAITING'}
-                </div>
+                <StatusBadge progress={task.progress} />
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -53,7 +38,7 @@ const TaskItem = ({ studentName, task, onOpenDetail }) => {
     );
 };
 
-const StudentProgressCard = ({ name, overallProgress, tasks, onAddTask, onOpenDetail }) => {
+const StudentProgressCard = ({ member, name, overallProgress, tasks, onAddTask, onOpenDetail }) => {
     const circumference = 188.5;
     const dashOffset = circumference * (1 - overallProgress / 100);
 
@@ -78,7 +63,7 @@ const StudentProgressCard = ({ name, overallProgress, tasks, onAddTask, onOpenDe
             ))}
 
             <div style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '10px' }}>
-                <button onClick={() => onAddTask(name)}
+                <button onClick={() => onAddTask(member)}
                     style={{ background: 'transparent', border: 'none', color: '#4bc4de', fontWeight: '700', fontSize: '13px', cursor: 'pointer' }}>
                     Add Task
                 </button>
@@ -103,6 +88,7 @@ const TaskCard = ({ studentsData, onAddTask, onOpenDetail }) => {
             {studentsData.map((student, index) => (
                 <StudentProgressCard
                     key={index}
+                    member={student.member}
                     name={student.name}
                     overallProgress={student.overallProgress}
                     tasks={student.tasks}

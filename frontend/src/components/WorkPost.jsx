@@ -17,7 +17,8 @@ export default function WorkPost({ author, title, date, assignmentId, onUpdate, 
     return (
         <div className={`post-card-work ${isStreamType ? 'post-card-stream' : ''}`} onClick={() => onClick && onClick(assignmentId)}>
             <div className="post-card-left">
-                <img src={checkListIcon} alt="Checklist" className="post-card-icon" />
+                {isStreamType ? <div className="post-icon-wrapper"><img src={checkListIcon} alt="Checklist" className="post-card-icon" /></div> : <img src={checkListIcon} alt="Checklist" className="post-card-icon" />
+                }
                 <div className="post-info">
                     <span className="post-card-title">
                         {isStreamType ? `${author} posted a new assignment: ${title}` : title}

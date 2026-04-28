@@ -24,6 +24,7 @@ export default function AssignModal({ onClose, classId, isCreate, assignmentId }
     const [modalData, setModalData] = useState({
         title: '',
         instruction: '',
+        useRubric: true,
         rubricCriterias: Array(2).fill(''),
         rubricLevels: Array(2).fill(''),
         rubricCells: Array.from({ length: 2 }, () => Array(2).fill('')),
@@ -94,6 +95,7 @@ export default function AssignModal({ onClose, classId, isCreate, assignmentId }
             formData.append('points', modalData.points);
             formData.append('dueDate', modalData.dueDateTime);
             formData.append('isGroupWork', modalData.isGroupWork);
+            formData.append('useRubric', modalData.useRubric);
 
             // Send arrays as JSON strings
             formData.append('rubricCriterias', JSON.stringify(modalData.rubricCriterias));
@@ -164,6 +166,7 @@ export default function AssignModal({ onClose, classId, isCreate, assignmentId }
                         criterias={modalData.rubricCriterias}
                         levels={modalData.rubricLevels}
                         cells={modalData.rubricCells}
+                        useRubric={modalData.useRubric}
                         setModalData={setModalData}
                     />
                 </div>

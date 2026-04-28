@@ -1,5 +1,6 @@
 import express from 'express';
 import GroupController from '../controllers/GroupController.js';
+import upload from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
@@ -14,5 +15,10 @@ router.get('/:groupId/comments', GroupController.getGroupComments);
 router.post('/:groupId/comments', GroupController.addGroupComment);
 router.post('/:groupId/track-meet', GroupController.trackMeetJoin);
 router.get('/:groupId/track-meet', GroupController.getMeetTracking);
+
+// Group Work Submission Routes
+router.post('/:groupId/upload', upload.array('files'), GroupController.uploadWork);
+router.delete('/work-file/:fileId', GroupController.deleteWorkFile);
+router.post('/:groupId/submit', GroupController.submitWork);
 
 export default router;

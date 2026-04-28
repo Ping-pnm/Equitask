@@ -3,9 +3,10 @@ import AssignmentModel from "../models/AssignmentModel.js";
 const WorkController = {
     getWorkFeed: async (req, res) => {
         try {
-            const { classId } = req.params;  
+            const { classId } = req.params;
+            const { userId } = req.query;
 
-            const response = await AssignmentModel.getAllByClassId(classId);
+            const response = await AssignmentModel.getAllByClassId(classId, userId);
 
             res.status(200).json(response);
         } catch(err) {
@@ -66,7 +67,8 @@ const WorkController = {
     getAssignment: async (req, res) => {
         try {
             const { assignmentId } = req.params;
-            const assignment = await AssignmentModel.getById(assignmentId);
+            const { userId } = req.query;
+            const assignment = await AssignmentModel.getById(assignmentId, userId);
             if (!assignment) {
                 return res.status(404).json({ message: "Assignment not found" });
             }

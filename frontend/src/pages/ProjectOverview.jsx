@@ -4,12 +4,16 @@ import checkListIcon from '../assets/checklist-icon.png';
 import { getAssignment, getAllGroupsForAssignment } from '../services/workService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import GroupCard from '../components/Dashboard/GroupCard';
+import { useAuth } from '../components/AuthContext';
+import { useClass } from '../components/ClassContext';
 
 export default function ProjectOverview() {
     const { assignmentId } = useParams();
     const [assignment, setAssignment] = useState(null);
     const [groups, setGroups] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { userId } = useAuth();
+    const { isLeader } = useClass();
 
     useEffect(() => {
         async function fetchData() {
@@ -33,6 +37,10 @@ export default function ProjectOverview() {
     if (isLoading) return <LoadingSpinner />;
     if (!assignment) return <div className="people-content-area" style={{ textAlign: 'center', padding: '50px' }}>Assignment not found.</div>;
 
+    const filteredGroups = isLeader
+        ? groups
+        : groups.filter(group => group.members.some(m => m.userId === userId));
+
     return (
         <section id="dashboard-project-view" className="stream-content extracted-style-18">
             <div className="dashboard-page-header">
@@ -41,8 +49,8 @@ export default function ProjectOverview() {
             </div>
 
             <div className="groups-grid" id="groups-container">
-                {groups.length > 0 ? (
-                    groups.map(group => (
+                {filteredGroups.length > 0 ? (
+                    filteredGroups.map(group => (
                         <GroupCard
                             key={group.groupId}
                             groupId={group.groupId}

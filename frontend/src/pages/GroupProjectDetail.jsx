@@ -4,9 +4,11 @@ import groupSign from '../assets/groupSign.png';
 import googlemeetSign from '../assets/googlemeetSign.png';
 import gearEditSign from '../assets/gearEditSign.png';
 import aiSign from '../assets/Ai-sign.png';
-import linkSign from '../assets/LinkSign.png';
 import uploadSign from '../assets/UploadSign.png';
-import { getGroup, getAssignment, getGroupComments, addGroupComment, trackMeetJoin, getMeetTracking } from '../services/workService';
+import {
+    getGroup, getAssignment, getGroupComments, addGroupComment,
+    trackMeetJoin, getMeetTracking, uploadGroupWork, deleteGroupWork, submitGroupWork
+} from '../services/workService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import CreateGroupModal from '../components/Work/CreateGroupModal';
 import Rubric from '../components/Rubric';
@@ -32,13 +34,12 @@ export default function GroupProjectDetail() {
     const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
     const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState('');
+    const [selectedMember, setSelectedMember] = useState(null);
     const [selectedTaskName, setSelectedTaskName] = useState('');
     const [popupMessage, setPopupMessage] = useState(null);
 
     // Work Section States
     const [isWorkMenuOpen, setIsWorkMenuOpen] = useState(false);
-    const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
-    const [newLink, setNewLink] = useState('');
     const [uploadedWork, setUploadedWork] = useState([]);
     const [isWorkSubmitted, setIsWorkSubmitted] = useState(false);
 
@@ -46,18 +47,24 @@ export default function GroupProjectDetail() {
         try {
             const groupData = await getGroup(groupId);
             setGroup(groupData);
+            setUploadedWork(groupData.files || []);
+            setIsWorkSubmitted(!!groupData.isSubmitted);
 
             // Also fetch assignment for rubrics
-            const assignmentData = await getAssignment(groupData.assignmentId);
-            setAssignment(assignmentData);
+            if (groupData.assignmentId) {
+                const assignmentData = await getAssignment(groupData.assignmentId);
+                setAssignment(assignmentData);
+            }
 
-            // Fetch group comments
-            fetchComments();
+            const commentsData = await getGroupComments(groupId);
+            setComments(commentsData);
 
-            // Fetch meet tracking
-            fetchMeetHistory();
+            const trackingData = await getMeetTracking(groupId);
+            setMeetTracking(trackingData);
         } catch (err) {
-            console.error("Failed to fetch group/assignment details:", err);
+            console.error("Error fetching group data:", err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -116,82 +123,81 @@ export default function GroupProjectDetail() {
             console.error("Failed to track meet join:", err);
         }
     };
-    const handleFileUpload = (e) => {
+
+    const handleFileUpload = async (e) => {
         const files = Array.from(e.target.files);
-        if (files.length > 0) {
-            setUploadedWork([...uploadedWork, ...files.map(f => f.name)]);
+        if (files.length === 0) return;
+
+        try {
+            const response = await uploadGroupWork(groupId, group.assignmentId, files);
+            setUploadedWork(prev => [...prev, ...response.files]);
             setIsWorkMenuOpen(false);
+            setPopupMessage({ message: "Files uploaded successfully", theme: 'green' });
+        } catch (err) {
+            console.error("Upload error:", err);
+            setPopupMessage({ message: "Failed to upload files", theme: 'red' });
         }
     };
 
-    const handleRemoveWork = (index) => {
-        if (isWorkSubmitted) return; // Cannot remove if submitted
-        setUploadedWork(uploadedWork.filter((_, i) => i !== index));
-    };
+    const handleRemoveWork = async (idx) => {
+        const fileToDelete = uploadedWork[idx];
+        if (!fileToDelete.fileId) {
+            // Local fallback if needed
+            setUploadedWork(prev => prev.filter((_, i) => i !== idx));
+            return;
+        }
 
-    const toggleWorkSubmission = () => {
-        setIsWorkSubmitted(!isWorkSubmitted);
-    };
-
-    const handleAddLink = () => {
-        if (newLink.trim()) {
-            setUploadedWork([...uploadedWork, newLink.trim()]);
-            setNewLink('');
-            setIsLinkModalOpen(false);
-            setIsWorkMenuOpen(false);
+        try {
+            await deleteGroupWork(fileToDelete.fileId);
+            setUploadedWork(prev => prev.filter((_, i) => i !== idx));
+            setPopupMessage({ message: "File removed successfully", theme: 'green' });
+        } catch (err) {
+            console.error("Remove error:", err);
+            setPopupMessage({ message: "Failed to remove file", theme: 'red' });
         }
     };
+
+    const toggleWorkSubmission = async () => {
+        const newStatus = !isWorkSubmitted;
+        try {
+            await submitGroupWork(groupId, group.assignmentId, newStatus);
+            setIsWorkSubmitted(newStatus);
+            setPopupMessage({
+                message: newStatus ? "Work submitted successfully!" : "Work unsubmitted",
+                theme: 'green'
+            });
+        } catch (err) {
+            console.error("Submission error:", err);
+            setPopupMessage({ message: "Failed to update submission status", theme: 'red' });
+        }
+    };
+
     const openTaskDetail = (student, task) => {
         setSelectedStudent(student);
         setSelectedTaskName(task);
         setIsTaskDetailOpen(true);
     };
 
-    const openAddTaskModal = (student) => {
-        setSelectedStudent(student);
+    const openAddTaskModal = (member) => {
+        setSelectedMember(member);
         setIsAddTaskModalOpen(true);
     };
 
     const studentsTasksData = group?.members?.map((member, index) => {
-        const demoData = [
-            {
-                overallProgress: 26,
-                tasks: [
-                    { name: "Task 1", status: "IN PROGRESS", progress: 79, aiSummary: "According to the rubric , I suggest you to edit..........................." },
-                    { name: "Task 2", status: "WAITING", progress: 0 },
-                    { name: "Task 3", status: "WAITING", progress: 0 }
-                ]
-            },
-            {
-                overallProgress: 9,
-                tasks: [
-                    { name: "Task 1", status: "AT RISK", progress: 29, aiSummary: "According to the rubric , I suggest you to edit..........................." },
-                    { name: "Task 2", status: "WAITING", progress: 0 },
-                    { name: "Task 3", status: "WAITING", progress: 0 }
-                ]
-            },
-            {
-                overallProgress: 57,
-                tasks: [
-                    { name: "Task 1", status: "SUCCESS", progress: 100, aiSummary: "This task is done!" },
-                    { name: "Task 2", status: "IN PROGRESS", progress: 71, aiSummary: "According to the rubric , I suggest you to edit..." },
-                    { name: "Task 3", status: "WAITING", progress: 0 }
-                ]
-            }
-        ];
-
-        const data = demoData[index] || {
-            overallProgress: 0,
-            tasks: [
-                { name: "Task 1", status: "WAITING", progress: 0 },
-                { name: "Task 2", status: "WAITING", progress: 0 },
-                { name: "Task 3", status: "WAITING", progress: 0 }
-            ]
-        };
+        const totalTasks = member.tasks?.length || 0;
+        const totalProgress = member.tasks?.reduce((acc, task) => acc + (task.progress || 0), 0) || 0;
+        const overallProgress = totalTasks > 0 ? Math.round(totalProgress / totalTasks) : 0;
 
         return {
             name: `${member.firstName} ${member.lastName}`,
-            ...data
+            member: member,
+            overallProgress: overallProgress,
+            tasks: member.tasks?.map(t => ({
+                name: t.name,
+                status: t.status,
+                progress: t.progress,
+                aiSummary: t.aiSummary
+            })) || []
         };
     }) || [];
 
@@ -305,15 +311,22 @@ export default function GroupProjectDetail() {
                         <div className="extracted-style-57" style={{ marginTop: '0' }}>
                             <div className="extracted-style-58">
                                 <span className="extracted-style-59">Group Work</span>
-                                <span className="extracted-style-60">Assigned</span>
+                                <span className="extracted-style-60">{isWorkSubmitted ? 'Submitted' : 'Assigned'}</span>
                             </div>
                             {/* List of Uploaded Files */}
                             <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {uploadedWork.map((fileName, idx) => (
+                                {uploadedWork.map((file, idx) => (
                                     <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px', background: 'white', borderRadius: '8px', border: '1px solid #eee' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             <div style={{ width: '30px', height: '30px', background: '#f0f0f0', borderRadius: '4px' }}></div>
-                                            <span style={{ fontSize: '13px', color: '#333', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fileName}</span>
+                                            <a
+                                                href={`http://localhost:3000/${file.fileUrl}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ fontSize: '13px', color: '#0a7e8c', fontWeight: '600', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'none' }}
+                                            >
+                                                {file.fileUrl.split('/').pop()}
+                                            </a>
                                         </div>
                                         {!isWorkSubmitted && (
                                             <svg onClick={() => handleRemoveWork(idx)} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{ cursor: 'pointer' }}>
@@ -328,9 +341,6 @@ export default function GroupProjectDetail() {
                             <div className="extracted-style-61" style={{ position: 'relative', marginTop: '15px' }}>
                                 {isWorkMenuOpen && (
                                     <div id="add-create-menu" className="extracted-style-63" style={{ display: 'block' }}>
-                                        <div className="extracted-style-64" style={{ cursor: 'pointer' }} onClick={() => setIsLinkModalOpen(true)}>
-                                            <img src={linkSign} alt="Link" className="extracted-style-65" /> Link
-                                        </div>
                                         <div className="extracted-style-66" style={{ cursor: 'pointer' }} onClick={() => document.getElementById('work-file-input').click()}>
                                             <img src={uploadSign} alt="File" className="extracted-style-67" /> File
                                             <input
@@ -519,9 +529,13 @@ export default function GroupProjectDetail() {
             )}
 
             <AddTaskModal
+                key={selectedMember?.userId || 'new-task'}
                 isOpen={isAddTaskModalOpen}
                 onClose={() => setIsAddTaskModalOpen(false)}
-                studentName={selectedStudent}
+                member={selectedMember}
+                groupId={groupId}
+                assignmentId={group.assignmentId}
+                onSuccess={fetchGroupData}
             />
 
             <TaskDetail
@@ -533,42 +547,12 @@ export default function GroupProjectDetail() {
             />
 
             {popupMessage && (
-                <MessagePopup theme="red" onClose={() => setPopupMessage(null)}>
-                    {popupMessage}
+                <MessagePopup
+                    theme={popupMessage.theme || 'green'}
+                    onClose={() => setPopupMessage(null)}
+                >
+                    {popupMessage.message}
                 </MessagePopup>
-            )}
-
-            {/* Link Modal */}
-            {isLinkModalOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
-                    <div style={{ background: 'white', padding: '30px', borderRadius: '12px', width: '400px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
-                        <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '20px', color: '#222' }}>Add Link</h3>
-                        <div style={{ paddingBottom: '5px', borderBottom: '1.5px solid #0a7e8c', marginBottom: '30px' }}>
-                            <input
-                                type="text"
-                                placeholder="https://..."
-                                value={newLink}
-                                onChange={(e) => setNewLink(e.target.value)}
-                                style={{ width: '100%', border: 'none', outline: 'none', fontSize: '15px' }}
-                                autoFocus
-                            />
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '15px' }}>
-                            <button
-                                onClick={() => setIsLinkModalOpen(false)}
-                                style={{ background: 'transparent', border: 'none', color: '#666', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleAddLink}
-                                style={{ background: '#0a7e8c', color: 'white', border: 'none', padding: '8px 25px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}
-                            >
-                                Add
-                            </button>
-                        </div>
-                    </div>
-                </div>
             )}
         </section >
     );

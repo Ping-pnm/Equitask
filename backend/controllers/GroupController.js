@@ -69,6 +69,9 @@ const GroupController = {
                         classId: row.classId,
                         meetLink: row.meetLink,
                         createdAt: row.createdAt,
+                        isSubmitted: row.isSubmitted,
+                        grades: row.grades,
+                        progress: Math.round(row.groupProgress || 0),
                         members: []
                     });
                 }
@@ -197,7 +200,62 @@ const GroupController = {
             res.status(200).json(tracking);
         } catch (err) {
             console.error("GroupController.getMeetTracking Error:", err);
-            res.status(500).json({ message: "Error fetching meet tracking" });
+            res.status(500).json({ message: "Error deleting group" });
+        }
+    },
+
+    uploadWork: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const { assignmentId } = req.body;
+            const files = req.files || [];
+
+            if (files.length === 0) {
+                return res.status(400).json({ message: "No files uploaded" });
+            }
+
+            const uploadedFiles = [];
+            for (const file of files) {
+                const fileUrl = file.path.replace(/\\/g, '/');
+                const fileId = await GroupModel.uploadGroupFile(groupId, assignmentId, fileUrl);
+                uploadedFiles.push({ fileId, fileUrl });
+            }
+
+            res.status(201).json({ message: "Files uploaded successfully", files: uploadedFiles });
+        } catch (err) {
+            console.error("GroupController.uploadWork Error:", err);
+            res.status(500).json({ message: "Error uploading work" });
+        }
+    },
+
+    deleteWorkFile: async (req, res) => {
+        try {
+            const { fileId } = req.params;
+            const success = await GroupModel.deleteGroupFile(fileId);
+            if (success) {
+                res.status(200).json({ message: "File deleted successfully" });
+            } else {
+                res.status(404).json({ message: "File not found" });
+            }
+        } catch (err) {
+            console.error("GroupController.deleteWorkFile Error:", err);
+            res.status(500).json({ message: "Error deleting work file" });
+        }
+    },
+
+    submitWork: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const { assignmentId, isSubmitted } = req.body;
+            const success = await GroupModel.submitGroupWork(groupId, assignmentId, isSubmitted);
+            if (success) {
+                res.status(200).json({ message: isSubmitted ? "Work submitted" : "Work unsubmitted" });
+            } else {
+                res.status(404).json({ message: "Group assignment not found" });
+            }
+        } catch (err) {
+            console.error("GroupController.submitWork Error:", err);
+            res.status(500).json({ message: "Error submitting work" });
         }
     }
 };

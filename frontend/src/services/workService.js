@@ -251,3 +251,64 @@ export async function getMeetTracking(groupId) {
         throw err;
     }
 }
+
+export async function uploadGroupWork(groupId, assignmentId, files) {
+    try {
+        const formData = new FormData();
+        formData.append('assignmentId', assignmentId);
+        files.forEach(file => formData.append('files', file));
+
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to upload work');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.uploadGroupWork Error:", err);
+        throw err;
+    }
+}
+
+export async function deleteGroupWork(fileId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/work-file/${fileId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete work file');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.deleteGroupWork Error:", err);
+        throw err;
+    }
+}
+
+export async function submitGroupWork(groupId, assignmentId, isSubmitted) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ assignmentId, isSubmitted })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to submit work');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.submitGroupWork Error:", err);
+        throw err;
+    }
+}

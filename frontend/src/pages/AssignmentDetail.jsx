@@ -137,11 +137,20 @@ export default function AssignmentDetail() {
                                     <div key={group.groupId} className="group-status-container">
                                         <div className="group-info-left">
                                             <span className="group-name-display">{group.groupName}</span>
-                                            <ProgressBar progress={0} />
+                                            <ProgressBar progress={group.progress || 0} />
                                         </div>
-                                        {isLeader && (
-                                            <button className="btn-delete-group" onClick={() => handleDeleteGroup(group.groupId)}>Delete</button>
-                                        )}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <button 
+                                                className="btn-view-group" 
+                                                onClick={() => navigate(`/group-project/${group.groupId}`)}
+                                                style={{ padding: '6px 15px', background: '#e0f7fa', color: '#00796b', border: '1px solid #00796b', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
+                                            >
+                                                View
+                                            </button>
+                                            {isLeader && (
+                                                <button className="btn-delete-group" onClick={() => handleDeleteGroup(group.groupId)}>Delete</button>
+                                            )}
+                                        </div>
                                     </div>
                                 ))
                             ) : (

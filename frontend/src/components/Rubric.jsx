@@ -1,6 +1,6 @@
 import RubricButton from "./Work/RubricButton";
 
-export default function Rubric({ criterias, levels, cells, setModalData, readOnly = false }) {
+export default function Rubric({ criterias, levels, cells, setModalData, useRubric = true, readOnly = false }) {
     const rowCount = criterias.length + 1;
     const colCount = levels.length + 1;
 
@@ -62,64 +62,82 @@ export default function Rubric({ criterias, levels, cells, setModalData, readOnl
     return (
         <div className="rubrics-config-section">
             {!readOnly && (
-                <>
-                    <div className="rubrics-config-header">
-                        Rubrics
-                        <div className="rubrics-config-controls">
-                            Rows:
-                            <RubricButton onClick={() => handleUpdateSize(true, false)} />
-                            <span id="rubric-rows-assign">{rowCount}</span>
-                            <RubricButton isPlus onClick={() => handleUpdateSize(true, true)} />
-                        </div>
-                        <div className="rubrics-config-controls">
-                            Columns:
-                            <RubricButton onClick={() => handleUpdateSize(false, false)} />
-                            <span id="rubric-cols-assign">{colCount}</span>
-                            <RubricButton isPlus onClick={() => handleUpdateSize(false, true)} />
-                        </div>
-                    </div>
-
-                    <p className="rubric-tip">
-                        <b>Tip:</b> Rows represent <b>Criteria</b>, while columns represent <b>Levels</b>.
-                        <br /> (Left columns = Good / Right columns = Bad)
-                    </p>
-                </>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '700', color: '#b3b9c6' }}>Add Rubrics</span>
+                    <label className="switch">
+                        <input 
+                            type="checkbox" 
+                            checked={useRubric} 
+                            onChange={(e) => setModalData(p => ({ ...p, useRubric: e.target.checked }))} 
+                        />
+                        <span className="slider round"></span>
+                    </label>
+                </div>
             )}
 
-            {/* Table */}
-            <div className="rubrics-table-wrapper">
-                <table className="rubrics-input-table">
-                    <tbody id="rubric-table-assign">
-                        {[...Array(rowCount)].map((_, rowIndex) => (
-                            <tr key={rowIndex}>
-                                {[...Array(colCount)].map((_, colIndex) => {
-                                    const isOrigin = rowIndex === 0 && colIndex === 0;
-                                    const isLevel = rowIndex === 0;
-                                    const isCriteria = colIndex === 0;
+            {useRubric && (
+                <>
+                    {!readOnly && (
+                        <>
+                            <div className="rubrics-config-header">
+                                Configuration
+                                <div className="rubrics-config-controls">
+                                    Rows:
+                                    <RubricButton onClick={() => handleUpdateSize(true, false)} />
+                                    <span id="rubric-rows-assign">{rowCount}</span>
+                                    <RubricButton isPlus onClick={() => handleUpdateSize(true, true)} />
+                                </div>
+                                <div className="rubrics-config-controls">
+                                    Columns:
+                                    <RubricButton onClick={() => handleUpdateSize(false, false)} />
+                                    <span id="rubric-cols-assign">{colCount}</span>
+                                    <RubricButton isPlus onClick={() => handleUpdateSize(false, true)} />
+                                </div>
+                            </div>
 
-                                    let content = "";
-                                    if (isOrigin) content = "Criteria \\ Level";
-                                    else if (isLevel) content = levels[colIndex - 1];
-                                    else if (isCriteria) content = criterias[rowIndex - 1];
-                                    else content = cells[rowIndex - 1][colIndex - 1];
+                            <p className="rubric-tip">
+                                <b>Tip:</b> Rows represent <b>Criteria</b>, while columns represent <b>Levels</b>.
+                                <br /> (Left columns = Good / Right columns = Bad)
+                            </p>
+                        </>
+                    )}
 
-                                    return (
-                                        <td
-                                            key={colIndex}
-                                            contentEditable={!readOnly && !isOrigin}
-                                            className={`rubrics-input-cell ${isOrigin ? 'rubric-origin' : (isCriteria || isLevel) ? 'rubric-header' : ''}`}
-                                            onBlur={(e) => !readOnly && handleBlur(rowIndex, colIndex, e.currentTarget.innerText)}
-                                            suppressContentEditableWarning={true}
-                                        >
-                                            {content}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                    {/* Table */}
+                    <div className="rubrics-table-wrapper">
+                        <table className="rubrics-input-table">
+                            <tbody id="rubric-table-assign">
+                                {[...Array(rowCount)].map((_, rowIndex) => (
+                                    <tr key={rowIndex}>
+                                        {[...Array(colCount)].map((_, colIndex) => {
+                                            const isOrigin = rowIndex === 0 && colIndex === 0;
+                                            const isLevel = rowIndex === 0;
+                                            const isCriteria = colIndex === 0;
+
+                                            let content = "";
+                                            if (isOrigin) content = "Criteria \\ Level";
+                                            else if (isLevel) content = levels[colIndex - 1];
+                                            else if (isCriteria) content = criterias[rowIndex - 1];
+                                            else content = cells[rowIndex - 1][colIndex - 1];
+
+                                            return (
+                                                <td
+                                                    key={colIndex}
+                                                    contentEditable={!readOnly && !isOrigin}
+                                                    className={`rubrics-input-cell ${isOrigin ? 'rubric-origin' : (isCriteria || isLevel) ? 'rubric-header' : ''}`}
+                                                    onBlur={(e) => !readOnly && handleBlur(rowIndex, colIndex, e.currentTarget.innerText)}
+                                                    suppressContentEditableWarning={true}
+                                                >
+                                                    {content}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
+            )}
         </div>
     );
-}
+}
