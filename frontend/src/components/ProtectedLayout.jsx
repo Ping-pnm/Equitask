@@ -25,7 +25,7 @@ export default function ProtectedLayout() {
                     {/* Main Content */}
                     <main className="main-content">
                         {/* Tabs Navbar */}
-                        <TabHeader activeAt='Stream' />
+                        <TabHeader />
 
                         <Outlet />
                     </main>

@@ -9,6 +9,7 @@ import AssignmentDetail from './pages/AssignmentDetail.jsx';
 import ProjectOverview from './pages/ProjectOverview.jsx';
 import Assignment from './pages/Assignment.jsx';
 import GroupProjectDetail from './pages/GroupProjectDetail.jsx';
+import TaskDetail from './pages/TaskDetail.jsx';
 
 import RootLayout from './components/RootLayout.jsx';
 import ProtectedLayout from './components/ProtectedLayout.jsx';
@@ -35,7 +36,8 @@ const router = createBrowserRouter([
                     { path: "/assignment/:assignmentId", element: <AssignmentDetail /> },
                     { path: "/project/:assignmentId", element: <ProjectOverview /> },
                     { path: "/group-assignment/:assignmentId", element: <Assignment /> },
-                    { path: "/group-project/:groupId", element: <GroupProjectDetail /> }
+                    { path: "/group-project/:groupId", element: <GroupProjectDetail /> },
+                    { path: "/task/:taskId", element: <TaskDetail /> }
                 ]
             }
         ]

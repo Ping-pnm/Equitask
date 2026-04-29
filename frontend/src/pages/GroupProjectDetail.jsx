@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import groupSign from '../assets/groupSign.png';
 import googlemeetSign from '../assets/googlemeetSign.png';
 import gearEditSign from '../assets/gearEditSign.png';
@@ -18,7 +18,7 @@ import { useClass } from '../components/ClassContext';
 import MessagePopup from '../components/MessagePopup';
 import TaskCard from '../components/Dashboard/TaskCard';
 import AddTaskModal from '../components/Dashboard/AddTaskModal';
-import TaskDetail from '../components/Dashboard/TaskDetail';
+// TaskDetail is now a page, not a component used here
 
 export default function GroupProjectDetail() {
     const { userId } = useAuth();
@@ -32,16 +32,14 @@ export default function GroupProjectDetail() {
     const [isLoading, setIsLoading] = useState(true);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
-    const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
-    const [selectedStudent, setSelectedStudent] = useState('');
     const [selectedMember, setSelectedMember] = useState(null);
-    const [selectedTask, setSelectedTask] = useState(null);
     const [popupMessage, setPopupMessage] = useState(null);
 
     // Work Section States
     const [isWorkMenuOpen, setIsWorkMenuOpen] = useState(false);
     const [uploadedWork, setUploadedWork] = useState([]);
     const [isWorkSubmitted, setIsWorkSubmitted] = useState(false);
+    const [rubricSelections, setRubricSelections] = useState(null);
 
     const fetchGroupData = async () => {
         try {
@@ -160,22 +158,38 @@ export default function GroupProjectDetail() {
     const toggleWorkSubmission = async () => {
         const newStatus = !isWorkSubmitted;
         try {
-            await submitGroupWork(groupId, group.assignmentId, newStatus);
+            const result = await submitGroupWork(groupId, group.assignmentId, newStatus);
             setIsWorkSubmitted(newStatus);
+
+            // Update local rubric selections
+            if (newStatus && result.selections && assignment?.criteria && assignment?.levels) {
+                const newIndices = assignment.criteria.map(c => {
+                    const sel = (result.selections || []).find(s => s.criteriaId === c.criteriaId);
+                    if (!sel) return -1;
+                    return assignment.levels.findIndex(l => l.levelId === sel.levelId);
+                });
+                setRubricSelections(newIndices);
+            } else if (!newStatus) {
+                setRubricSelections(null);
+            }
+
             setPopupMessage({
                 message: newStatus ? "Work submitted successfully!" : "Work unsubmitted",
                 theme: 'green'
             });
+
+            // Re-fetch to update GroupCard and other stats
+            fetchGroupData();
         } catch (err) {
             console.error("Submission error:", err);
             setPopupMessage({ message: "Failed to update submission status", theme: 'red' });
         }
     };
 
+    const navigate = useNavigate();
+
     const openTaskDetail = (student, task) => {
-        setSelectedStudent(student);
-        setSelectedTask(task);
-        setIsTaskDetailOpen(true);
+        navigate(`/task/${task.taskId}`);
     };
 
     const openAddTaskModal = (member) => {
@@ -195,6 +209,26 @@ export default function GroupProjectDetail() {
             tasks: member.tasks || []
         };
     }) || [];
+
+    useEffect(() => {
+        if (isWorkSubmitted && assignment?.criteria) {
+            const currentSelections = assignment.criteria.map((c) => {
+                if (c.selectedLevelId) {
+                    const levelIdx = assignment.levels.findIndex(l => l.levelId === c.selectedLevelId);
+                    if (levelIdx !== -1) return levelIdx;
+                }
+                return -1;
+            });
+
+            if (currentSelections.some(idx => idx >= 0)) {
+                setRubricSelections(currentSelections);
+            } else {
+                setRubricSelections(null);
+            }
+        } else if (!isWorkSubmitted) {
+            setRubricSelections(null);
+        }
+    }, [isWorkSubmitted, assignment]);
 
     useEffect(() => {
         async function initialFetch() {
@@ -230,7 +264,7 @@ export default function GroupProjectDetail() {
                     <div className="column-main" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
                         {/* Group Title Area */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: '16px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', gap: '16px', textAlign: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <img src={groupSign} alt="Group Sign" style={{ width: '50px', height: '50px', marginRight: '12px' }} />
                                 <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
@@ -338,7 +372,7 @@ export default function GroupProjectDetail() {
                             </div>
 
                             {/* Submit / Unsubmit Button */}
-                            {uploadedWork.length > 0 && (
+                            {(uploadedWork.length > 0 || isWorkSubmitted) && (
                                 <button
                                     onClick={toggleWorkSubmission}
                                     style={{
@@ -422,6 +456,7 @@ export default function GroupProjectDetail() {
                                 cells={assignment.rubricCells}
                                 readOnly={true}
                                 fullWidth={true}
+                                selections={rubricSelections}
                             />
                         ) : (
                             <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>No rubric defined for this assignment.</p>
@@ -447,22 +482,77 @@ export default function GroupProjectDetail() {
 
                     {/* Pie Chart Column */}
                     <div className="column-sidebar"
-                        style={{ alignItems: 'center', justifyContent: 'center', position: 'relative', height: '220px', }}>
-                        <div style={{
-                            position: 'relative',
-                            width: '220px',
-                            height: '220px',
-                            borderRadius: '50%',
-                            background: 'conic-gradient(#71E2Db 0% 33.3%, #47BBD6 33.3% 77.7%, #2F8EBA 77.7% 100%)'
-                        }}>
-                            {/* Labels */}
-                            <div style={{ position: 'absolute', top: '15%', right: '-50px', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
-                                Student 1<br />33.3%</div>
-                            <div style={{ position: 'absolute', bottom: '-25px', left: '50%', transform: 'translateX(-50%)', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
-                                Student 2<br />44.4%</div>
-                            <div style={{ position: 'absolute', top: '5%', left: '-50px', fontSize: '11px', color: '#111', textAlign: 'center', lineHeight: '1.2', }}>
-                                Student 3<br />22.2%</div>
-                        </div>
+                        style={{ alignItems: 'center', justifyContent: 'center', position: 'relative', height: '300px', display: 'flex' }}>
+                        {(() => {
+                            // Calculate Workload Contribution
+                            // 1. Get each member's total progress (sum of task progress)
+                            const memberProgress = group.members.map(m => {
+                                const totalProg = m.tasks?.reduce((sum, t) => sum + (t.progress || 0), 0) || 0;
+                                return { name: m.firstName, progress: totalProg };
+                            });
+
+                            // 2. Calculate Total Group Progress
+                            const totalGroupProgress = memberProgress.reduce((sum, m) => sum + m.progress, 0);
+
+                            // 3. Calculate Percentages (Totaling 100%)
+                            const workloadData = memberProgress.map(m => ({
+                                name: m.name,
+                                percentage: totalGroupProgress > 0 ? (m.progress / totalGroupProgress) * 100 : (100 / group.members.length)
+                            }));
+
+                            // 4. Build Conic Gradient String
+                            const colors = ['#71E2Db', '#47BBD6', '#2F8EBA', '#1a5f7a', '#a8dadc'];
+                            let currentPercent = 0;
+                            const gradientParts = workloadData.map((m, i) => {
+                                const start = currentPercent;
+                                currentPercent += m.percentage;
+                                return `${colors[i % colors.length]} ${start}% ${currentPercent}%`;
+                            });
+
+                            return (
+                                <div style={{
+                                    position: 'relative',
+                                    width: '220px',
+                                    height: '220px',
+                                    borderRadius: '50%',
+                                    background: `conic-gradient(${gradientParts.join(', ')})`,
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                }}>
+                                    {/* Labels */}
+                                    {workloadData.map((m, i) => {
+                                        // Calculate position based on the middle of the segment
+                                        let cumulative = 0;
+                                        for (let j = 0; j < i; j++) cumulative += workloadData[j].percentage;
+                                        const middlePercent = cumulative + (m.percentage / 2);
+                                        const angle = (middlePercent / 100) * 360 - 90; // -90 to start from top
+                                        const radius = 140; // distance from center
+                                        const x = Math.cos(angle * (Math.PI / 180)) * radius;
+                                        const y = Math.sin(angle * (Math.PI / 180)) * radius;
+
+                                        return (
+                                            <div key={i} style={{
+                                                position: 'absolute',
+                                                top: `calc(50% + ${y}px)`,
+                                                left: `calc(50% + ${x}px)`,
+                                                transform: 'translate(-50%, -50%)',
+                                                fontSize: '12px',
+                                                fontWeight: '700',
+                                                color: '#333',
+                                                textAlign: 'center',
+                                                lineHeight: '1.2',
+                                                background: 'rgba(255,255,255,0.8)',
+                                                padding: '4px 8px',
+                                                borderRadius: '6px',
+                                                whiteSpace: 'nowrap',
+                                                pointerEvents: 'none'
+                                            }}>
+                                                {m.name}<br />{Math.round(m.percentage)}%
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })()}
                     </div>
                 </div>
 
@@ -529,15 +619,6 @@ export default function GroupProjectDetail() {
                 groupId={groupId}
                 assignmentId={group.assignmentId}
                 onSuccess={fetchGroupData}
-            />
-
-            <TaskDetail
-                isOpen={isTaskDetailOpen}
-                onClose={() => setIsTaskDetailOpen(false)}
-                studentName={selectedStudent}
-                task={selectedTask}
-                groupName={group.groupName}
-                assignment={assignment}
             />
 
             {popupMessage && (

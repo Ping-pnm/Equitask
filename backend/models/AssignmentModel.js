@@ -3,54 +3,106 @@ import pool from '../db.js';
 const AssignmentModel = {
     getAllByClassId: async (classId, userId) => {
         try {
-            const sql = `
+            // Step 1: Get all assignments for the class
+            const assignmentSql = `
                 SELECT 
                     a.*, 
                     u.firstName, u.lastName,
-                    COALESCE(ua.isSubmitted, g_info.isSubmitted, 0) as isSubmitted,
-                    COALESCE(ua.grades, g_info.grades) as grades,
-                    g_info.groupId,
-                    g_info.groupName,
-                    g_info.groupProgress,
-                    g_info.members
+                    COALESCE(ua.isSubmitted, 0) as isSubmitted,
+                    ua.grades as grades
                 FROM assignments a
                 JOIN users u ON a.creatorId = u.userId
                 LEFT JOIN userAssignments ua ON a.assignmentId = ua.assignmentId AND ua.userId = ?
-                LEFT JOIN (
-                    SELECT 
-                        m.userId as current_user_id,
-                        g.groupId,
-                        g.groupName,
-                        g.assignmentId,
-                        g.isSubmitted,
-                        g.grades,
-                        (SELECT AVG(t.progress) FROM tasks t WHERE t.groupId = g.groupId AND t.assignmentId = g.assignmentId) as groupProgress,
-                        (
-                            SELECT JSON_ARRAYAGG(
-                                JSON_OBJECT(
-                                    'userId', m2.userId,
-                                    'name', CONCAT(u2.firstName, ' ', u2.lastName),
-                                    'progress', (SELECT COALESCE(AVG(t2.progress), 0) FROM tasks t2 WHERE t2.userId = m2.userId AND t2.groupId = g.groupId AND t2.assignmentId = g.assignmentId)
-                                )
-                            )
-                            FROM memberships m2
-                            JOIN users u2 ON m2.userId = u2.userId
-                            WHERE m2.groupId = g.groupId
-                        ) as members
-                    FROM memberships m
-                    JOIN groups g ON m.groupId = g.groupId
-                ) g_info ON a.assignmentId = g_info.assignmentId AND g_info.current_user_id = ?
                 WHERE a.classId = ?
-                ORDER BY a.createdAt DESC;
+                ORDER BY a.createdAt DESC
             `;
+            const [assignments] = await pool.query(assignmentSql, [userId, classId]);
 
-            const [assignmentRes] = await pool.query(sql, [userId, userId, classId]);
+            if (assignments.length === 0) return [];
+
+            const assignmentIds = assignments.map(a => a.assignmentId);
+
+            // Step 2: Find which group the current user belongs to for each assignment
+            const userGroupSql = `
+                SELECT g.groupId, g.groupName, g.assignmentId, g.isSubmitted, g.grades,
+                       COALESCE(
+                           (SELECT AVG(COALESCE((SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1), 0))
+                            FROM tasks t WHERE t.groupId = g.groupId AND t.assignmentId = g.assignmentId),
+                       0) as groupProgress
+                FROM memberships m
+                JOIN \`groups\` g ON m.groupId = g.groupId
+                WHERE m.userId = ? AND g.assignmentId IN (?)
+            `;
+            const [userGroups] = await pool.query(userGroupSql, [userId, assignmentIds]);
             
-            // Parse members JSON string if necessary
-            return assignmentRes.map(item => ({
-                ...item,
-                members: typeof item.members === 'string' ? JSON.parse(item.members) : (item.members || [])
-            }));
+            const groupIds = userGroups.map(g => g.groupId);
+
+            // Step 3: Get all members for these groups
+            let membersMap = {};
+            let tasksMap = {};
+
+            if (groupIds.length > 0) {
+                const membersSql = `
+                    SELECT m.groupId, m.userId,
+                           CONCAT(u.firstName, ' ', u.lastName) as name,
+                           COALESCE(m.memberProgress, 0) as progress
+                    FROM memberships m
+                    JOIN users u ON m.userId = u.userId
+                    WHERE m.groupId IN (?)
+                `;
+                const [members] = await pool.query(membersSql, [groupIds]);
+                members.forEach(m => {
+                    if (!membersMap[m.groupId]) membersMap[m.groupId] = [];
+                    membersMap[m.groupId].push(m);
+                });
+
+                // Step 4: Get all tasks for these groups
+                const tasksSql = `
+                    SELECT t.taskId, t.name, t.userId, t.groupId, t.assignmentId,
+                           COALESCE(
+                               (SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1),
+                           0) as progress
+                    FROM tasks t
+                    WHERE t.groupId IN (?) AND t.assignmentId IN (?)
+                `;
+                const [tasks] = await pool.query(tasksSql, [groupIds, assignmentIds]);
+                tasks.forEach(t => {
+                    const key = `${t.groupId}_${t.userId}`;
+                    if (!tasksMap[key]) tasksMap[key] = [];
+                    tasksMap[key].push({ taskId: t.taskId, name: t.name, progress: Number(t.progress) || 0 });
+                });
+            }
+
+            // Step 5: Assemble result
+            const userGroupByAssignment = {};
+            userGroups.forEach(g => { userGroupByAssignment[g.assignmentId] = g; });
+
+            return assignments.map(a => {
+                const groupInfo = userGroupByAssignment[a.assignmentId] || null;
+                let members = [];
+                let groupProgress = 0;
+
+                if (groupInfo) {
+                    const rawMembers = membersMap[groupInfo.groupId] || [];
+                    members = rawMembers.map(m => ({
+                        userId: m.userId,
+                        name: m.name,
+                        progress: Number(m.progress) || 0,
+                        tasks: tasksMap[`${groupInfo.groupId}_${m.userId}`] || []
+                    }));
+                    groupProgress = Number(groupInfo.groupProgress) || 0;
+                }
+
+                return {
+                    ...a,
+                    isSubmitted: groupInfo ? (groupInfo.isSubmitted || a.isSubmitted || 0) : (a.isSubmitted || 0),
+                    grades: groupInfo?.grades ?? a.grades,
+                    groupId: groupInfo?.groupId || null,
+                    groupName: groupInfo?.groupName || null,
+                    groupProgress,
+                    members
+                };
+            });
         } catch(err) {
             console.error("Database Error (getAllByClassId)", err);
             throw err;
@@ -193,7 +245,7 @@ const AssignmentModel = {
                     LEFT JOIN (
                         SELECT m.userId, g.groupId, g.assignmentId, g.isSubmitted, g.grades
                         FROM memberships m
-                        JOIN groups g ON m.groupId = g.groupId
+                        JOIN \`groups\` g ON m.groupId = g.groupId
                     ) g ON a.assignmentId = g.assignmentId AND g.userId = ?
                     WHERE a.assignmentId = ?
                 `;
@@ -248,8 +300,8 @@ const AssignmentModel = {
                 }
             }
 
-            // 6. Get Files
-            const fileSql = `SELECT * FROM files WHERE assignmentId = ?`;
+            // 6. Get Files (Assignment level only - where group and task are null)
+            const fileSql = `SELECT * FROM files WHERE assignmentId = ? AND groupId IS NULL AND taskId IS NULL AND userId IS NULL`;
             const [files] = await pool.query(fileSql, [assignmentId]);
 
             return {

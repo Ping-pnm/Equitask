@@ -23,11 +23,11 @@ const StatusBadge = ({ progress }) => {
             fontSize: '10px',
             textTransform: 'uppercase'
         };
-    } else if (numProgress > 0 && numProgress <= 50) {
+    } else if (numProgress > 0 && numProgress < 50) {
         text = 'AT RISK';
         styles = {
             background: '#FFF4E5', // Light yellow/orange
-            color: '#B76E00',      // Darker orange for text contrast
+            color: '#cd1500ff',      // Darker orange for text contrast
             border: 'none',
             padding: '4px 10px',
             borderRadius: '6px',
@@ -36,7 +36,7 @@ const StatusBadge = ({ progress }) => {
             textTransform: 'uppercase',
             display: 'inline-block'
         };
-    } else if (numProgress > 50 && numProgress < 100) {
+    } else if (numProgress >= 50 && numProgress < 100) {
         text = 'IN PROGRESS';
         styles = {
             background: '#FFF9E5', // Light yellow

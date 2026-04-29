@@ -56,12 +56,13 @@ export default function ProjectOverview() {
                             groupId={group.groupId}
                             assignmentId={assignmentId}
                             groupName={group.groupName}
-                            overallProgress={Math.floor(Math.random() * 100)} // Placeholder
+                            overallProgress={group.groupProgress}
                             members={group.members.map(m => ({
-                                name: m.firstName,
-                                progress: Math.floor(Math.random() * 100) // Placeholder
+                                name: m.name,
+                                progress: m.progress,
+                                tasks: m.tasks || []
                             }))}
-                            summary="are currently working on the initial phases of the project..." // Placeholder
+                            summary={group.aiSummary || "This group are currently working on their project tasks..."}
                         />
                     ))
                 ) : (

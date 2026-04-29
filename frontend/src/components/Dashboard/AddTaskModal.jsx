@@ -49,7 +49,7 @@ export default function AddTaskModal({ isOpen, onClose, member, groupId, assignm
 
     return (
         <div id="modal-add-task" className="modal-overlay" style={{ display: 'flex' }}>
-            <div className="modal-content modal-edit-content" style={{ maxWidth: '650px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="modal-content modal-edit-content" style={{ maxWidth: '950px', width: '90%', maxHeight: '95vh', overflowY: 'auto' }}>
                 {/* Header */}
                 <div className="modal-title-row">
                     <h2 className="modal-title-text" style={{ color: '#5cc3e0' }}>

@@ -1,6 +1,6 @@
 import RubricButton from "./Work/RubricButton";
 
-export default function Rubric({ criterias, levels, cells, setModalData, useRubric = true, readOnly = false, fullWidth = false }) {
+export default function Rubric({ criterias, levels, cells, setModalData, useRubric = true, readOnly = false, fullWidth = false, selections = null }) {
     const rowCount = (criterias?.length || 0) + 1;
     const colCount = (levels?.length || 0) + 1;
 
@@ -119,13 +119,16 @@ export default function Rubric({ criterias, levels, cells, setModalData, useRubr
                                             else if (isCriteria) content = criterias[rowIndex - 1];
                                             else content = cells[rowIndex - 1][colIndex - 1];
 
+                                            const isSelected = selections && rowIndex > 0 && colIndex > 0 && selections[rowIndex - 1] === (colIndex - 1);
+
                                             return (
                                                 <td
                                                     key={colIndex}
                                                     contentEditable={!readOnly && !isOrigin}
-                                                    className={`rubrics-input-cell ${isOrigin ? 'rubric-origin' : (isCriteria || isLevel) ? 'rubric-header' : ''}`}
+                                                    className={`rubrics-input-cell ${isOrigin ? 'rubric-origin' : (isCriteria || isLevel) ? 'rubric-header' : ''} ${isSelected ? 'rubric-cell-selected' : ''}`}
                                                     onBlur={(e) => !readOnly && handleBlur(rowIndex, colIndex, e.currentTarget.innerText)}
                                                     suppressContentEditableWarning={true}
+                                                    style={{ position: 'relative' }}
                                                 >
                                                     {content}
                                                 </td>

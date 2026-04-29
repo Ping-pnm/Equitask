@@ -315,7 +315,7 @@ export async function submitGroupWork(groupId, assignmentId, isSubmitted) {
 
 export async function getTaskDetail(taskId) {
     try {
-        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}`);
+        const response = await fetch(`http://localhost:3000/api/task/${taskId}`);
         if (!response.ok) throw new Error("Failed to fetch task detail");
         return await response.json();
     } catch (err) {
@@ -331,7 +331,7 @@ export async function uploadTaskWork(taskId, groupId, assignmentId, files) {
         formData.append('assignmentId', assignmentId);
         files.forEach(file => formData.append('files', file));
 
-        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}/upload`, {
+        const response = await fetch(`http://localhost:3000/api/task/${taskId}/upload`, {
             method: 'POST',
             body: formData,
         });
@@ -350,7 +350,7 @@ export async function uploadTaskWork(taskId, groupId, assignmentId, files) {
 
 export async function deleteTaskWork(fileId) {
     try {
-        const response = await fetch(`http://localhost:3000/api/tasks/work-file/${fileId}`, {
+        const response = await fetch(`http://localhost:3000/api/task/work-file/${fileId}`, {
             method: 'DELETE'
         });
 
@@ -368,7 +368,7 @@ export async function deleteTaskWork(fileId) {
 
 export async function submitTaskWork(taskId, isSubmitted) {
     try {
-        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}/submit`, {
+        const response = await fetch(`http://localhost:3000/api/task/${taskId}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ isSubmitted })

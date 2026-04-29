@@ -157,7 +157,7 @@ export default function AssignmentDetail() {
                                                 <img src={groupSign} alt="Group" style={{ width: '32px', height: '32px', opacity: 0.8 }} />
                                                 <span className="group-name-display" style={{ fontSize: '16px' }}>{group.groupName}</span>
                                             </div>
-                                            <ProgressBar progress={group.progress || 0} />
+                                            <ProgressBar progress={group.groupProgress || group.progress || 0} />
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             {isLeader && (

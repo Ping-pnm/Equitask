@@ -77,9 +77,15 @@ const TaskController = {
         try {
             const { taskId } = req.params;
             const { isSubmitted } = req.body;
-            const success = await TaskModel.submitTask(taskId, isSubmitted);
-            if (success) {
-                res.status(200).json({ message: isSubmitted ? "Task submitted" : "Task unsubmitted" });
+            
+            const result = await TaskModel.submitTask(taskId, isSubmitted);
+            
+            if (result.success) {
+                res.status(200).json({ 
+                    message: isSubmitted ? "Task submitted" : "Task unsubmitted",
+                    progress: result.progress,
+                    selections: result.selections
+                });
             } else {
                 res.status(404).json({ message: "Task not found" });
             }

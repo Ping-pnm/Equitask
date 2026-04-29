@@ -12,7 +12,7 @@ const GroupModel = {
                 LEFT JOIN (
                     SELECT m.userId, m.groupId
                     FROM memberships m
-                    JOIN groups g ON m.groupId = g.groupId
+                    JOIN \`groups\` g ON m.groupId = g.groupId
                     WHERE g.assignmentId = ?
                 ) mg ON u.userId = mg.userId
                 WHERE e.classId = ?
@@ -29,6 +29,7 @@ const GroupModel = {
         }
     },
 
+
     createGroup: async (groupName, assignmentId, creatorId, classId, meetLink, memberIds) => {
         const connection = await pool.getConnection();
         try {
@@ -36,7 +37,7 @@ const GroupModel = {
 
             // 1. Create the group record
             const groupSql = `
-                INSERT INTO groups (groupName, assignmentId, classId, meetLink)
+                INSERT INTO \`groups\` (groupName, assignmentId, classId, meetLink)
                 VALUES (?, ?, ?, ?)
             `;
             const [groupRes] = await connection.query(groupSql, [groupName, assignmentId, classId, meetLink || null]);
@@ -44,7 +45,7 @@ const GroupModel = {
 
             // 2. Add entries to memberships table
             const allMemberIds = Array.from(new Set([creatorId, ...memberIds]));
-            const membershipSql = `INSERT INTO memberships (groupId, userId) VALUES (?, ?)`;
+            const membershipSql = `INSERT INTO memberships (groupId, userId, memberProgress) VALUES (?, ?, 0)`;
 
             for (const userId of allMemberIds) {
                 await connection.query(membershipSql, [groupId, userId]);
@@ -65,7 +66,7 @@ const GroupModel = {
         const sql = `
             SELECT m.groupId 
             FROM memberships m
-            JOIN groups g ON m.groupId = g.groupId
+            JOIN \`groups\` g ON m.groupId = g.groupId
             WHERE m.userId = ? AND g.assignmentId = ?
         `;
         const [rows] = await pool.query(sql, [userId, assignmentId]);
@@ -74,8 +75,11 @@ const GroupModel = {
 
     getGroupForUser: async (userId, assignmentId) => {
         const sql = `
-            SELECT g.* 
-            FROM groups g
+            SELECT g.*,
+                   (SELECT AVG((SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1)) 
+                    FROM tasks t 
+                    WHERE t.groupId = g.groupId AND t.assignmentId = g.assignmentId) as groupProgress
+            FROM \`groups\` g
             JOIN memberships m ON g.groupId = m.groupId
             WHERE m.userId = ? AND g.assignmentId = ?
         `;
@@ -84,18 +88,82 @@ const GroupModel = {
     },
 
     getAllGroupsForAssignment: async (assignmentId) => {
-        const sql = `
-            SELECT g.*, u.userId, u.firstName, u.lastName, u.email,
-                   (SELECT AVG(t.progress) 
-                    FROM tasks t 
-                    WHERE t.groupId = g.groupId AND t.assignmentId = g.assignmentId) as groupProgress
-            FROM groups g
-            LEFT JOIN memberships m ON g.groupId = m.groupId
-            LEFT JOIN users u ON m.userId = u.userId
+        // Step 1: Get all groups with their overall progress
+        const groupsSql = `
+            SELECT g.*,
+                   COALESCE(
+                       (SELECT AVG(
+                           COALESCE((SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1), 0)
+                       ) FROM tasks t WHERE t.groupId = g.groupId AND t.assignmentId = g.assignmentId),
+                   0) as groupProgress
+            FROM \`groups\` g
             WHERE g.assignmentId = ?
         `;
-        const [rows] = await pool.query(sql, [assignmentId]);
-        return rows;
+        const [groups] = await pool.query(groupsSql, [assignmentId]);
+
+        if (groups.length === 0) return [];
+
+        // Step 2: Get all members for these groups with their memberProgress
+        const groupIds = groups.map(g => g.groupId);
+        const membersSql = `
+            SELECT 
+                m.groupId,
+                m.userId,
+                CONCAT(u.firstName, ' ', u.lastName) as name,
+                COALESCE(m.memberProgress, 0) as progress
+            FROM memberships m
+            JOIN users u ON m.userId = u.userId
+            WHERE m.groupId IN (?)
+        `;
+        const [members] = await pool.query(membersSql, [groupIds]);
+
+        // Step 3: Get all tasks for these groups with their latest progress
+        const tasksSql = `
+            SELECT 
+                t.taskId,
+                t.name,
+                t.userId,
+                t.groupId,
+                COALESCE(
+                    (SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1),
+                0) as progress
+            FROM tasks t
+            WHERE t.groupId IN (?) AND t.assignmentId = ?
+        `;
+        const [tasks] = await pool.query(tasksSql, [groupIds, assignmentId]);
+
+        // Step 4: Assemble the result in JavaScript
+        return groups.map(group => {
+            const groupMembers = members
+                .filter(m => m.groupId === group.groupId)
+                .map(m => {
+                    const memberTasks = tasks
+                        .filter(t => t.groupId === group.groupId && t.userId === m.userId)
+                        .map(t => ({
+                            taskId: t.taskId,
+                            name: t.name,
+                            progress: Number(t.progress) || 0
+                        }));
+
+                    // Calculate member progress dynamically from their tasks' latest progress
+                    const memberProgress = memberTasks.length > 0
+                        ? Math.round(memberTasks.reduce((sum, t) => sum + t.progress, 0) / memberTasks.length)
+                        : 0;
+
+                    return {
+                        userId: m.userId,
+                        name: m.name,
+                        progress: memberProgress,
+                        tasks: memberTasks
+                    };
+                });
+
+            return {
+                ...group,
+                groupProgress: Number(group.groupProgress) || 0,
+                members: groupMembers
+            };
+        });
     },
 
     deleteGroup: async (groupId) => {
@@ -104,7 +172,7 @@ const GroupModel = {
             await connection.beginTransaction();
             // Delete memberships first due to foreign key constraints if any
             await connection.query(`DELETE FROM memberships WHERE groupId = ?`, [groupId]);
-            await connection.query(`DELETE FROM groups WHERE groupId = ?`, [groupId]);
+            await connection.query(`DELETE FROM \`groups\` WHERE groupId = ?`, [groupId]);
             await connection.commit();
         } catch (err) {
             await connection.rollback();
@@ -117,8 +185,8 @@ const GroupModel = {
 
     getGroupById: async (groupId) => {
         const sql = `
-            SELECT g.*, u.userId, u.firstName, u.lastName, u.email
-            FROM groups g
+            SELECT g.*, u.userId, u.firstName, u.lastName, u.email, m.memberProgress
+            FROM \`groups\` g
             LEFT JOIN memberships m ON g.groupId = m.groupId
             LEFT JOIN users u ON m.userId = u.userId
             WHERE g.groupId = ?
@@ -147,25 +215,27 @@ const GroupModel = {
                         userId: row.userId,
                         firstName: row.firstName,
                         lastName: row.lastName,
-                        email: row.email
+                        email: row.email,
+                        progress: row.memberProgress
                     });
                 }
             }
         });
 
-        // Fetch Group Work Files
-        const filesSql = `SELECT * FROM files WHERE groupId = ?`;
-        const [files] = await pool.query(filesSql, [groupId]);
+        // Fetch Group Work Files (where taskId and userId are NULL)
+        const filesSql = `SELECT * FROM files WHERE groupId = ? AND assignmentId = ? AND taskId IS NULL AND userId IS NULL`;
+        const [files] = await pool.query(filesSql, [groupId, group.assignmentId]);
         group.files = files;
 
         // Fetch Tasks for each member
         for (const member of group.members) {
             const taskSql = `
                 SELECT t.*,
+                       COALESCE((SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1), 0) as progress,
                        CASE 
-                           WHEN t.progress = 100 THEN 'COMPLETED'
-                           WHEN t.progress >= 50 THEN 'IN PROGRESS'
-                           WHEN t.progress > 0 THEN 'AT RISK'
+                           WHEN (SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1) = 100 THEN 'COMPLETED'
+                           WHEN (SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1) >= 50 THEN 'IN PROGRESS'
+                           WHEN (SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1) > 0 THEN 'AT RISK'
                            ELSE 'WAITING'
                        END as status
                 FROM tasks t 
@@ -185,7 +255,7 @@ const GroupModel = {
 
             // 1. Update the group record
             const groupSql = `
-                UPDATE groups 
+                UPDATE \`groups\` 
                 SET groupName = ?, meetLink = ?
                 WHERE groupId = ?
             `;
@@ -217,7 +287,7 @@ const GroupModel = {
         const sql = `
             SELECT m.groupId 
             FROM memberships m
-            JOIN groups g ON m.groupId = g.groupId
+            JOIN \`groups\` g ON m.groupId = g.groupId
             WHERE m.userId = ? AND g.assignmentId = ? AND g.groupId != ?
         `;
         const [rows] = await pool.query(sql, [userId, assignmentId, currentGroupId]);
@@ -282,13 +352,51 @@ const GroupModel = {
     },
 
     submitGroupWork: async (groupId, assignmentId, isSubmitted) => {
-        const sql = `
-            UPDATE groups 
-            SET isSubmitted = ? 
-            WHERE groupId = ?
-        `;
-        const [result] = await pool.query(sql, [isSubmitted ? 1 : 0, groupId]);
-        return result.affectedRows > 0;
+        const connection = await pool.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            // 1. Update group submission status
+            const sql = `UPDATE \`groups\` SET isSubmitted = ? WHERE groupId = ?`;
+            await connection.query(sql, [isSubmitted ? 1 : 0, groupId]);
+
+            let selections = [];
+
+            if (isSubmitted) {
+                // 2. Randomize Rubric Selections for the Assignment
+                const rubricSql = `SELECT * FROM rubrics WHERE assignmentId = ?`;
+                const [rubrics] = await connection.query(rubricSql, [assignmentId]);
+                
+                if (rubrics.length > 0) {
+                    const rubricId = rubrics[0].rubricId;
+                    
+                    // Fetch Criteria and Levels
+                    const [criteriaRows] = await connection.query(`SELECT * FROM criteria WHERE rubricId = ? ORDER BY sort_order ASC`, [rubricId]);
+                    const [levelRows] = await connection.query(`SELECT * FROM levels WHERE rubricId = ? ORDER BY sort_order ASC`, [rubricId]);
+
+                    if (criteriaRows.length > 0 && levelRows.length > 0) {
+                        for (const crit of criteriaRows) {
+                            const randomIdx = Math.floor(Math.random() * levelRows.length);
+                            const selectedLevel = levelRows[randomIdx];
+                            
+                            selections.push({ criteriaId: crit.criteriaId, levelId: selectedLevel.levelId });
+
+                            // Update criteria table with the random selection
+                            await connection.query(`UPDATE criteria SET selectedLevelId = ? WHERE criteriaId = ?`, [selectedLevel.levelId, crit.criteriaId]);
+                        }
+                    }
+                }
+            }
+
+            await connection.commit();
+            return { success: true, selections };
+        } catch (err) {
+            await connection.rollback();
+            console.error("GroupModel.submitGroupWork Error:", err);
+            throw err;
+        } finally {
+            connection.release();
+        }
     }
 };
 
