@@ -75,27 +75,6 @@ const TaskModel = {
                 }
             }
 
-            // 6. Update memberProgress in memberships table
-            const updateMemberProgressSql = `
-                UPDATE memberships 
-                SET memberProgress = (
-                    SELECT COALESCE(ROUND(AVG(latest_progress)), 0)
-                    FROM (
-                        SELECT (
-                            SELECT progress 
-                            FROM attemptLog 
-                            WHERE taskId = t.taskId 
-                            ORDER BY createdAt DESC 
-                            LIMIT 1
-                        ) as latest_progress
-                        FROM tasks t
-                        WHERE t.userId = ? AND t.groupId = ? AND t.assignmentId = ?
-                    ) as task_stats
-                )
-                WHERE userId = ? AND groupId = ?
-            `;
-            await connection.query(updateMemberProgressSql, [data.userId, data.groupId, data.assignmentId, data.userId, data.groupId]);
-
             await connection.commit();
             return taskId;
         } catch (err) {
@@ -269,32 +248,6 @@ const TaskModel = {
             } else {
                 // If unsubmitting, optionally clear selections (depends on desired behavior)
                 // For now, we'll just keep them but set isSubmitted to 0
-            }
-
-            // 4. Update memberProgress in memberships table
-            const taskInfoSql = "SELECT userId, groupId, assignmentId FROM tasks WHERE taskId = ?";
-            const [taskInfoRows] = await connection.query(taskInfoSql, [taskId]);
-            if (taskInfoRows.length > 0) {
-                const { userId: uId, groupId: gId, assignmentId: aId } = taskInfoRows[0];
-                const updateMemberProgressSql = `
-                    UPDATE memberships 
-                    SET memberProgress = (
-                        SELECT COALESCE(ROUND(AVG(latest_progress)), 0)
-                        FROM (
-                            SELECT (
-                                SELECT progress 
-                                FROM attemptLog 
-                                WHERE taskId = t.taskId 
-                                ORDER BY createdAt DESC 
-                                LIMIT 1
-                            ) as latest_progress
-                            FROM tasks t
-                            WHERE t.userId = ? AND t.groupId = ? AND t.assignmentId = ?
-                        ) as task_stats
-                    )
-                    WHERE userId = ? AND groupId = ?
-                `;
-                await connection.query(updateMemberProgressSql, [uId, gId, aId, uId, gId]);
             }
 
             await connection.commit();

@@ -51,7 +51,21 @@ export default function Classwork() {
                                 isGroupWork={!!work.isGroupWork}
                                 assignmentId={work.assignmentId}
                                 onUpdate={fetchWork}
-                                onClick={(id) => navigate(`/assignment/${id}`, { state: { from: 'Work' } })}
+                                onClick={(id) => {
+                                    if (isLeader) {
+                                        if (work.isGroupWork) {
+                                            navigate(`/assignment/${id}`, { state: { from: 'Work' } });
+                                        } else {
+                                            navigate(`/leader-assignment/${id}`, { state: { from: 'Work' } });
+                                        }
+                                    } else {
+                                        if (work.isGroupWork) {
+                                            navigate(`/assignment/${id}`, { state: { from: 'Work' } });
+                                        } else {
+                                            navigate(`/group-assignment/${id}`, { state: { from: 'Work' } });
+                                        }
+                                    }
+                                }}
                             />
                         ))
                     ) : (

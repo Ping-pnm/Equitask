@@ -4,9 +4,9 @@ const WorkController = {
     getWorkFeed: async (req, res) => {
         try {
             const { classId } = req.params;
-            const { userId } = req.query;
+            const { userId, onlyGroupWork } = req.query;
 
-            const response = await AssignmentModel.getAllByClassId(classId, userId);
+            const response = await AssignmentModel.getAllByClassId(classId, userId, onlyGroupWork === 'true');
 
             res.status(200).json(response);
         } catch(err) {
@@ -149,7 +149,73 @@ const WorkController = {
             console.error("Delete Work Error:", err);
             res.status(500).json({ message: "Server error deleting assignment" });
         }
-    } 
+    },
+    uploadIndividualFile: async (req, res) => {
+        try {
+            const { userId, assignmentId } = req.body;
+            const files = req.files || [];
+
+            if (files.length === 0) {
+                return res.status(400).json({ message: "No files uploaded" });
+            }
+
+            const uploadedFiles = [];
+            for (const file of files) {
+                const fileUrl = file.path.replace(/\\/g, '/');
+                const fileId = await AssignmentModel.uploadIndividualFile(userId, assignmentId, fileUrl);
+                uploadedFiles.push({ fileId, fileUrl });
+            }
+
+            res.status(201).json({ message: "Files uploaded successfully", files: uploadedFiles });
+        } catch (err) {
+            console.error("Upload Individual File Error:", err);
+            res.status(500).json({ message: "Server error uploading file" });
+        }
+    },
+    deleteIndividualFile: async (req, res) => {
+        try {
+            const { fileId } = req.params;
+            const success = await AssignmentModel.deleteIndividualFile(fileId);
+            if (success) {
+                res.status(200).json({ message: "File deleted successfully" });
+            } else {
+                res.status(404).json({ message: "File not found" });
+            }
+        } catch (err) {
+            console.error("Delete Individual File Error:", err);
+            res.status(500).json({ message: "Server error deleting file" });
+        }
+    },
+    submitIndividualWork: async (req, res) => {
+        try {
+            const { userId, assignmentId, isSubmitted } = req.body;
+            await AssignmentModel.submitIndividualWork(userId, assignmentId, isSubmitted);
+            res.status(200).json({ message: isSubmitted ? "Work submitted" : "Work unsubmitted" });
+        } catch (err) {
+            console.error("Submit Individual Work Error:", err);
+            res.status(500).json({ message: "Server error submitting work" });
+        }
+    },
+    getIndividualSubmissions: async (req, res) => {
+        try {
+            const { assignmentId } = req.params;
+            const submissions = await AssignmentModel.getAllIndividualSubmissions(assignmentId);
+            res.status(200).json(submissions);
+        } catch (err) {
+            console.error("Get Individual Submissions Error:", err);
+            res.status(500).json({ message: "Server error fetching submissions" });
+        }
+    },
+    gradeIndividualWork: async (req, res) => {
+        try {
+            const { userId, assignmentId, grades } = req.body;
+            await AssignmentModel.gradeIndividualWork(userId, assignmentId, grades);
+            res.status(200).json({ message: "Work graded successfully" });
+        } catch (err) {
+            console.error("Grade Individual Work Error:", err);
+            res.status(500).json({ message: "Server error grading work" });
+        }
+    }
 };
 
 export default WorkController;

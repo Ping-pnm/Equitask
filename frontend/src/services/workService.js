@@ -1,6 +1,10 @@
-export async function getWorkFeed(classId, userId) {
+export async function getWorkFeed(classId, userId, onlyGroupWork = false) {
     try {
-        const response = await fetch(`http://localhost:3000/api/work/feed/${classId}?userId=${userId}`, {
+        const url = new URL(`http://localhost:3000/api/work/feed/${classId}`);
+        if (userId) url.searchParams.append('userId', userId);
+        if (onlyGroupWork) url.searchParams.append('onlyGroupWork', 'true');
+
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -41,9 +45,12 @@ export async function assignWork(formData) {
     }
 }
 
-export async function getAssignment(assignmentId) {
+export async function getAssignment(assignmentId, userId = null) {
     try {
-        const response = await fetch(`http://localhost:3000/api/work/${assignmentId}`);
+        const url = userId 
+            ? `http://localhost:3000/api/work/${assignmentId}?userId=${userId}`
+            : `http://localhost:3000/api/work/${assignmentId}`;
+        const response = await fetch(url);
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Failed to fetch assignment');
@@ -313,6 +320,26 @@ export async function submitGroupWork(groupId, assignmentId, isSubmitted) {
     }
 }
 
+export async function gradeGroup(groupId, grades) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/group/${groupId}/grade`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ grades })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to grade group');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.gradeGroup Error:", err);
+        throw err;
+    }
+}
+
 export async function getTaskDetail(taskId) {
     try {
         const response = await fetch(`http://localhost:3000/api/task/${taskId}`);
@@ -382,6 +409,102 @@ export async function submitTaskWork(taskId, isSubmitted) {
         return await response.json();
     } catch (err) {
         console.error("workService.submitTaskWork Error:", err);
+        throw err;
+    }
+}
+
+export async function uploadIndividualWork(userId, assignmentId, files) {
+    try {
+        const formData = new FormData();
+        formData.append('userId', userId);
+        formData.append('assignmentId', assignmentId);
+        files.forEach(file => formData.append('files', file));
+
+        const response = await fetch(`http://localhost:3000/api/work/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to upload individual work');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.uploadIndividualWork Error:", err);
+        throw err;
+    }
+}
+
+export async function deleteIndividualWork(fileId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/work/file/${fileId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete individual file');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.deleteIndividualWork Error:", err);
+        throw err;
+    }
+}
+
+export async function submitIndividualWork(userId, assignmentId, isSubmitted) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/work/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, assignmentId, isSubmitted })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to submit individual work');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.submitIndividualWork Error:", err);
+        throw err;
+    }
+}
+
+export async function getAllIndividualSubmissions(assignmentId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/work/submissions/${assignmentId}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch individual submissions');
+        }
+        return await response.json();
+    } catch (err) {
+        console.error("workService.getAllIndividualSubmissions Error:", err);
+        throw err;
+    }
+}
+
+export async function gradeIndividualWork(userId, assignmentId, grades) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/work/grade`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, assignmentId, grades })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to grade work');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.gradeIndividualWork Error:", err);
         throw err;
     }
 }

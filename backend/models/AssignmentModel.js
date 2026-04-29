@@ -1,7 +1,7 @@
 import pool from '../db.js';
 
 const AssignmentModel = {
-    getAllByClassId: async (classId, userId) => {
+    getAllByClassId: async (classId, userId = null, onlyGroupWork = false) => {
         try {
             // Step 1: Get all assignments for the class
             const assignmentSql = `
@@ -13,7 +13,7 @@ const AssignmentModel = {
                 FROM assignments a
                 JOIN users u ON a.creatorId = u.userId
                 LEFT JOIN userAssignments ua ON a.assignmentId = ua.assignmentId AND ua.userId = ?
-                WHERE a.classId = ?
+                WHERE a.classId = ? ${onlyGroupWork ? 'AND a.isGroupWork = 1' : ''}
                 ORDER BY a.createdAt DESC
             `;
             const [assignments] = await pool.query(assignmentSql, [userId, classId]);
@@ -44,8 +44,7 @@ const AssignmentModel = {
             if (groupIds.length > 0) {
                 const membersSql = `
                     SELECT m.groupId, m.userId,
-                           CONCAT(u.firstName, ' ', u.lastName) as name,
-                           COALESCE(m.memberProgress, 0) as progress
+                           CONCAT(u.firstName, ' ', u.lastName) as name
                     FROM memberships m
                     JOIN users u ON m.userId = u.userId
                     WHERE m.groupId IN (?)
@@ -84,12 +83,19 @@ const AssignmentModel = {
 
                 if (groupInfo) {
                     const rawMembers = membersMap[groupInfo.groupId] || [];
-                    members = rawMembers.map(m => ({
-                        userId: m.userId,
-                        name: m.name,
-                        progress: Number(m.progress) || 0,
-                        tasks: tasksMap[`${groupInfo.groupId}_${m.userId}`] || []
-                    }));
+                    members = rawMembers.map(m => {
+                        const memberTasks = tasksMap[`${groupInfo.groupId}_${m.userId}`] || [];
+                        const memberProgress = memberTasks.length > 0
+                            ? Math.round(memberTasks.reduce((sum, t) => sum + t.progress, 0) / memberTasks.length)
+                            : 0;
+                        
+                        return {
+                            userId: m.userId,
+                            name: m.name,
+                            progress: memberProgress,
+                            tasks: memberTasks
+                        };
+                    });
                     groupProgress = Number(groupInfo.groupProgress) || 0;
                 }
 
@@ -300,9 +306,16 @@ const AssignmentModel = {
                 }
             }
 
-            // 6. Get Files (Assignment level only - where group and task are null)
+            // 6. Get Files (Assignment level)
             const fileSql = `SELECT * FROM files WHERE assignmentId = ? AND groupId IS NULL AND taskId IS NULL AND userId IS NULL`;
             const [files] = await pool.query(fileSql, [assignmentId]);
+
+            // 7. Get User Files (if userId provided, for individual work)
+            let userFiles = [];
+            if (userId) {
+                const userFileSql = `SELECT * FROM files WHERE assignmentId = ? AND userId = ? AND groupId IS NULL AND taskId IS NULL`;
+                [userFiles] = await pool.query(userFileSql, [assignmentId, userId]);
+            }
 
             return {
                 ...assignment,
@@ -310,7 +323,8 @@ const AssignmentModel = {
                 criteria,
                 levels,
                 rubricCells,
-                files
+                files,
+                userFiles
             };
         } catch (err) {
             console.error("Database Error (getById)", err);
@@ -444,6 +458,44 @@ const AssignmentModel = {
         } finally {
             connection.release();
         }
+    },
+    uploadIndividualFile: async (userId, assignmentId, fileUrl) => {
+        const sql = `INSERT INTO files (fileUrl, userId, assignmentId) VALUES (?, ?, ?)`;
+        const [result] = await pool.query(sql, [fileUrl, userId, assignmentId]);
+        return result.insertId;
+    },
+    deleteIndividualFile: async (fileId) => {
+        const sql = `DELETE FROM files WHERE fileId = ?`;
+        const [result] = await pool.query(sql, [fileId]);
+        return result.affectedRows > 0;
+    },
+    submitIndividualWork: async (userId, assignmentId, isSubmitted) => {
+        const sql = `UPDATE userAssignments SET isSubmitted = ? WHERE userId = ? AND assignmentId = ?`;
+        await pool.query(sql, [isSubmitted ? 1 : 0, userId, assignmentId]);
+    },
+    getAllIndividualSubmissions: async (assignmentId) => {
+        const sql = `
+            SELECT 
+                u.userId,
+                u.firstName,
+                u.lastName,
+                u.email,
+                ua.isSubmitted,
+                ua.grades,
+                (SELECT GROUP_CONCAT(fileUrl) FROM files f WHERE f.userId = u.userId AND f.assignmentId = ?) as fileUrls
+            FROM users u
+            JOIN userAssignments ua ON u.userId = ua.userId
+            WHERE ua.assignmentId = ?
+        `;
+        const [rows] = await pool.query(sql, [assignmentId, assignmentId]);
+        return rows.map(r => ({
+            ...r,
+            files: r.fileUrls ? r.fileUrls.split(',').map(url => ({ fileUrl: url })) : []
+        }));
+    },
+    gradeIndividualWork: async (userId, assignmentId, grades) => {
+        const sql = `UPDATE userAssignments SET grades = ? WHERE userId = ? AND assignmentId = ?`;
+        await pool.query(sql, [grades, userId, assignmentId]);
     }
 };
 

@@ -3,7 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 export default function TabHeader() {
     const location = useLocation();
     const from = location.state?.from;
-    const isAssignment = location.pathname.startsWith('/assignment/');
+    const isAssignment = location.pathname.startsWith('/assignment/') || 
+                         location.pathname.startsWith('/leader-assignment/') || 
+                         location.pathname.startsWith('/group-assignment/');
 
     return (
         <header className="top-nav">

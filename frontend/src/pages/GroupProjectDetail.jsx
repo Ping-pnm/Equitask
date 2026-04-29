@@ -7,7 +7,7 @@ import aiSign from '../assets/Ai-sign.png';
 import uploadSign from '../assets/UploadSign.png';
 import {
     getGroup, getAssignment, getGroupComments, addGroupComment,
-    trackMeetJoin, getMeetTracking, uploadGroupWork, deleteGroupWork, submitGroupWork
+    trackMeetJoin, getMeetTracking, uploadGroupWork, deleteGroupWork, submitGroupWork, gradeGroup
 } from '../services/workService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import CreateGroupModal from '../components/Work/CreateGroupModal';
@@ -40,6 +40,7 @@ export default function GroupProjectDetail() {
     const [uploadedWork, setUploadedWork] = useState([]);
     const [isWorkSubmitted, setIsWorkSubmitted] = useState(false);
     const [rubricSelections, setRubricSelections] = useState(null);
+    const [gradeValue, setGradeValue] = useState('');
 
     const fetchGroupData = async () => {
         try {
@@ -47,6 +48,7 @@ export default function GroupProjectDetail() {
             setGroup(groupData);
             setUploadedWork(groupData.files || []);
             setIsWorkSubmitted(!!groupData.isSubmitted);
+            setGradeValue(groupData.grades || '');
 
             // Also fetch assignment for rubrics
             if (groupData.assignmentId) {
@@ -186,6 +188,19 @@ export default function GroupProjectDetail() {
         }
     };
 
+    const handleGradeUpdate = async (e) => {
+        if (e.key === 'Enter') {
+            try {
+                await gradeGroup(groupId, gradeValue);
+                setPopupMessage({ message: "Grade updated successfully!", theme: 'green' });
+                fetchGroupData();
+            } catch (err) {
+                console.error("Grade update error:", err);
+                setPopupMessage({ message: "Failed to update grade", theme: 'red' });
+            }
+        }
+    };
+
     const navigate = useNavigate();
 
     const openTaskDetail = (student, task) => {
@@ -249,12 +264,12 @@ export default function GroupProjectDetail() {
     return (
         <section id="dashboard-group-detail-view" className="stream-content extracted-style-19">
             <div className="main-dashboard-wrapper" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', padding: '0 20px' }}>
-                <Link to={`/project/${group.assignmentId}`} id="extracted-el-2" className="extracted-style-20" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link to={isLeader ? `/project/${group.assignmentId}` : "/dashboard"} id="extracted-el-2" className="extracted-style-20" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
-                    Back to Group Project
+                    {isLeader ? "Back to Group Project" : "Back to Dashboard"}
                 </Link>
 
                 {/* Consolidated Header & Main Content Grid */}
@@ -393,9 +408,27 @@ export default function GroupProjectDetail() {
                                 </button>
                             )}
 
-                            {isLeader && (
-                                <div className="extracted-style-69" style={{ marginTop: '20px' }}>
-                                    <input type="text" placeholder="Add grade" className="extracted-style-70" /> / 100
+                            {/* Grading Section */}
+                            {(isLeader || group.grades !== null) && (
+                                <div className="extracted-style-69" style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    {isLeader ? (
+                                        <>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Add grade" 
+                                                className="extracted-style-70" 
+                                                value={gradeValue}
+                                                onChange={(e) => setGradeValue(e.target.value)}
+                                                onKeyDown={handleGradeUpdate}
+                                            /> 
+                                            <span style={{ fontSize: '16px', fontWeight: '600', color: '#555' }}>/ {assignment?.points || 100}</span>
+                                        </>
+                                    ) : (
+                                        <div style={{ padding: '10px 15px', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #e9ecef', width: '100%', textAlign: 'center' }}>
+                                            <span style={{ fontSize: '14px', color: '#666', fontWeight: '500' }}>Grade: </span>
+                                            <span style={{ fontSize: '18px', color: '#2c3e50', fontWeight: '700' }}>{group.grades} / {assignment?.points || 100}</span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

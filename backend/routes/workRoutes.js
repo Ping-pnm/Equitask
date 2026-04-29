@@ -10,4 +10,11 @@ router.post('/assign', upload.array('files'), WorkController.assignWork);
 router.put('/:assignmentId', upload.array('files'), WorkController.updateWork);
 router.delete('/:assignmentId', WorkController.deleteWork);
 
+// Individual Submission Routes
+router.post('/upload', upload.array('files'), WorkController.uploadIndividualFile);
+router.delete('/file/:fileId', WorkController.deleteIndividualFile);
+router.post('/submit', WorkController.submitIndividualWork);
+router.get('/submissions/:assignmentId', WorkController.getIndividualSubmissions);
+router.post('/grade', WorkController.gradeIndividualWork);
+
 export default router;

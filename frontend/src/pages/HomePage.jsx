@@ -91,7 +91,21 @@ export default function HomePage() {
                                     author={`${feed.firstName} ${feed.lastName}`}
                                     date={new Date(feed.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                                     assignmentId={feed.assignmentId || feed.id}
-                                    onClick={(id) => navigate(`/assignment/${id}`, { state: { from: 'Work' } })}
+                                    onClick={(id) => {
+                                        if (isLeader) {
+                                            if (feed.isGroupWork) {
+                                                navigate(`/assignment/${id}`, { state: { from: 'Work' } });
+                                            } else {
+                                                navigate(`/leader-assignment/${id}`, { state: { from: 'Work' } });
+                                            }
+                                        } else {
+                                            if (feed.isGroupWork) {
+                                                navigate(`/assignment/${id}`, { state: { from: 'Work' } });
+                                            } else {
+                                                navigate(`/group-assignment/${id}`, { state: { from: 'Work' } });
+                                            }
+                                        }
+                                    }}
                                 />
                             )
                         ))

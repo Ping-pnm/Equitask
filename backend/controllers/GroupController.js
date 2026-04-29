@@ -233,6 +233,18 @@ const GroupController = {
             console.error("GroupController.submitWork Error:", err);
             res.status(500).json({ message: "Error submitting work" });
         }
+    },
+
+    gradeGroup: async (req, res) => {
+        try {
+            const { groupId } = req.params;
+            const { grades } = req.body;
+            await GroupModel.gradeGroup(groupId, grades);
+            res.status(200).json({ message: "Group graded successfully" });
+        } catch (err) {
+            console.error("GroupController.gradeGroup Error:", err);
+            res.status(500).json({ message: "Error grading group" });
+        }
     }
 };
 

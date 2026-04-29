@@ -7,9 +7,10 @@ import People from './pages/People.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import AssignmentDetail from './pages/AssignmentDetail.jsx';
 import ProjectOverview from './pages/ProjectOverview.jsx';
-import Assignment from './pages/Assignment.jsx';
+import IndividualAssignment from './pages/IndividualAssignment.jsx';
 import GroupProjectDetail from './pages/GroupProjectDetail.jsx';
 import TaskDetail from './pages/TaskDetail.jsx';
+import LeaderIndividualAss from './pages/LeaderIndividualAss.jsx';
 
 import RootLayout from './components/RootLayout.jsx';
 import ProtectedLayout from './components/ProtectedLayout.jsx';
@@ -35,7 +36,8 @@ const router = createBrowserRouter([
                     { path: "/dashboard", element: <Dashboard /> },
                     { path: "/assignment/:assignmentId", element: <AssignmentDetail /> },
                     { path: "/project/:assignmentId", element: <ProjectOverview /> },
-                    { path: "/group-assignment/:assignmentId", element: <Assignment /> },
+                    { path: "/group-assignment/:assignmentId", element: <IndividualAssignment /> },
+                    { path: "/leader-assignment/:assignmentId", element: <LeaderIndividualAss /> },
                     { path: "/group-project/:groupId", element: <GroupProjectDetail /> },
                     { path: "/task/:taskId", element: <TaskDetail /> }
                 ]

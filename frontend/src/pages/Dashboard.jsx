@@ -18,7 +18,7 @@ export default function Dashboard() {
         if (!activeClassId || !userId) { setIsLoading(false); return; }
         try {
             setIsLoading(true);
-            const data = await getWorkFeed(activeClassId, userId);
+            const data = await getWorkFeed(activeClassId, userId, true);
             setAssignments(data);
         } catch (err) {
             console.error("Failed to fetch dashboard work:", err);
@@ -38,35 +38,42 @@ export default function Dashboard() {
                     <LoadingSpinner />
                 ) : assignments.length > 0 ? (
                     (() => {
-                        const filteredAssignments = isLeader 
-                            ? assignments 
-                            : assignments.filter(work => work.isGroupWork);
-
-                        if (filteredAssignments.length === 0) {
-                            return <p className="no-posts-msg">No group assignments found.</p>;
-                        }
-
-                        return filteredAssignments.map((work) => {
-                            // Student View: Group Assignments only
+                        return assignments.map((work) => {
+                            // Student View
                             if (!isLeader) {
-                                if (work.groupId) {
-                                    return (
-                                        <GroupCard
-                                            key={work.assignmentId}
-                                            groupId={work.groupId}
-                                            assignmentId={work.assignmentId}
-                                            groupName={work.groupName || `Project: ${work.title}`}
-                                            overallProgress={Math.round(work.groupProgress || 0)}
-                                            members={work.members}
-                                            summary={null}
-                                        />
-                                    );
+                                if (work.isGroupWork) {
+                                    if (work.groupId) {
+                                        return (
+                                            <GroupCard
+                                                key={work.assignmentId}
+                                                groupId={work.groupId}
+                                                assignmentId={work.assignmentId}
+                                                groupName={work.groupName || `Project: ${work.title}`}
+                                                overallProgress={Math.round(work.groupProgress || 0)}
+                                                members={work.members}
+                                                summary={null}
+                                            />
+                                        );
+                                    } else {
+                                        return (
+                                            <div key={work.assignmentId} className="no-group-display">
+                                                <h3 className="group-card-title">{work.title}</h3>
+                                                <p className="no-group-notice">You have no group for this project.</p>
+                                            </div>
+                                        );
+                                    }
                                 } else {
+                                    // Individual Assignment for Student
                                     return (
-                                        <div key={work.assignmentId} className="no-group-display">
-                                            <h3 className="group-card-title">{work.title}</h3>
-                                            <p className="no-group-notice">You have no group for this project.</p>
-                                        </div>
+                                        <WorkPost
+                                            key={work.assignmentId}
+                                            title={work.title}
+                                            date={new Date(work.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase()}
+                                            isGroupWork={false}
+                                            assignmentId={work.assignmentId}
+                                            onUpdate={fetchWork}
+                                            onClick={(id) => navigate(`/group-assignment/${id}`)}
+                                        />
                                     );
                                 }
                             }
@@ -84,7 +91,7 @@ export default function Dashboard() {
                                         if (work.isGroupWork) {
                                             navigate(`/project/${id}`);
                                         } else {
-                                            navigate(`/assignment/${id}`, { state: { from: 'Work' } });
+                                            navigate(`/leader-assignment/${id}`);
                                         }
                                     }}
                                 />

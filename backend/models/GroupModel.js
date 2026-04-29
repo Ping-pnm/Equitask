@@ -45,7 +45,7 @@ const GroupModel = {
 
             // 2. Add entries to memberships table
             const allMemberIds = Array.from(new Set([creatorId, ...memberIds]));
-            const membershipSql = `INSERT INTO memberships (groupId, userId, memberProgress) VALUES (?, ?, 0)`;
+            const membershipSql = `INSERT INTO memberships (groupId, userId) VALUES (?, ?)`;
 
             for (const userId of allMemberIds) {
                 await connection.query(membershipSql, [groupId, userId]);
@@ -109,8 +109,7 @@ const GroupModel = {
             SELECT 
                 m.groupId,
                 m.userId,
-                CONCAT(u.firstName, ' ', u.lastName) as name,
-                COALESCE(m.memberProgress, 0) as progress
+                CONCAT(u.firstName, ' ', u.lastName) as name
             FROM memberships m
             JOIN users u ON m.userId = u.userId
             WHERE m.groupId IN (?)
@@ -185,7 +184,7 @@ const GroupModel = {
 
     getGroupById: async (groupId) => {
         const sql = `
-            SELECT g.*, u.userId, u.firstName, u.lastName, u.email, m.memberProgress
+            SELECT g.*, u.userId, u.firstName, u.lastName, u.email
             FROM \`groups\` g
             LEFT JOIN memberships m ON g.groupId = m.groupId
             LEFT JOIN users u ON m.userId = u.userId
@@ -215,8 +214,7 @@ const GroupModel = {
                         userId: row.userId,
                         firstName: row.firstName,
                         lastName: row.lastName,
-                        email: row.email,
-                        progress: row.memberProgress
+                        email: row.email
                     });
                 }
             }
@@ -397,6 +395,12 @@ const GroupModel = {
         } finally {
             connection.release();
         }
+    },
+
+    gradeGroup: async (groupId, grades) => {
+        const sql = `UPDATE \`groups\` SET grades = ? WHERE groupId = ?`;
+        const [result] = await pool.query(sql, [grades, groupId]);
+        return result.affectedRows > 0;
     }
 };
 

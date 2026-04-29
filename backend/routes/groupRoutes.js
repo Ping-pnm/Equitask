@@ -20,5 +20,6 @@ router.get('/:groupId/track-meet', GroupController.getMeetTracking);
 router.post('/:groupId/upload', upload.array('files'), GroupController.uploadWork);
 router.delete('/work-file/:fileId', GroupController.deleteWorkFile);
 router.post('/:groupId/submit', GroupController.submitWork);
+router.post('/:groupId/grade', GroupController.gradeGroup);
 
 export default router;
