@@ -63,6 +63,7 @@ export default function ProjectOverview() {
                                 tasks: m.tasks || []
                             }))}
                             summary={group.aiSummary || "This group are currently working on their project tasks..."}
+                            isSubmitted={!!group.isSubmitted}
                         />
                     ))
                 ) : (

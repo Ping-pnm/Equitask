@@ -143,10 +143,6 @@ export default function LeaderIndividualAss() {
                                 levels={assignment.levels.map(l => l.title)}
                                 cells={assignment.rubricCells}
                                 readOnly={true}
-                                selections={assignment.criteria.map(c => {
-                                    if (!c.selectedLevelId) return null;
-                                    return assignment.levels.findIndex(l => l.levelId === c.selectedLevelId);
-                                })}
                             />
                         </div>
                     )}

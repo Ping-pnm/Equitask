@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 export default function GroupCard({ groupId, assignmentId, groupName, overallProgress, members, summary, isSubmitted }) {
     const navigate = useNavigate();
 
-    // If group has submitted, show 100% regardless of task progress
-    const baseProgress = (members && members.length > 0)
-        ? members.reduce((sum, m) => sum + (Number(m.progress) || 0), 0) / members.length
-        : (overallProgress != null ? Number(overallProgress) : 0);
+    // Use overallProgress if provided, otherwise calculate from members
+    const baseProgress = (overallProgress != null)
+        ? Number(overallProgress)
+        : (members && members.length > 0)
+            ? members.reduce((sum, m) => sum + (Number(m.progress) || 0), 0) / members.length
+            : 0;
 
     const roundedProgress = isSubmitted ? 100 : Math.round(baseProgress);
 
