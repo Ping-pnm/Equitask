@@ -267,12 +267,9 @@ const TaskModel = {
 
     updateCriteriaSelections: async (selections) => {
         // selections is an array of { criteriaId, levelId }
-        console.log("TaskModel.updateCriteriaSelections: starting update for", selections.length, "items");
         const sql = "UPDATE criteria SET selectedLevelId = ? WHERE criteriaId = ?";
         for (const sel of selections) {
-            console.log(`Updating criteria ${sel.criteriaId} with level ${sel.levelId}`);
             const [result] = await pool.query(sql, [sel.levelId, sel.criteriaId]);
-            console.log(`Update result for criteria ${sel.criteriaId}: ${result.affectedRows} rows affected`);
         }
         return true;
     }

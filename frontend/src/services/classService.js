@@ -79,7 +79,6 @@ export async function postAnnouncement(content, creatorId, classId, files) {
         
         // Append all files to the 'files' field
         files.forEach((file, index) => {
-            console.log(`Appending file ${index}:`, file.name);
             formData.append('files', file);
         });
 

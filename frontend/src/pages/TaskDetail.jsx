@@ -104,7 +104,6 @@ export default function TaskDetail() {
                     // Calculate percentage (rankIndex 0 = 100%, highest rankIndex = 0%)
                     const rowScore = ((totalLevels - 1 - rankIndex) / divisor) * 100;
                     totalPoints += rowScore;
-                    console.log(`Evaluating Criteria: ${criteria.title} | Rank: ${rankIndex} | Score: ${rowScore.toFixed(1)}%`);
                 }
             }
         });

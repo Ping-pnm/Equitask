@@ -84,6 +84,7 @@ const WorkController = {
         try {
             const { assignmentId } = req.params;
             const { 
+                classId,
                 title, 
                 instruction, 
                 points, 
@@ -118,6 +119,7 @@ const WorkController = {
             ];
 
             const updateData = {
+                classId,
                 title,
                 instruction,
                 points: parseInt(points),

@@ -51,7 +51,6 @@ const GroupController = {
         try {
             const { assignmentId } = req.params;
             const groups = await GroupModel.getAllGroupsForAssignment(assignmentId);
-            console.log('[GroupController.getAllGroupsForAssignment] groups:', JSON.stringify(groups, null, 2));
             res.status(200).json(groups);
         } catch (err) {
             console.error("GroupController.getAllGroupsForAssignment Error:", err);

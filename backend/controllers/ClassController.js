@@ -76,9 +76,6 @@ const ClassController = {
     postAnnouncement: async (req, res) => {
         try {
             // Debugging: See exactly what is arriving
-            console.log("--- New Announcement Request ---");
-            console.log("Body:", req.body);
-            console.log("Files:", req.files);
 
             const { content, creatorId } = req.body;
             const { classId } = req.params;

@@ -370,9 +370,7 @@ const AssignmentModel = {
                 assignmentId
             ];
 
-            console.log("Updating assignment:", assignmentId, data);
             const [result] = await connection.query(sql, params);
-            console.log("Update result:", result.affectedRows, "rows affected");
 
             // 2. Sync Rubrics based on useRubric flag
             const [rubricRows] = await connection.query(`SELECT rubricId FROM rubrics WHERE assignmentId = ?`, [assignmentId]);
@@ -472,6 +470,28 @@ const AssignmentModel = {
                 const fileSql = `INSERT INTO files (fileUrl, assignmentId) VALUES (?, ?)`;
                 for (const file of data.files) {
                     await connection.query(fileSql, [file.fileUrl, assignmentId]);
+                }
+            }
+
+            // 4. Handle linking tables (Group vs Individual) during update
+            if (!data.isGroupWork) {
+                // If individual, link all students (members) in class to this assignment, excluding leaders
+                const enrollmentSql = `
+                    SELECT userId FROM enrollments 
+                    WHERE classId = ? 
+                    AND userId NOT IN (SELECT userId FROM owners WHERE classId = ?)
+                `;
+                const [students] = await connection.query(enrollmentSql, [data.classId, data.classId]);
+                
+                if (students.length > 0) {
+                    // Use INSERT IGNORE to skip if the user is already assigned
+                    const userAssignmentSql = `
+                        INSERT IGNORE INTO userAssignments (userId, assignmentId, isSubmitted, grades)
+                        VALUES (?, ?, 0, NULL)
+                    `;
+                    for (const student of students) {
+                        await connection.query(userAssignmentSql, [student.userId, assignmentId]);
+                    }
                 }
             }
 

@@ -12,7 +12,6 @@ export default function GroupCard({ groupId, assignmentId, groupName, overallPro
 
     const roundedProgress = isSubmitted ? 100 : Math.round(baseProgress);
 
-    console.log('[GroupCard]', groupName, '| overallProgress:', overallProgress, '| members:', members);
 
     // Half-circle gauge settings
     const circumference = 188.5; // (PI * 120) / 2 approx for half circle
