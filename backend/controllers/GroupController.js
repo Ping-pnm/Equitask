@@ -20,12 +20,6 @@ const GroupController = {
                 return res.status(400).json({ message: "Group name, Assignment ID, Class ID, and Creator ID are required" });
             }
 
-            // Check if creator is already in a group
-            const creatorInGroup = await GroupModel.checkUserHasGroup(creatorId, assignmentId);
-            if (creatorInGroup) {
-                return res.status(400).json({ message: "You are already in a group for this assignment." });
-            }
-
             // Check if any of the added members are already in a group
             for (const userId of memberIds) {
                 const inGroup = await GroupModel.checkUserHasGroup(userId, assignmentId);

@@ -145,32 +145,40 @@ export default function AssignmentDetail() {
 
                         <div className="groups-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {groupsToDisplay.length > 0 ? (
-                                groupsToDisplay.map(group => (
-                                    <div
-                                        key={group.groupId}
-                                        className="group-status-container"
-                                        onClick={() => navigate(`/group-project/${group.groupId}`)}
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <div className="group-info-left">
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: '100px' }}>
-                                                <img src={groupSign} alt="Group" style={{ width: '32px', height: '32px', opacity: 0.8 }} />
-                                                <span className="group-name-display" style={{ fontSize: '16px' }}>{group.groupName}</span>
+                                groupsToDisplay.map(group => {
+                                    const baseProgress = (group.members && group.members.length > 0)
+                                        ? group.members.reduce((sum, m) => sum + (Number(m.progress) || 0), 0) / group.members.length
+                                        : (group.groupProgress != null ? Number(group.groupProgress) : (group.progress || 0));
+                                    
+                                    const roundedProgress = group.isSubmitted ? 100 : Math.round(baseProgress);
+
+                                    return (
+                                        <div
+                                            key={group.groupId}
+                                            className="group-status-container"
+                                            onClick={() => navigate(`/group-project/${group.groupId}`)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <div className="group-info-left">
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: '100px' }}>
+                                                    <img src={groupSign} alt="Group" style={{ width: '32px', height: '32px', opacity: 0.8 }} />
+                                                    <span className="group-name-display" style={{ fontSize: '16px' }}>{group.groupName}</span>
+                                                </div>
+                                                <ProgressBar progress={roundedProgress} />
                                             </div>
-                                            <ProgressBar progress={group.groupProgress || group.progress || 0} />
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                {isLeader && (
+                                                    <button
+                                                        className="btn-delete-group"
+                                                        onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group.groupId); }}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            {isLeader && (
-                                                <button
-                                                    className="btn-delete-group"
-                                                    onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group.groupId); }}
-                                                >
-                                                    Delete
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))
+                                    );
+                                })
                             ) : (
                                 <p style={{ fontSize: '14px', color: '#999', textAlign: 'center' }}>No groups joined yet.</p>
                             )}

@@ -41,10 +41,12 @@ export default function AssignModal({ onClose, classId, isCreate, assignmentId }
                     const data = await getAssignment(assignmentId);
                     const fetchedCriterias = data.criteria?.length > 0 ? data.criteria.map(c => c.title) : Array(2).fill('');
                     const fetchedLevels = data.levels?.length > 0 ? data.levels.map(l => l.title) : Array(2).fill('');
+                    const hasRubric = !!(data.criteria && data.criteria.length > 0);
 
                     setModalData({
                         title: data.title || '',
                         instruction: data.instructions || '',
+                        useRubric: hasRubric,
                         points: data.points || 100,
                         dueDateTime: data.dueDate ? data.dueDate.split('.')[0].replace(' ', 'T') : getTodayDateTimeString(),
                         isGroupWork: !!data.isGroupWork,
@@ -72,6 +74,8 @@ export default function AssignModal({ onClose, classId, isCreate, assignmentId }
             ...prev,
             files: [...prev.files, ...selectedFiles]
         }));
+        // Reset input value so the same file can be selected again
+        e.target.value = '';
     };
 
     const handleDeleteFile = (index) => {
@@ -101,7 +105,7 @@ export default function AssignModal({ onClose, classId, isCreate, assignmentId }
             formData.append('rubricCriterias', JSON.stringify(modalData.rubricCriterias));
             formData.append('rubricLevels', JSON.stringify(modalData.rubricLevels));
             formData.append('rubricCells', JSON.stringify(modalData.rubricCells));
-            
+
             // Separate existing files from new ones
             const existingFiles = modalData.files.filter(f => f.isExisting);
             formData.append('existingFiles', JSON.stringify(existingFiles));
@@ -210,11 +214,12 @@ export default function AssignModal({ onClose, classId, isCreate, assignmentId }
                     </div>
                 </div>
 
+                <div style={{ padding: '0 30px 20px' }}>
+                     <AttachmentDisplay files={modalData.files} onDelete={handleDeleteFile} />
+                </div>
+
                 <div className="modal-footer-row">
-                    <div className="compose-icons" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        <div className="attachments-footer-wrapper" style={{ marginBottom: '10px', width: '100%' }}>
-                            <AttachmentDisplay files={modalData.files} onDelete={handleDeleteFile} />
-                        </div>
+                    <div className="compose-icons" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '15px' }}>
                         <input
                             type="file"
                             multiple

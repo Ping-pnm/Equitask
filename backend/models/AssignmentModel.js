@@ -139,58 +139,63 @@ const AssignmentModel = {
             const [assignmentResult] = await connection.query(assignmentSql, assignmentParams);
             const assignmentId = assignmentResult.insertId;
 
-            // 2. Insert into rubrics (link to assignmentId)
-            const rubricSql = `
-                INSERT INTO rubrics (title, assignmentId)
-                VALUES (?, ?)
-            `;
-            const [rubricResult] = await connection.query(rubricSql, [`Rubric for ${data.title}`, assignmentId]);
-            const rubricId = rubricResult.insertId;
+            // 2. Insert into rubrics only if useRubric is enabled and we have valid criteria
+            const validCriterias = (data.rubrics?.criterias || []).filter(c => c && c.trim() !== '');
+            const validLevels = (data.rubrics?.levels || []).filter(l => l && l.trim() !== '');
 
-            // 3. Insert into criteria (Rows)
-            const criteriaIds = [];
-            if (data.rubrics && data.rubrics.criterias) {
-                const numCriteria = data.rubrics.criterias.length;
-                const maxPct = numCriteria > 0 ? (100 / numCriteria) : 0;
-                
-                const criteriaSql = `
-                    INSERT INTO criteria (title, sort_order, rubricId, maxPercentage)
-                    VALUES (?, ?, ?, ?)
+            if (data.useRubric && validCriterias.length > 0) {
+                const rubricSql = `
+                    INSERT INTO rubrics (title, assignmentId)
+                    VALUES (?, ?)
                 `;
-                for (let i = 0; i < data.rubrics.criterias.length; i++) {
-                    const criteriaTitle = data.rubrics.criterias[i];
-                    const [res] = await connection.query(criteriaSql, [criteriaTitle || '', i, rubricId, maxPct]);
-                    criteriaIds.push(res.insertId);
+                const [rubricResult] = await connection.query(rubricSql, [`Rubric for ${data.title}`, assignmentId]);
+                const rubricId = rubricResult.insertId;
+
+                // 3. Insert into criteria (Rows)
+                const criteriaIds = [];
+                if (validCriterias.length > 0) {
+                    const numCriteria = validCriterias.length;
+                    const maxPct = numCriteria > 0 ? (100 / numCriteria) : 0;
+                    
+                    const criteriaSql = `
+                        INSERT INTO criteria (title, sort_order, rubricId, maxPercentage)
+                        VALUES (?, ?, ?, ?)
+                    `;
+                    for (let i = 0; i < validCriterias.length; i++) {
+                        const criteriaTitle = validCriterias[i];
+                        const [res] = await connection.query(criteriaSql, [criteriaTitle, i, rubricId, maxPct]);
+                        criteriaIds.push(res.insertId);
+                    }
                 }
-            }
 
-            // 4. Insert into levels (Columns)
-            const levelIds = [];
-            if (data.rubrics && data.rubrics.levels) {
-                const levelsSql = `
-                    INSERT INTO levels (title, sort_order, rubricId)
-                    VALUES (?, ?, ?)
-                `;
-                for (let i = 0; i < data.rubrics.levels.length; i++) {
-                    const levelTitle = data.rubrics.levels[i];
-                    const [res] = await connection.query(levelsSql, [levelTitle || '', i, rubricId]);
-                    levelIds.push(res.insertId);
+                // 4. Insert into levels (Columns)
+                const levelIds = [];
+                if (validLevels.length > 0) {
+                    const levelsSql = `
+                        INSERT INTO levels (title, sort_order, rubricId)
+                        VALUES (?, ?, ?)
+                    `;
+                    for (let i = 0; i < validLevels.length; i++) {
+                        const levelTitle = validLevels[i];
+                        const [res] = await connection.query(levelsSql, [levelTitle, i, rubricId]);
+                        levelIds.push(res.insertId);
+                    }
                 }
-            }
 
-            // 5. Insert into rubriccells (The Content)
-            if (data.rubrics && data.rubrics.cells && criteriaIds.length > 0 && levelIds.length > 0) {
-                const cellSql = `
-                    INSERT INTO rubriccells (criteriaId, levelId, content)
-                    VALUES (?, ?, ?)
-                `;
-                for (let r = 0; r < data.rubrics.cells.length; r++) {
-                    for (let c = 0; c < data.rubrics.cells[r].length; c++) {
-                        const content = data.rubrics.cells[r][c];
-                        const criteriaId = criteriaIds[r];
-                        const levelId = levelIds[c];
-                        if (criteriaId && levelId) {
-                            await connection.query(cellSql, [criteriaId, levelId, content || '']);
+                // 5. Insert into rubriccells (The Content)
+                if (data.rubrics && data.rubrics.cells && criteriaIds.length > 0 && levelIds.length > 0) {
+                    const cellSql = `
+                        INSERT INTO rubriccells (criteriaId, levelId, content)
+                        VALUES (?, ?, ?)
+                    `;
+                    for (let r = 0; r < data.rubrics.cells.length; r++) {
+                        for (let c = 0; c < data.rubrics.cells[r].length; c++) {
+                            const content = data.rubrics.cells[r][c];
+                            const criteriaId = criteriaIds[r];
+                            const levelId = levelIds[c];
+                            if (criteriaId && levelId) {
+                                await connection.query(cellSql, [criteriaId, levelId, content || '']);
+                            }
                         }
                     }
                 }
@@ -316,10 +321,18 @@ const AssignmentModel = {
 
             // 7. Get User Files (if userId provided, for individual work)
             let userFiles = [];
+            let userLinks = [];
             if (userId) {
                 const userFileSql = `SELECT * FROM files WHERE assignmentId = ? AND userId = ? AND groupId IS NULL AND taskId IS NULL`;
                 [userFiles] = await pool.query(userFileSql, [assignmentId, userId]);
+
+                const userLinkSql = `SELECT * FROM links WHERE assignmentId = ? AND userId = ? AND groupId IS NULL AND taskId IS NULL`;
+                [userLinks] = await pool.query(userLinkSql, [assignmentId, userId]);
             }
+
+            // 8. Get Teacher Links (Assignment level)
+            const linkSql = `SELECT * FROM links WHERE assignmentId = ? AND groupId IS NULL AND taskId IS NULL AND userId IS NULL`;
+            const [links] = await pool.query(linkSql, [assignmentId]);
 
             return {
                 ...assignment,
@@ -328,7 +341,9 @@ const AssignmentModel = {
                 levels,
                 rubricCells,
                 files,
-                userFiles
+                userFiles,
+                links,
+                userLinks
             };
         } catch (err) {
             console.error("Database Error (getById)", err);
@@ -359,37 +374,83 @@ const AssignmentModel = {
             const [result] = await connection.query(sql, params);
             console.log("Update result:", result.affectedRows, "rows affected");
 
-            // 2. Sync Rubrics (Delete and Re-insert logic)
+            // 2. Sync Rubrics based on useRubric flag
             const [rubricRows] = await connection.query(`SELECT rubricId FROM rubrics WHERE assignmentId = ?`, [assignmentId]);
-            if (rubricRows.length > 0) {
+
+            const validCriterias = (data.rubrics?.criterias || []).filter(c => c && c.trim() !== '');
+            const validLevels = (data.rubrics?.levels || []).filter(l => l && l.trim() !== '');
+
+            if (!data.useRubric || validCriterias.length === 0) {
+                // useRubric toggled OFF or no criteria — delete any existing rubric for this assignment
+                if (rubricRows.length > 0) {
+                    const rubricId = rubricRows[0].rubricId;
+                    await connection.query(`DELETE FROM rubriccells WHERE criteriaId IN (SELECT criteriaId FROM criteria WHERE rubricId = ?)`, [rubricId]);
+                    await connection.query(`DELETE FROM criteria WHERE rubricId = ?`, [rubricId]);
+                    await connection.query(`DELETE FROM levels WHERE rubricId = ?`, [rubricId]);
+                    await connection.query(`DELETE FROM rubrics WHERE rubricId = ?`, [rubricId]);
+                }
+            } else if (rubricRows.length > 0) {
+                // useRubric ON and rubric exists — delete content and re-insert
                 const rubricId = rubricRows[0].rubricId;
                 
-                // Delete existing rubric content (cells first due to FK, then criteria/levels)
                 await connection.query(`DELETE FROM rubriccells WHERE criteriaId IN (SELECT criteriaId FROM criteria WHERE rubricId = ?)`, [rubricId]);
                 await connection.query(`DELETE FROM criteria WHERE rubricId = ?`, [rubricId]);
                 await connection.query(`DELETE FROM levels WHERE rubricId = ?`, [rubricId]);
 
                 // Re-insert criteria
                 const criteriaIds = [];
-                if (data.rubrics && data.rubrics.criterias) {
+                if (validCriterias.length > 0) {
                     const criteriaSql = `INSERT INTO criteria (title, sort_order, rubricId) VALUES (?, ?, ?)`;
-                    for (let i = 0; i < data.rubrics.criterias.length; i++) {
-                        const [res] = await connection.query(criteriaSql, [data.rubrics.criterias[i] || '', i, rubricId]);
+                    for (let i = 0; i < validCriterias.length; i++) {
+                        const [res] = await connection.query(criteriaSql, [validCriterias[i], i, rubricId]);
                         criteriaIds.push(res.insertId);
                     }
                 }
 
                 // Re-insert levels
                 const levelIds = [];
-                if (data.rubrics && data.rubrics.levels) {
+                if (validLevels.length > 0) {
                     const levelsSql = `INSERT INTO levels (title, sort_order, rubricId) VALUES (?, ?, ?)`;
-                    for (let i = 0; i < data.rubrics.levels.length; i++) {
-                        const [res] = await connection.query(levelsSql, [data.rubrics.levels[i] || '', i, rubricId]);
+                    for (let i = 0; i < validLevels.length; i++) {
+                        const [res] = await connection.query(levelsSql, [validLevels[i], i, rubricId]);
                         levelIds.push(res.insertId);
                     }
                 }
 
                 // Re-insert cells
+                if (data.rubrics && data.rubrics.cells && criteriaIds.length > 0 && levelIds.length > 0) {
+                    const cellSql = `INSERT INTO rubriccells (criteriaId, levelId, content) VALUES (?, ?, ?)`;
+                    for (let r = 0; r < data.rubrics.cells.length; r++) {
+                        for (let c = 0; c < data.rubrics.cells[r].length; c++) {
+                            const content = data.rubrics.cells[r][c];
+                            const criteriaId = criteriaIds[r];
+                            const levelId = levelIds[c];
+                            if (criteriaId && levelId) {
+                                await connection.query(cellSql, [criteriaId, levelId, content || '']);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // useRubric ON but NO rubric exists yet — Create new rubric
+                const rubricSql = `INSERT INTO rubrics (title, assignmentId) VALUES (?, ?)`;
+                const [rubricResult] = await connection.query(rubricSql, [`Rubric for ${data.title}`, assignmentId]);
+                const rubricId = rubricResult.insertId;
+
+                const criteriaIds = [];
+                const criteriaSql = `INSERT INTO criteria (title, sort_order, rubricId) VALUES (?, ?, ?)`;
+                for (let i = 0; i < validCriterias.length; i++) {
+                    const [res] = await connection.query(criteriaSql, [validCriterias[i], i, rubricId]);
+                    criteriaIds.push(res.insertId);
+                }
+
+                const levelIds = [];
+                const levelsSql = `INSERT INTO levels (title, sort_order, rubricId) VALUES (?, ?, ?)`;
+                for (let i = 0; i < validLevels.length; i++) {
+                    const [res] = await connection.query(levelsSql, [validLevels[i], i, rubricId]);
+                    levelIds.push(res.insertId);
+                }
+
                 if (data.rubrics && data.rubrics.cells && criteriaIds.length > 0 && levelIds.length > 0) {
                     const cellSql = `INSERT INTO rubriccells (criteriaId, levelId, content) VALUES (?, ?, ?)`;
                     for (let r = 0; r < data.rubrics.cells.length; r++) {
@@ -474,8 +535,50 @@ const AssignmentModel = {
         return result.affectedRows > 0;
     },
     submitIndividualWork: async (userId, assignmentId, isSubmitted) => {
-        const sql = `UPDATE userAssignments SET isSubmitted = ? WHERE userId = ? AND assignmentId = ?`;
-        await pool.query(sql, [isSubmitted ? 1 : 0, userId, assignmentId]);
+        const connection = await pool.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            // 1. Update isSubmitted status
+            const sql = `UPDATE userAssignments SET isSubmitted = ? WHERE userId = ? AND assignmentId = ?`;
+            await connection.query(sql, [isSubmitted ? 1 : 0, userId, assignmentId]);
+
+            let selections = [];
+
+            if (isSubmitted) {
+                // 2. Randomize Rubric Selections
+                const rubricSql = `SELECT rubricId FROM rubrics WHERE assignmentId = ?`;
+                const [rubrics] = await connection.query(rubricSql, [assignmentId]);
+                
+                if (rubrics.length > 0) {
+                    const rubricId = rubrics[0].rubricId;
+                    
+                    const [criteriaRows] = await connection.query(`SELECT criteriaId FROM criteria WHERE rubricId = ? ORDER BY sort_order ASC`, [rubricId]);
+                    const [levelRows] = await connection.query(`SELECT levelId FROM levels WHERE rubricId = ? ORDER BY sort_order ASC`, [rubricId]);
+
+                    if (criteriaRows.length > 0 && levelRows.length > 0) {
+                        for (const crit of criteriaRows) {
+                            const randomIdx = Math.floor(Math.random() * levelRows.length);
+                            const selectedLevel = levelRows[randomIdx];
+                            
+                            selections.push({ criteriaId: crit.criteriaId, levelId: selectedLevel.levelId });
+
+                            // Update criteria table with the random selection
+                            await connection.query(`UPDATE criteria SET selectedLevelId = ? WHERE criteriaId = ?`, [selectedLevel.levelId, crit.criteriaId]);
+                        }
+                    }
+                }
+            }
+
+            await connection.commit();
+            return { success: true, selections };
+        } catch (err) {
+            await connection.rollback();
+            console.error("AssignmentModel.submitIndividualWork Error:", err);
+            throw err;
+        } finally {
+            connection.release();
+        }
     },
     getAllIndividualSubmissions: async (assignmentId) => {
         const sql = `

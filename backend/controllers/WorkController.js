@@ -23,7 +23,8 @@ const WorkController = {
                 instruction, 
                 points, 
                 dueDate, 
-                isGroupWork, 
+                isGroupWork,
+                useRubric,
                 rubricCriterias, 
                 rubricLevels, 
                 rubricCells 
@@ -46,6 +47,7 @@ const WorkController = {
                 points: parseInt(points) || 100,
                 dueDate: dueDate.replace('T', ' '),
                 isGroupWork: isGroupWork === 'true',
+                useRubric: useRubric === 'true',
                 rubrics: rubricData,
                 files: files.map(f => ({
                     fileName: f.originalname,
@@ -86,7 +88,8 @@ const WorkController = {
                 instruction, 
                 points, 
                 dueDate, 
-                isGroupWork, 
+                isGroupWork,
+                useRubric,
                 rubricCriterias, 
                 rubricLevels, 
                 rubricCells,
@@ -120,6 +123,7 @@ const WorkController = {
                 points: parseInt(points),
                 dueDate: dueDate.replace('T', ' '),
                 isGroupWork: isGroupWork === 'true',
+                useRubric: useRubric === 'true',
                 rubrics: rubricData,
                 files: combinedFiles
             };
@@ -189,8 +193,11 @@ const WorkController = {
     submitIndividualWork: async (req, res) => {
         try {
             const { userId, assignmentId, isSubmitted } = req.body;
-            await AssignmentModel.submitIndividualWork(userId, assignmentId, isSubmitted);
-            res.status(200).json({ message: isSubmitted ? "Work submitted" : "Work unsubmitted" });
+            const result = await AssignmentModel.submitIndividualWork(userId, assignmentId, isSubmitted);
+            res.status(200).json({ 
+                message: isSubmitted ? "Work submitted" : "Work unsubmitted",
+                ...result 
+            });
         } catch (err) {
             console.error("Submit Individual Work Error:", err);
             res.status(500).json({ message: "Server error submitting work" });

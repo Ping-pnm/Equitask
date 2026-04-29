@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    getAssignment, uploadIndividualWork, deleteIndividualWork, submitIndividualWork
+    getAssignment, uploadIndividualWork, deleteIndividualWork, submitIndividualWork, addLink, deleteLink
 } from '../services/workService';
 import { useAuth } from '../components/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import MessagePopup from '../components/MessagePopup';
+import LinkModal from '../components/Work/LinkModal';
 import Rubric from '../components/Rubric';
+import AttachmentDisplay from '../components/AttachmentDisplay';
 import aiSign from '../assets/Ai-sign.png';
 import uploadSign from '../assets/UploadSign.png';
 
@@ -18,15 +20,20 @@ export default function IndividualAssignment() {
     const [assignment, setAssignment] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [uploadedWork, setUploadedWork] = useState([]);
+    const [uploadedLinks, setUploadedLinks] = useState([]);
     const [isWorkSubmitted, setIsWorkSubmitted] = useState(false);
     const [isWorkMenuOpen, setIsWorkMenuOpen] = useState(false);
+    const [isAddingLink, setIsAddingLink] = useState(false);
+    const [newLinkUrl, setNewLinkUrl] = useState('');
     const [popupMessage, setPopupMessage] = useState(null);
+    const [rubricSelections, setRubricSelections] = useState(null);
 
     const fetchData = async () => {
         try {
             const data = await getAssignment(assignmentId, userId);
             setAssignment(data);
             setUploadedWork(data.userFiles || []);
+            setUploadedLinks(data.userLinks || []);
             setIsWorkSubmitted(!!data.isSubmitted);
         } catch (err) {
             console.error("Failed to fetch assignment data:", err);
@@ -65,11 +72,56 @@ export default function IndividualAssignment() {
         }
     };
 
+    const handleLinkAdd = async (url) => {
+        const linkUrl = url || newLinkUrl;
+        if (!linkUrl.trim()) return;
+        try {
+            const res = await addLink({
+                linkUrl: linkUrl,
+                assignmentId: assignmentId,
+                userId: userId
+            });
+            setUploadedLinks(prev => [...prev, { linkId: res.linkId, linkUrl: linkUrl }]);
+            setNewLinkUrl('');
+            setIsAddingLink(false);
+            setIsWorkMenuOpen(false);
+            setPopupMessage({ message: "Link added successfully", theme: 'green' });
+        } catch (err) {
+            console.error("Link add error:", err);
+            setPopupMessage({ message: "Failed to add link", theme: 'red' });
+        }
+    };
+
+    const handleRemoveLink = async (linkId) => {
+        try {
+            await deleteLink(linkId);
+            setUploadedLinks(prev => prev.filter(l => l.linkId !== linkId));
+            setPopupMessage({ message: "Link removed successfully", theme: 'green' });
+        } catch (err) {
+            console.error("Remove link error:", err);
+            setPopupMessage({ message: "Failed to remove link", theme: 'red' });
+        }
+    };
+
     const toggleWorkSubmission = async () => {
         const newStatus = !isWorkSubmitted;
         try {
-            await submitIndividualWork(userId, assignmentId, newStatus);
+            const result = await submitIndividualWork(userId, assignmentId, newStatus);
             setIsWorkSubmitted(newStatus);
+
+            // Update local rubric selections for immediate UI feedback if submitting
+            if (newStatus && result.selections && assignment?.levels) {
+                const newIndices = assignment.criteria.map(c => {
+                    const sel = result.selections.find(s => s.criteriaId === c.criteriaId);
+                    if (!sel) return -1;
+                    return assignment.levels.findIndex(l => l.levelId === sel.levelId);
+                });
+                setRubricSelections(newIndices);
+            } else if (!newStatus) {
+                // Clear local selections on unsubmit
+                setRubricSelections(null);
+            }
+
             setPopupMessage({
                 message: newStatus ? "Work submitted successfully!" : "Work unsubmitted",
                 theme: 'green'
@@ -80,6 +132,26 @@ export default function IndividualAssignment() {
             setPopupMessage({ message: "Failed to update submission status", theme: 'red' });
         }
     };
+
+    useEffect(() => {
+        if (isWorkSubmitted && assignment?.criteria) {
+            const currentSelections = assignment.criteria.map((c) => {
+                if (c.selectedLevelId) {
+                    const levelIdx = assignment.levels.findIndex(l => l.levelId === c.selectedLevelId);
+                    if (levelIdx !== -1) return levelIdx;
+                }
+                return -1;
+            });
+
+            if (currentSelections.some(idx => idx >= 0)) {
+                setRubricSelections(currentSelections);
+            } else {
+                setRubricSelections(null);
+            }
+        } else if (!isWorkSubmitted) {
+            setRubricSelections(null);
+        }
+    }, [isWorkSubmitted, assignment]);
 
     if (isLoading) return <LoadingSpinner />;
     if (!assignment) return <div style={{ padding: '50px', textAlign: 'center' }}>Assignment not found.</div>;
@@ -112,146 +184,163 @@ export default function IndividualAssignment() {
                     {/* Attachment Card */}
                     <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: '40px' }}>
                         {assignment.files && assignment.files.map((file, idx) => (
-                            <div key={idx} style={{ 
-                                display: 'flex', 
+                            <div key={idx} style={{
+                                display: 'flex',
                                 alignItems: 'center',
                                 gap: '12px',
-                                border: '1px solid #ddd', 
-                                borderRadius: '24px', 
+                                border: '1px solid #ddd',
+                                borderRadius: '24px',
                                 padding: '10px 16px',
                                 cursor: 'pointer',
                                 background: '#fff'
                             }} onClick={() => window.open(`http://localhost:3000/${file.fileUrl}`, '_blank')}>
                                 <div style={{ width: '28px', height: '28px', background: '#f8f9fa', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#11b4d1" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#11b4d1" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" /></svg>
                                 </div>
                                 <div style={{ fontSize: '14px', fontWeight: '500', color: '#11b4d1' }}>{file.fileUrl.split('/').pop()}</div>
                             </div>
                         ))}
                     </div>
 
-                    <div style={{ borderTop: '1px solid #eee', marginBottom: '30px' }}></div>
-
-                    {/* AI Rubrics Table */}
-                    <div style={{ marginBottom: '40px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                            <img src={aiSign} alt="AI" style={{ width: '24px', height: '24px' }} />
-                            <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#11b4d1', margin: 0 }}>AI Rubrics</h2>
+                    {/* Rubrics Section */}
+                    {assignment?.criteria?.length > 0 && (
+                        <div style={{ marginBottom: '40px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+                                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#1a1f36', letterSpacing: '-0.01em' }}>Evaluation Rubric</h3>
+                                <div style={{ height: '1px', flex: 1, background: 'linear-gradient(to right, #eee, transparent)' }}></div>
+                            </div>
+                            <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                                <div style={{ padding: '20px' }}>
+                                    <Rubric
+                                        criterias={assignment.criteria.map(c => c.title)}
+                                        levels={assignment.levels.map(l => l.title)}
+                                        cells={assignment.rubricCells || []}
+                                        readOnly={true}
+                                        fullWidth={true}
+                                        selections={rubricSelections}
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        {assignment.criteria && assignment.criteria.length > 0 ? (
-                            <Rubric
-                                criterias={assignment.criteria.map(c => c.title)}
-                                levels={assignment.levels.map(l => l.title)}
-                                cells={assignment.rubricCells}
-                                readOnly={true}
-                            />
-                        ) : (
-                            <p style={{ color: '#888', fontSize: '14px' }}>No rubrics assigned.</p>
-                        )}
-                    </div>
+                    )}
                 </div>
 
                 {/* RIGHT COLUMN */}
                 <div className="hw1-side-col">
 
                     {/* Work Card */}
-                    <div style={{ background: '#f8f9fa', borderRadius: '16px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                            <span style={{ fontSize: '20px', fontWeight: '600', color: '#333' }}>Work</span>
-                            <span style={{ fontSize: '14px', color: '#666', fontWeight: '500' }}>{isWorkSubmitted ? 'Turned in' : 'Assigned'}</span>
+                    <div style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', marginBottom: '20px', border: '1px solid #edf0f2', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <span style={{ fontSize: '18px', fontWeight: '700', color: '#1a1f36' }}>Your Work</span>
+                            <span style={{ fontSize: '13px', fontWeight: '600', color: isWorkSubmitted ? '#1e8e3e' : '#666', background: isWorkSubmitted ? '#e6f4ea' : '#f0f0f0', padding: '4px 10px', borderRadius: '20px' }}>
+                                {isWorkSubmitted ? 'Turned in' : 'Assigned'}
+                            </span>
                         </div>
-                        
+
                         {assignment.grades !== null && (
-                            <div style={{ marginBottom: '20px', fontSize: '15px', fontWeight: '600', color: '#1e8e3e' }}>
+                            <div style={{ marginBottom: '20px', padding: '12px', background: '#f8f9fa', borderRadius: '8px', fontSize: '15px', fontWeight: '600', color: '#1e8e3e' }}>
                                 Grade: {assignment.grades} / {assignment.points}
                             </div>
                         )}
 
-                        {/* File Submissions */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-                            {uploadedWork.map((file, idx) => (
-                                <div key={idx} 
-                                    onClick={() => window.open(`http://localhost:3000/${file.fileUrl}`, '_blank')}
+                            <AttachmentDisplay
+                                files={uploadedWork.map(f => {
+                                    if (f instanceof File) return f;
+                                    return { ...f, isExisting: true };
+                                })}
+                                onDelete={!isWorkSubmitted ? (index) => handleRemoveWork(uploadedWork[index].fileId) : null}
+                            />
+
+                            {uploadedLinks.map((link, idx) => (
+                                <div key={idx}
+                                    onClick={() => window.open(link.linkUrl.startsWith('http') ? link.linkUrl : `https://${link.linkUrl}`, '_blank')}
                                     style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '12px',
-                                    padding: '12px',
-                                    background: '#fff',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '12px',
-                                    position: 'relative',
-                                    cursor: 'pointer'
-                                }}>
-                                    <div style={{ width: '40px', height: '40px', background: '#f0f0f0', borderRadius: '4px' }}></div>
-                                    <div style={{ flex: 1, overflow: 'hidden' }}>
-                                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            {file.fileUrl.split('/').pop()}
-                                        </div>
-                                        <div style={{ fontSize: '12px', color: '#888' }}>Attachment</div>
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px',
+                                        padding: '12px',
+                                        background: '#fafafa',
+                                        border: '1px solid #edf0f2',
+                                        borderRadius: '12px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.borderColor = '#0a7e8c'}
+                                    onMouseLeave={(e) => e.currentTarget.style.borderColor = '#edf0f2'}
+                                >
+                                    <div style={{ color: '#0a7e8c', fontSize: '20px' }}>🔗</div>
+                                    <div style={{ flex: 1, overflow: 'hidden', fontSize: '14px', fontWeight: '600', color: '#333' }}>
+                                        {link.linkUrl}
                                     </div>
                                     {!isWorkSubmitted && (
                                         <button
-                                            onClick={() => handleRemoveWork(file.fileId)}
-                                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
-                                        >
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
+                                            onClick={(e) => { e.stopPropagation(); handleRemoveLink(link.linkId); }}
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: '18px' }}
+                                            onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4f'}
+                                            onMouseLeave={(e) => e.currentTarget.style.color = '#ccc'}
+                                        >✕</button>
                                     )}
                                 </div>
                             ))}
                         </div>
 
-                        {/* Add or Create Button */}
-                        <div style={{ position: 'relative', marginBottom: '15px' }}>
-                            {isWorkMenuOpen && (
-                                <div style={{ position: 'absolute', bottom: '110%', left: 0, right: 0, background: '#fff', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 10 }}>
-                                    <div style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px' }} onClick={() => document.getElementById('file-upload').click()}>
-                                        <img src={uploadSign} alt="upload" style={{ width: '20px' }} /> File
-                                        <input type="file" id="file-upload" style={{ display: 'none' }} onChange={handleFileUpload} multiple />
+                        {/* Add/Create Button */}
+                        {!isWorkSubmitted && (
+                            <div style={{ position: 'relative', marginBottom: '15px' }}>
+                                <input type="file" id="file-upload" style={{ display: 'none' }} onChange={handleFileUpload} multiple />
+                                {isWorkMenuOpen && (
+                                    <div style={{ position: 'absolute', bottom: '110%', left: 0, right: 0, background: '#fff', border: '1px solid #eee', borderRadius: '12px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)', overflow: 'hidden', zIndex: 10 }}>
+                                        <div style={{ padding: '12px 16px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#333', borderBottom: '1px solid #f0f0f0' }} onClick={() => { document.getElementById('file-upload').click(); setIsWorkMenuOpen(false); }}>File</div>
+                                        <div style={{ padding: '12px 16px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#333' }} onClick={() => { setIsAddingLink(true); setIsWorkMenuOpen(false); }}>Link</div>
                                     </div>
-                                </div>
-                            )}
-                            <button
-                                onClick={() => setIsWorkMenuOpen(!isWorkMenuOpen)}
-                                disabled={isWorkSubmitted}
-                                style={{
-                                    width: '100%',
-                                    padding: '10px',
-                                    borderRadius: '24px',
-                                    border: '1px solid #ddd',
-                                    background: '#fff',
-                                    color: '#11b4d1',
-                                    fontWeight: '600',
-                                    cursor: isWorkSubmitted ? 'not-allowed' : 'pointer',
-                                    fontSize: '14px'
-                                }}
-                            >
-                                Add or create
-                            </button>
-                        </div>
+                                )}
+
+                                <button
+                                    onClick={() => setIsWorkMenuOpen(!isWorkMenuOpen)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        borderRadius: '24px',
+                                        border: '1px solid #edf0f2',
+                                        background: '#fff',
+                                        color: '#0a7e8c',
+                                        fontWeight: '700',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = '#f0f9fa'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+                                >
+                                    + Add or create
+                                </button>
+                            </div>
+                        )}
 
                         {/* Submit Button */}
-                        <button
-                            onClick={toggleWorkSubmission}
-                            disabled={uploadedWork.length === 0}
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                background: isWorkSubmitted ? '#e0e0e0' : '#11b4d1',
-                                color: isWorkSubmitted ? '#666' : '#fff',
-                                fontWeight: '700',
-                                cursor: uploadedWork.length === 0 ? 'not-allowed' : 'pointer',
-                                fontSize: '14px'
-                            }}
-                        >
-                            {isWorkSubmitted ? 'Unsubmit' : 'Submit'}
-                        </button>
+                        {(true) && (
+                            <button
+                                onClick={toggleWorkSubmission}
+                                style={{
+                                    width: '100%',
+                                    padding: '14px',
+                                    borderRadius: '12px',
+                                    border: 'none',
+                                    background: isWorkSubmitted ? '#f0f0f0' : '#0a7e8c',
+                                    color: isWorkSubmitted ? '#666' : '#fff',
+                                    fontWeight: '800',
+                                    cursor: 'pointer',
+                                    fontSize: '15px',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: isWorkSubmitted ? 'none' : '0 4px 12px rgba(10,126,140,0.2)'
+                                }}
+                                onMouseEnter={(e) => { if (!isWorkSubmitted) e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                                onMouseLeave={(e) => { if (!isWorkSubmitted) e.currentTarget.style.transform = 'translateY(0)'; }}
+                            >
+                                {isWorkSubmitted ? 'Unsubmit' : 'Submit'}
+                            </button>
+                        )}
                     </div>
 
                     {/* AI Summary Card */}
@@ -273,6 +362,14 @@ export default function IndividualAssignment() {
                     {popupMessage.message}
                 </MessagePopup>
             )}
+
+            <LinkModal
+                isOpen={isAddingLink}
+                onClose={() => setIsAddingLink(false)}
+                onAdd={(url) => {
+                    handleLinkAdd(url);
+                }}
+            />
         </section>
     );
 }

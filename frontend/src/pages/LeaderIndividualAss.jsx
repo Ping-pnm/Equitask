@@ -131,23 +131,25 @@ export default function LeaderIndividualAss() {
 
                     <div style={{ borderTop: '1px solid #eee', marginBottom: '30px' }}></div>
 
-                    {/* Rubrics Table */}
-                    <div style={{ marginBottom: '40px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                            <img src={aiSign} alt="Rubric" style={{ width: '24px', height: '24px' }} />
-                            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#3c4043', margin: 0 }}>Rubrics</h2>
-                        </div>
-                        {assignment.criteria && assignment.criteria.length > 0 ? (
+                    {/* Rubrics Table — only shown if rubric exists */}
+                    {assignment?.criteria?.length > 0 && (
+                        <div style={{ marginBottom: '40px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                                <img src={aiSign} alt="Rubric" style={{ width: '24px', height: '24px' }} />
+                                <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#3c4043', margin: 0 }}>Rubrics</h2>
+                            </div>
                             <Rubric
                                 criterias={assignment.criteria.map(c => c.title)}
                                 levels={assignment.levels.map(l => l.title)}
                                 cells={assignment.rubricCells}
                                 readOnly={true}
+                                selections={assignment.criteria.map(c => {
+                                    if (!c.selectedLevelId) return null;
+                                    return assignment.levels.findIndex(l => l.levelId === c.selectedLevelId);
+                                })}
                             />
-                        ) : (
-                            <p style={{ color: '#888', fontSize: '14px' }}>No rubrics assigned.</p>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 <div style={{ display: 'flex', gap: '60px', borderBottom: '1px solid #eee', paddingBottom: '20px', marginBottom: '30px' }}>

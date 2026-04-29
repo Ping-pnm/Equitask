@@ -8,7 +8,7 @@ import CreateClassModal from './CreateClassModal';
 import LoadingSpinner from './LoadingSpinner';
 
 export default function Sidebar() {
-    const { userId } = useAuth();
+    const { userId, logout } = useAuth();
     const { activeClassId, setActiveClassId, updateRole } = useClass();
 
     const [isCreateClass, setCreateClass] = useState(false);
@@ -70,6 +70,7 @@ export default function Sidebar() {
             </div>
 
             <button id="btn-create-class" className="btn-create-class-sidebar" onClick={() => setCreateClass(true)}> + Create New Class</button>
+            <button id="btn-logout" className="btn-logout-sidebar" onClick={logout}>Log Out</button>
 
             {isCreateClass && <CreateClassModal onClassCreated={fetchClasses} onClose={() => setCreateClass(false)} />}
         </aside>

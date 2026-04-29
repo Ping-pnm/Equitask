@@ -43,11 +43,10 @@ const GroupModel = {
             const [groupRes] = await connection.query(groupSql, [groupName, assignmentId, classId, meetLink || null]);
             const groupId = groupRes.insertId;
 
-            // 2. Add entries to memberships table
-            const allMemberIds = Array.from(new Set([creatorId, ...memberIds]));
+            // 2. Add entries to memberships table (use exactly the members provided)
             const membershipSql = `INSERT INTO memberships (groupId, userId) VALUES (?, ?)`;
 
-            for (const userId of allMemberIds) {
+            for (const userId of memberIds) {
                 await connection.query(membershipSql, [groupId, userId]);
             }
 
@@ -74,17 +73,64 @@ const GroupModel = {
     },
 
     getGroupForUser: async (userId, assignmentId) => {
+        // Step 1: Get the group basic info
         const sql = `
-            SELECT g.*,
-                   (SELECT AVG((SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1)) 
-                    FROM tasks t 
-                    WHERE t.groupId = g.groupId AND t.assignmentId = g.assignmentId) as groupProgress
+            SELECT g.*
             FROM \`groups\` g
             JOIN memberships m ON g.groupId = m.groupId
             WHERE m.userId = ? AND g.assignmentId = ?
         `;
         const [rows] = await pool.query(sql, [userId, assignmentId]);
-        return rows[0] || null;
+        if (rows.length === 0) return null;
+        
+        const group = rows[0];
+        const groupId = group.groupId;
+
+        // Step 2: Get members
+        const membersSql = `
+            SELECT 
+                m.userId,
+                CONCAT(u.firstName, ' ', u.lastName) as name
+            FROM memberships m
+            JOIN users u ON m.userId = u.userId
+            WHERE m.groupId = ?
+        `;
+        const [members] = await pool.query(membersSql, [groupId]);
+
+        // Step 3: Get tasks for all members in this group
+        const tasksSql = `
+            SELECT 
+                t.taskId, t.userId,
+                COALESCE(
+                    (SELECT progress FROM attemptLog al WHERE al.taskId = t.taskId ORDER BY al.createdAt DESC LIMIT 1),
+                0) as progress
+            FROM tasks t
+            WHERE t.groupId = ? AND t.assignmentId = ?
+        `;
+        const [tasks] = await pool.query(tasksSql, [groupId, assignmentId]);
+
+        // Step 4: Map members with their progress
+        const groupMembers = members.map(m => {
+            const memberTasks = tasks.filter(t => t.userId === m.userId);
+            const memberProgress = memberTasks.length > 0
+                ? Math.round(memberTasks.reduce((sum, t) => sum + (Number(t.progress) || 0), 0) / memberTasks.length)
+                : 0;
+            return {
+                ...m,
+                progress: memberProgress
+            };
+        });
+
+        // Step 5: Flat average for legacy overall progress field
+        const groupProgress = tasks.length > 0
+            ? tasks.reduce((sum, t) => sum + (Number(t.progress) || 0), 0) / tasks.length
+            : 0;
+
+        return {
+            ...group,
+            groupProgress: groupProgress,
+            members: groupMembers
+        };
     },
 
     getAllGroupsForAssignment: async (assignmentId) => {
@@ -203,7 +249,8 @@ const GroupModel = {
             isSubmitted: rows[0].isSubmitted,
             grades: rows[0].grades,
             members: [],
-            files: []
+            files: [],
+            links: []
         };
 
         rows.forEach(row => {
@@ -225,6 +272,11 @@ const GroupModel = {
         const [files] = await pool.query(filesSql, [groupId, group.assignmentId]);
         group.files = files;
 
+        // Fetch Group Work Links (where taskId and userId are NULL)
+        const linksSql = `SELECT * FROM links WHERE groupId = ? AND assignmentId = ? AND taskId IS NULL AND userId IS NULL`;
+        const [links] = await pool.query(linksSql, [groupId, group.assignmentId]);
+        group.links = links;
+
         // Fetch Tasks for each member
         for (const member of group.members) {
             const taskSql = `
@@ -240,6 +292,14 @@ const GroupModel = {
                 WHERE t.groupId = ? AND t.userId = ? AND t.assignmentId = ?
             `;
             const [tasks] = await pool.query(taskSql, [groupId, member.userId, group.assignmentId]);
+            
+            // For each task, fetch links
+            for (const task of tasks) {
+                const taskLinkSql = `SELECT * FROM links WHERE taskId = ?`;
+                const [taskLinks] = await pool.query(taskLinkSql, [task.taskId]);
+                task.links = taskLinks;
+            }
+            
             member.tasks = tasks;
         }
 
@@ -263,11 +323,10 @@ const GroupModel = {
             // Delete all current memberships for this group
             await connection.query(`DELETE FROM memberships WHERE groupId = ?`, [groupId]);
 
-            // Add new memberships (ensuring creator is included)
-            const allMemberIds = Array.from(new Set([creatorId, ...memberIds]));
+            // Add new memberships (use exactly the members provided, no forced creatorId)
             const membershipSql = `INSERT INTO memberships (groupId, userId) VALUES (?, ?)`;
 
-            for (const userId of allMemberIds) {
+            for (const userId of memberIds) {
                 await connection.query(membershipSql, [groupId, userId]);
             }
 

@@ -8,6 +8,7 @@ import classRoutes from './routes/classRoutes.js';
 import workRoutes from './routes/workRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import linkRoutes from './routes/linkRoutes.js';
 
 const app = express();
 dotenv.config();
@@ -24,6 +25,7 @@ app.use('/api/class', classRoutes);
 app.use('/api/work', workRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/task', taskRoutes);
+app.use('/api/link', linkRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

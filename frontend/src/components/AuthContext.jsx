@@ -4,17 +4,17 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [userId, setUserId] = useState(() => {
-        return localStorage.getItem('isAuthenticated') || null;
+        return sessionStorage.getItem('isAuthenticated') || null;
     });
 
     function login(id) {
         setUserId(id);
-        localStorage.setItem('isAuthenticated', id);
+        sessionStorage.setItem('isAuthenticated', id);
     };
 
     function logout() {
         setUserId(null);
-        localStorage.removeItem('isAuthenticated');
+        sessionStorage.removeItem('isAuthenticated');
     };
 
     const isAuthenticated = Boolean(userId);

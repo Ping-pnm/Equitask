@@ -10,7 +10,7 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
     const [meetLink, setMeetLink] = useState(initialGroup?.meetLink || "");
     const [allMembers, setAllMembers] = useState([]);
     const [selectedMembers, setSelectedMembers] = useState(
-        initialGroup?.members ? initialGroup.members.filter(m => m.userId !== userId) : []
+        initialGroup?.members ? initialGroup.members : []
     );
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,9 +22,9 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
             try {
                 setIsLoading(true);
                 const members = await getGroupMembers(classId, assignmentId);
-                // Filter out the current user and anyone already in the group
+                // Filter out already-selected members AND members already in a group
                 const currentMemberIds = selectedMembers.map(m => m.userId);
-                setAllMembers(members.filter(m => m.userId !== userId && !currentMemberIds.includes(m.userId)));
+                setAllMembers(members.filter(m => !currentMemberIds.includes(m.userId) && !m.hasGroup));
             } catch (err) {
                 console.error("Failed to fetch members:", err);
             } finally {
@@ -32,7 +32,7 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
             }
         }
         fetchMembers();
-    }, [classId, assignmentId, userId]);
+    }, [classId, assignmentId]);
 
     const handleAddMember = (e) => {
         const memberId = parseInt(e.target.value);
@@ -135,7 +135,6 @@ export default function CreateGroupModal({ onClose, onSuccess, assignmentId, cla
                                         {allMembers.map(member => (
                                             <option key={member.userId} value={member.userId}>
                                                 {member.firstName} {member.lastName} ({member.email})
-                                                {member.hasGroup ? " - [ALREADY IN GROUP]" : ""}
                                             </option>
                                         ))}
                                     </select>

@@ -17,7 +17,10 @@ const TaskModel = {
             const taskId = taskResult.insertId;
 
             // 2. Handle Rubrics (Optional)
-            if (data.rubrics) {
+            const validCriterias = (data.rubrics?.criterias || []).filter(c => c && c.trim() !== '');
+            const validLevels = (data.rubrics?.levels || []).filter(l => l && l.trim() !== '');
+
+            if (data.rubrics && validCriterias.length > 0) {
                 const rubricSql = `
                     INSERT INTO rubrics (title, taskId)
                     VALUES (?, ?)
@@ -27,31 +30,31 @@ const TaskModel = {
 
                 // 3. Insert into criteria (Rows)
                 const criteriaIds = [];
-                if (data.rubrics.criterias) {
-                    const numCriteria = data.rubrics.criterias.length;
+                if (validCriterias.length > 0) {
+                    const numCriteria = validCriterias.length;
                     const maxPct = numCriteria > 0 ? (100 / numCriteria) : 0;
                     
                     const criteriaSql = `
                         INSERT INTO criteria (title, sort_order, rubricId, maxPercentage)
                         VALUES (?, ?, ?, ?)
                     `;
-                    for (let i = 0; i < data.rubrics.criterias.length; i++) {
-                        const criteriaTitle = data.rubrics.criterias[i];
-                        const [res] = await connection.query(criteriaSql, [criteriaTitle || '', i, rubricId, maxPct]);
+                    for (let i = 0; i < validCriterias.length; i++) {
+                        const criteriaTitle = validCriterias[i];
+                        const [res] = await connection.query(criteriaSql, [criteriaTitle, i, rubricId, maxPct]);
                         criteriaIds.push(res.insertId);
                     }
                 }
 
                 // 4. Insert into levels (Columns)
                 const levelIds = [];
-                if (data.rubrics.levels) {
+                if (validLevels.length > 0) {
                     const levelsSql = `
                         INSERT INTO levels (title, sort_order, rubricId)
                         VALUES (?, ?, ?)
                     `;
-                    for (let i = 0; i < data.rubrics.levels.length; i++) {
-                        const levelTitle = data.rubrics.levels[i];
-                        const [res] = await connection.query(levelsSql, [levelTitle || '', i, rubricId]);
+                    for (let i = 0; i < validLevels.length; i++) {
+                        const levelTitle = validLevels[i];
+                        const [res] = await connection.query(levelsSql, [levelTitle, i, rubricId]);
                         levelIds.push(res.insertId);
                     }
                 }
@@ -132,16 +135,15 @@ const TaskModel = {
         const [logs] = await pool.query(logsSql, [taskId]);
         task.logs = logs;
 
-        // --- FETCH RUBRIC DATA ---
-        // 1. Try to find rubric for THIS task
-        let rubricSql = `SELECT * FROM rubrics WHERE taskId = ?`;
-        let [rubrics] = await pool.query(rubricSql, [taskId]);
+        // Fetch task-specific links
+        const linkSql = `SELECT * FROM links WHERE taskId = ?`;
+        const [links] = await pool.query(linkSql, [taskId]);
+        task.links = links;
 
-        // 2. Fallback to assignment rubric if not found
-        if (rubrics.length === 0) {
-            rubricSql = `SELECT * FROM rubrics WHERE assignmentId = ?`;
-            [rubrics] = await pool.query(rubricSql, [task.assignmentId]);
-        }
+        // --- FETCH RUBRIC DATA ---
+        // Only fetch rubric explicitly linked to this task (no fallback to group/assignment rubric)
+        const rubricSql = `SELECT * FROM rubrics WHERE taskId = ?`;
+        const [rubrics] = await pool.query(rubricSql, [taskId]);
 
         task.rubric = rubrics[0] || null;
         task.criteria = [];
@@ -213,7 +215,9 @@ const TaskModel = {
             if (isSubmitted) {
                 // Fetch current rubric, criteria and levels to perform randomization and calculation
                 const task = await TaskModel.getById(taskId); // This now includes criteria and levels
-                if (task && task.criteria && task.levels) {
+                
+                // If there are rubrics, randomize and calculate progress
+                if (task && task.criteria && task.criteria.length > 0 && task.levels && task.levels.length > 0) {
                     const sortedLevels = [...task.levels].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
                     const totalLevels = sortedLevels.length;
                     const divisor = totalLevels > 1 ? (totalLevels - 1) : 1;
@@ -236,7 +240,10 @@ const TaskModel = {
                     }
 
                     const numCriteria = task.criteria.length;
-                    progress = numCriteria > 0 ? Math.round(totalPoints / numCriteria) : 0;
+                    progress = Math.round(totalPoints / numCriteria);
+                } else {
+                    // If no rubrics are attached, progress should be 100% upon submission
+                    progress = 100;
                 }
 
                 // 3. Add to attemptLog
@@ -245,9 +252,6 @@ const TaskModel = {
                     VALUES (?, ?, ?)
                 `;
                 await connection.query(logSql, [taskId, progress, null]);
-            } else {
-                // If unsubmitting, optionally clear selections (depends on desired behavior)
-                // For now, we'll just keep them but set isSubmitted to 0
             }
 
             await connection.commit();

@@ -7,7 +7,7 @@ import aiSign from '../assets/Ai-sign.png';
 import uploadSign from '../assets/UploadSign.png';
 import {
     getGroup, getAssignment, getGroupComments, addGroupComment,
-    trackMeetJoin, getMeetTracking, uploadGroupWork, deleteGroupWork, submitGroupWork, gradeGroup
+    trackMeetJoin, getMeetTracking, uploadGroupWork, deleteGroupWork, submitGroupWork, gradeGroup, addLink, deleteLink
 } from '../services/workService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import CreateGroupModal from '../components/Work/CreateGroupModal';
@@ -16,8 +16,10 @@ import Message from '../components/Dashboard/Message';
 import { useAuth } from '../components/AuthContext';
 import { useClass } from '../components/ClassContext';
 import MessagePopup from '../components/MessagePopup';
+import AttachmentDisplay from '../components/AttachmentDisplay';
 import TaskCard from '../components/Dashboard/TaskCard';
 import AddTaskModal from '../components/Dashboard/AddTaskModal';
+import LinkModal from '../components/Work/LinkModal';
 // TaskDetail is now a page, not a component used here
 
 export default function GroupProjectDetail() {
@@ -38,7 +40,10 @@ export default function GroupProjectDetail() {
     // Work Section States
     const [isWorkMenuOpen, setIsWorkMenuOpen] = useState(false);
     const [uploadedWork, setUploadedWork] = useState([]);
+    const [uploadedLinks, setUploadedLinks] = useState([]);
     const [isWorkSubmitted, setIsWorkSubmitted] = useState(false);
+    const [isAddingLink, setIsAddingLink] = useState(false);
+    const [newLinkUrl, setNewLinkUrl] = useState('');
     const [rubricSelections, setRubricSelections] = useState(null);
     const [gradeValue, setGradeValue] = useState('');
 
@@ -47,6 +52,7 @@ export default function GroupProjectDetail() {
             const groupData = await getGroup(groupId);
             setGroup(groupData);
             setUploadedWork(groupData.files || []);
+            setUploadedLinks(groupData.links || []);
             setIsWorkSubmitted(!!groupData.isSubmitted);
             setGradeValue(groupData.grades || '');
 
@@ -111,7 +117,7 @@ export default function GroupProjectDetail() {
 
     const handleJoinMeet = async () => {
         if (!group.meetLink) {
-            setPopupMessage("No Meet link available for this group.");
+            setPopupMessage({ message: "No Meet link available for this group.", theme: 'red' });
             return;
         }
 
@@ -154,6 +160,37 @@ export default function GroupProjectDetail() {
         } catch (err) {
             console.error("Remove error:", err);
             setPopupMessage({ message: "Failed to remove file", theme: 'red' });
+        }
+    };
+
+    const handleLinkAdd = async (url) => {
+        const linkUrl = url || newLinkUrl;
+        if (!linkUrl.trim()) return;
+        try {
+            const res = await addLink({
+                linkUrl: linkUrl,
+                assignmentId: group.assignmentId,
+                groupId: groupId
+            });
+            setUploadedLinks(prev => [...prev, { linkId: res.linkId, linkUrl: linkUrl }]);
+            setNewLinkUrl('');
+            setIsAddingLink(false);
+            setIsWorkMenuOpen(false);
+            setPopupMessage({ message: "Link added successfully", theme: 'green' });
+        } catch (err) {
+            console.error("Link add error:", err);
+            setPopupMessage({ message: "Failed to add link", theme: 'red' });
+        }
+    };
+
+    const handleRemoveLink = async (linkId) => {
+        try {
+            await deleteLink(linkId);
+            setUploadedLinks(prev => prev.filter(l => l.linkId !== linkId));
+            setPopupMessage({ message: "Link removed successfully", theme: 'green' });
+        } catch (err) {
+            console.error("Remove link error:", err);
+            setPopupMessage({ message: "Failed to remove link", theme: 'red' });
         }
     };
 
@@ -337,41 +374,64 @@ export default function GroupProjectDetail() {
                             </div>
                             {/* List of Uploaded Files */}
                             <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {uploadedWork.map((file, idx) => (
-                                    <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px', background: 'white', borderRadius: '8px', border: '1px solid #eee' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <div style={{ width: '30px', height: '30px', background: '#f0f0f0', borderRadius: '4px' }}></div>
+                                <AttachmentDisplay 
+                                    files={uploadedWork.map(f => {
+                                        if (f instanceof File) return f;
+                                        return { ...f, isExisting: true };
+                                    })} 
+                                    onDelete={!isWorkSubmitted ? (index) => handleRemoveWork(index) : null} 
+                                />
+
+                                {uploadedLinks.map((link, idx) => (
+                                    <div key={idx} style={{
+                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px',
+                                        background: 'white', borderRadius: '10px', border: '1px solid #eee',
+                                        transition: 'all 0.2s ease', cursor: 'pointer'
+                                    }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0a7e8c'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(10,126,140,0.1)'; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#eee'; e.currentTarget.style.boxShadow = 'none'; }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, overflow: 'hidden' }}>
+                                            <div style={{
+                                                width: '32px', height: '32px', background: '#f0f9fa', borderRadius: '8px',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'
+                                            }}>🔗</div>
                                             <a
-                                                href={`http://localhost:3000/${file.fileUrl}`}
+                                                href={link.linkUrl.startsWith('http') ? link.linkUrl : `https://${link.linkUrl}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ fontSize: '13px', color: '#0a7e8c', fontWeight: '600', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'none' }}
+                                                style={{
+                                                    fontSize: '13px', color: '#0a7e8c', fontWeight: '600',
+                                                    maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap', textDecoration: 'none'
+                                                }}
                                             >
-                                                {file.fileUrl.split('/').pop()}
+                                                {link.linkUrl}
                                             </a>
                                         </div>
                                         {!isWorkSubmitted && (
-                                            <svg onClick={() => handleRemoveWork(idx)} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{ cursor: 'pointer' }}>
+                                            <svg onClick={(e) => { e.stopPropagation(); handleRemoveLink(link.linkId); }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" style={{ cursor: 'pointer', transition: 'stroke 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.stroke = '#ff4d4f'} onMouseLeave={(e) => e.currentTarget.style.stroke = '#ccc'}>
                                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                                             </svg>
                                         )}
                                     </div>
                                 ))}
-                            </div>
-
-                            <div className="extracted-style-61" style={{ position: 'relative', marginTop: '15px' }}>
+                            </div>                             <div className="extracted-style-61" style={{ position: 'relative', marginTop: '15px' }}>
+                                <input
+                                    type="file"
+                                    id="work-file-input"
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileUpload}
+                                    multiple
+                                />
                                 {isWorkMenuOpen && (
                                     <div id="add-create-menu" className="extracted-style-63" style={{ display: 'block' }}>
-                                        <div className="extracted-style-66" style={{ cursor: 'pointer' }} onClick={() => document.getElementById('work-file-input').click()}>
+                                        <div className="extracted-style-66" style={{ cursor: 'pointer', borderBottom: '1px solid #f0f0f0' }} onClick={() => { document.getElementById('work-file-input').click(); setIsWorkMenuOpen(false); }}>
                                             <img src={uploadSign} alt="File" className="extracted-style-67" /> File
-                                            <input
-                                                type="file"
-                                                id="work-file-input"
-                                                style={{ display: 'none' }}
-                                                onChange={handleFileUpload}
-                                                multiple
-                                            />
+                                        </div>
+                                        <div className="extracted-style-66" style={{ cursor: 'pointer' }} onClick={() => { setIsAddingLink(true); setIsWorkMenuOpen(false); }}>
+                                            <span style={{ fontSize: '18px', marginRight: '10px' }}>🔗</span> Link
                                         </div>
                                     </div>
                                 )}
@@ -387,7 +447,7 @@ export default function GroupProjectDetail() {
                             </div>
 
                             {/* Submit / Unsubmit Button */}
-                            {(uploadedWork.length > 0 || isWorkSubmitted) && (
+                            {(uploadedWork.length > 0 || uploadedLinks.length > 0 || isWorkSubmitted) && (
                                 <button
                                     onClick={toggleWorkSubmission}
                                     style={{
@@ -413,14 +473,14 @@ export default function GroupProjectDetail() {
                                 <div className="extracted-style-69" style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     {isLeader ? (
                                         <>
-                                            <input 
-                                                type="text" 
-                                                placeholder="Add grade" 
-                                                className="extracted-style-70" 
+                                            <input
+                                                type="text"
+                                                placeholder="Add grade"
+                                                className="extracted-style-70"
                                                 value={gradeValue}
                                                 onChange={(e) => setGradeValue(e.target.value)}
                                                 onKeyDown={handleGradeUpdate}
-                                            /> 
+                                            />
                                             <span style={{ fontSize: '16px', fontWeight: '600', color: '#555' }}>/ {assignment?.points || 100}</span>
                                         </>
                                     ) : (
@@ -475,27 +535,27 @@ export default function GroupProjectDetail() {
                     </div>
                 </div>
 
-                {/* AI Rubric Summary Section (Full Width) */}
-                <div className="extracted-style-44" style={{ marginTop: '30px', width: '100%' }}>
-                    <div className="extracted-style-45">
-                        <img src={aiSign} alt="AI Icon" className="extracted-style-46" />
-                        <h2 className="ai-summary-text-gradient ai-summary-text-gradient-large" style={{ margin: '0', lineHeight: '1.2' }}>AI Group Rubric Summary</h2>
+                {/* AI Rubric Summary Section — only shown if rubric exists */}
+                {assignment?.criteria?.length > 0 && (
+                    <div style={{ marginBottom: '40px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#1a1f36', letterSpacing: '-0.01em' }}>Evaluation Rubric</h3>
+                            <div style={{ height: '1px', flex: 1, background: 'linear-gradient(to right, #eee, transparent)' }}></div>
+                        </div>
+                        <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                            <div style={{ padding: '20px' }}>
+                                <Rubric
+                                    criterias={assignment.criteria.map(c => c.title)}
+                                    levels={assignment.levels.map(l => l.title)}
+                                    cells={assignment.rubricCells || []}
+                                    readOnly={true}
+                                    fullWidth={true}
+                                    selections={rubricSelections}
+                                />
+                            </div>
+                        </div>
                     </div>
-                    <div className="extracted-style-48" style={{ overflowX: 'auto', width: '100%' }}>
-                        {assignment && assignment.criteria && assignment.criteria.length > 0 ? (
-                            <Rubric
-                                criterias={assignment.criteria.map(c => c.title)}
-                                levels={assignment.levels.map(l => l.title)}
-                                cells={assignment.rubricCells}
-                                readOnly={true}
-                                fullWidth={true}
-                                selections={rubricSelections}
-                            />
-                        ) : (
-                            <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>No rubric defined for this assignment.</p>
-                        )}
-                    </div>
-                </div>
+                )}
 
                 {/* AI Summary & Chart Section */}
                 <div className="detail-content-grid" style={{ marginTop: '40px', alignItems: 'flex-start', }}>
@@ -634,15 +694,17 @@ export default function GroupProjectDetail() {
                 />
             </div>
 
-            {isEditModalOpen && (
-                <CreateGroupModal
-                    onClose={() => setIsEditModalOpen(false)}
-                    onSuccess={handleEditSuccess}
-                    assignmentId={group.assignmentId}
-                    classId={group.classId}
-                    initialGroup={group}
-                />
-            )}
+            {
+                isEditModalOpen && (
+                    <CreateGroupModal
+                        onClose={() => setIsEditModalOpen(false)}
+                        onSuccess={handleEditSuccess}
+                        assignmentId={group.assignmentId}
+                        classId={group.classId}
+                        initialGroup={group}
+                    />
+                )
+            }
 
             <AddTaskModal
                 key={selectedMember?.userId || 'new-task'}
@@ -654,14 +716,24 @@ export default function GroupProjectDetail() {
                 onSuccess={fetchGroupData}
             />
 
-            {popupMessage && (
-                <MessagePopup
-                    theme={popupMessage.theme || 'green'}
-                    onClose={() => setPopupMessage(null)}
-                >
-                    {popupMessage.message}
-                </MessagePopup>
-            )}
+            {
+                popupMessage && (
+                    <MessagePopup
+                        theme={popupMessage.theme || 'green'}
+                        onClose={() => setPopupMessage(null)}
+                    >
+                        {popupMessage.message}
+                    </MessagePopup>
+                )
+            }
+
+            <LinkModal
+                isOpen={isAddingLink}
+                onClose={() => setIsAddingLink(false)}
+                onAdd={(url) => {
+                    handleLinkAdd(url);
+                }}
+            />
         </section >
     );
 }

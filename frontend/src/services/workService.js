@@ -455,6 +455,46 @@ export async function deleteIndividualWork(fileId) {
     }
 }
 
+/* ===== Link Services ===== */
+
+export async function addLink(linkData) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/link/add`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(linkData),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add link');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.addLink Error:", err);
+        throw err;
+    }
+}
+
+export async function deleteLink(linkId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/link/${linkId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete link');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("workService.deleteLink Error:", err);
+        throw err;
+    }
+}
+
 export async function submitIndividualWork(userId, assignmentId, isSubmitted) {
     try {
         const response = await fetch(`http://localhost:3000/api/work/submit`, {
