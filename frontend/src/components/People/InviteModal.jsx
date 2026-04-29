@@ -27,7 +27,7 @@ export default function InviteModal({ onClose, type, onRefresh }) {
                 <div className="invite-modal-top">
                     <div className="invite-heading-wrapper">
                         <h2 id="invite-modal-title" className="invite-modal-heading">
-                            Invite {type === 'leader' ? 'Leader' : 'Student'}
+                            Invite {type === 'leader' ? 'Leader' : 'Member'}
                         </h2>
                         <div className="invite-blue-line"></div>
                     </div>

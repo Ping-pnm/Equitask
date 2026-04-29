@@ -209,9 +209,13 @@ const AssignmentModel = {
 
             // 6. Handle linking tables (Group vs Individual)
             if (!data.isGroupWork) {
-                // If individual, link all students in class to this assignment
-                const enrollmentSql = `SELECT userId FROM enrollments WHERE classId = ?`;
-                const [students] = await connection.query(enrollmentSql, [data.classId]);
+                // If individual, link all students (members) in class to this assignment, excluding leaders
+                const enrollmentSql = `
+                    SELECT userId FROM enrollments 
+                    WHERE classId = ? 
+                    AND userId NOT IN (SELECT userId FROM owners WHERE classId = ?)
+                `;
+                const [students] = await connection.query(enrollmentSql, [data.classId, data.classId]);
                 
                 if (students.length > 0) {
                     const userAssignmentSql = `
@@ -494,8 +498,13 @@ const AssignmentModel = {
         }));
     },
     gradeIndividualWork: async (userId, assignmentId, grades) => {
-        const sql = `UPDATE userAssignments SET grades = ? WHERE userId = ? AND assignmentId = ?`;
-        await pool.query(sql, [grades, userId, assignmentId]);
+        const sql = `
+            UPDATE userAssignments 
+            SET grades = ?, 
+                isSubmitted = CASE WHEN ? IS NOT NULL THEN 1 ELSE isSubmitted END 
+            WHERE userId = ? AND assignmentId = ?
+        `;
+        await pool.query(sql, [grades, grades, userId, assignmentId]);
     }
 };
 

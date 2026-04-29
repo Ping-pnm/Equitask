@@ -3,15 +3,18 @@ import { createContext, useContext, useState } from 'react';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    const [userId, setUserId] = useState(null);
+    const [userId, setUserId] = useState(() => {
+        return localStorage.getItem('isAuthenticated') || null;
+    });
 
     function login(id) {
         setUserId(id);
-
+        localStorage.setItem('isAuthenticated', id);
     };
 
     function logout() {
         setUserId(null);
+        localStorage.removeItem('isAuthenticated');
     };
 
     const isAuthenticated = Boolean(userId);

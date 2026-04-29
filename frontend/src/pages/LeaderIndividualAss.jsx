@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getAssignment, getAllIndividualSubmissions } from '../services/workService';
+import { getAssignment, getAllIndividualSubmissions, gradeIndividualWork } from '../services/workService';
 import LoadingSpinner from '../components/LoadingSpinner';
+import MessagePopup from '../components/MessagePopup';
 import checkListIcon from '../assets/checklist-icon.png';
 import { useAuth } from '../components/AuthContext';
 import { useClass } from '../components/ClassContext';
+import Rubric from '../components/Rubric';
+import aiSign from '../assets/Ai-sign.png';
 
 export default function LeaderIndividualAss() {
     const { assignmentId } = useParams();
@@ -16,33 +19,75 @@ export default function LeaderIndividualAss() {
     const [submissions, setSubmissions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [grade, setGrade] = useState('');
+    const [popupMessage, setPopupMessage] = useState(null);
+
+    const fetchSubmissions = async () => {
+        try {
+            const [assignmentData, submissionsData] = await Promise.all([
+                getAssignment(assignmentId),
+                getAllIndividualSubmissions(assignmentId)
+            ]);
+            setAssignment(assignmentData);
+            setSubmissions(submissionsData);
+            
+            // If we have a selected student, update their data from the new list
+            if (selectedStudent) {
+                const updated = submissionsData.find(s => s.userId === selectedStudent.userId);
+                if (updated) {
+                    setSelectedStudent(updated);
+                    setGrade(updated.grades || '');
+                }
+            } else if (submissionsData.length > 0) {
+                const firstSub = submissionsData[0];
+                setSelectedStudent(firstSub);
+                setGrade(firstSub.grades || '');
+            }
+        } catch (err) {
+            console.error("Failed to fetch leader data:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [assignmentData, submissionsData] = await Promise.all([
-                    getAssignment(assignmentId),
-                    getAllIndividualSubmissions(assignmentId)
-                ]);
-                setAssignment(assignmentData);
-                setSubmissions(submissionsData);
-                if (submissionsData.length > 0) {
-                    setSelectedStudent(submissionsData[0]);
-                }
-            } catch (err) {
-                console.error("Failed to fetch leader data:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchData();
+        fetchSubmissions();
     }, [assignmentId]);
+
+    const handleStudentSelect = (sub) => {
+        setSelectedStudent(sub);
+        setGrade(sub.grades || '');
+    };
+
+    const handleReturn = async () => {
+        if (!selectedStudent || !assignment) return;
+        try {
+            await gradeIndividualWork(selectedStudent.userId, assignmentId, grade);
+            setPopupMessage({ message: "Grade returned successfully!", theme: 'green' });
+            await fetchSubmissions(); // Re-fetch to move student to Graded section
+        } catch (err) {
+            console.error(err);
+            setPopupMessage({ message: "Failed to return grade", theme: 'red' });
+        }
+    };
+
+    const handleUnreturn = async () => {
+        if (!selectedStudent || !assignment) return;
+        try {
+            await gradeIndividualWork(selectedStudent.userId, assignmentId, null);
+            setPopupMessage({ message: "Grade reset successfully", theme: 'green' });
+            await fetchSubmissions(); // Re-fetch to move student back to Turned In section
+        } catch (err) {
+            console.error(err);
+            setPopupMessage({ message: "Failed to reset grade", theme: 'red' });
+        }
+    };
 
     if (isLoading) return <LoadingSpinner />;
     if (!assignment) return <div style={{ padding: '50px', textAlign: 'center' }}>Assignment not found.</div>;
 
+    const assignedList = submissions.filter(s => !s.isSubmitted && s.grades === null);
     const turnedInList = submissions.filter(s => s.isSubmitted && s.grades === null);
-    const assignedList = submissions.filter(s => !s.isSubmitted);
     const gradedList = submissions.filter(s => s.grades !== null);
 
     return (
@@ -73,7 +118,7 @@ export default function LeaderIndividualAss() {
                         {assignment.instructions}
                     </div>
                     
-                    <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
+                    <div style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '30px' }}>
                         {assignment.files && assignment.files.map((file, i) => (
                             <div key={i} style={{ border: '1px solid #dadce0', borderRadius: '24px', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '12px', minWidth: '120px', cursor: 'pointer' }} onClick={() => window.open(`http://localhost:3000/${file.fileUrl}`, '_blank')}>
                                 <div style={{ width: '28px', height: '28px', background: '#f8f9fa', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -82,6 +127,26 @@ export default function LeaderIndividualAss() {
                                 <span style={{ color: '#11b4d1', fontWeight: '500', fontSize: '13px' }}>{file.fileUrl.split('/').pop()}</span>
                             </div>
                         ))}
+                    </div>
+
+                    <div style={{ borderTop: '1px solid #eee', marginBottom: '30px' }}></div>
+
+                    {/* Rubrics Table */}
+                    <div style={{ marginBottom: '40px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                            <img src={aiSign} alt="Rubric" style={{ width: '24px', height: '24px' }} />
+                            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#3c4043', margin: 0 }}>Rubrics</h2>
+                        </div>
+                        {assignment.criteria && assignment.criteria.length > 0 ? (
+                            <Rubric
+                                criterias={assignment.criteria.map(c => c.title)}
+                                levels={assignment.levels.map(l => l.title)}
+                                cells={assignment.rubricCells}
+                                readOnly={true}
+                            />
+                        ) : (
+                            <p style={{ color: '#888', fontSize: '14px' }}>No rubrics assigned.</p>
+                        )}
                     </div>
                 </div>
 
@@ -113,7 +178,7 @@ export default function LeaderIndividualAss() {
                                 {list.map(sub => (
                                     <div 
                                         key={sub.userId} 
-                                        onClick={() => setSelectedStudent(sub)}
+                                        onClick={() => handleStudentSelect(sub)}
                                         style={{ 
                                             display: 'flex', 
                                             alignItems: 'center', 
@@ -197,14 +262,39 @@ export default function LeaderIndividualAss() {
                                         <input 
                                             type="text" 
                                             placeholder="—"
-                                            defaultValue={selectedStudent.grades}
-                                            style={{ width: '60px', border: 'none', borderBottom: '2px solid #11b4d1', textAlign: 'center', fontSize: '18px', padding: '5px' }}
+                                            value={grade}
+                                            onChange={(e) => setGrade(e.target.value)}
+                                            readOnly={selectedStudent.grades !== null}
+                                            style={{ 
+                                                width: '60px', 
+                                                border: 'none', 
+                                                borderBottom: '2px solid #11b4d1', 
+                                                textAlign: 'center', 
+                                                fontSize: '18px', 
+                                                padding: '5px', 
+                                                outline: 'none',
+                                                background: selectedStudent.grades !== null ? 'transparent' : '#fff',
+                                                color: selectedStudent.grades !== null ? '#5f6368' : '#000'
+                                            }}
                                         />
                                         <span style={{ fontSize: '16px', color: '#5f6368' }}>/ {assignment.points}</span>
                                     </div>
 
-                                    <button style={{ width: '100%', marginTop: '20px', padding: '10px', borderRadius: '4px', border: 'none', background: '#11b4d1', color: '#fff', fontWeight: '600', cursor: 'pointer' }}>
-                                        Return
+                                    <button 
+                                        onClick={selectedStudent.grades !== null ? handleUnreturn : handleReturn}
+                                        style={{ 
+                                            width: '100%', 
+                                            marginTop: '20px', 
+                                            padding: '10px', 
+                                            borderRadius: '4px', 
+                                            border: 'none', 
+                                            background: selectedStudent.grades !== null ? '#e0e0e0' : '#11b4d1', 
+                                            color: selectedStudent.grades !== null ? '#888' : '#fff', 
+                                            fontWeight: '600', 
+                                            cursor: 'pointer' 
+                                        }}
+                                    >
+                                        {selectedStudent.grades !== null ? 'Returned' : 'Return'}
                                     </button>
                                 </>
                             )}
@@ -214,6 +304,12 @@ export default function LeaderIndividualAss() {
                     <div style={{ textAlign: 'center', color: '#70757a', padding: '50px 0' }}>Select a student to grade their work</div>
                 )}
             </div>
+
+            {popupMessage && (
+                <MessagePopup theme={popupMessage.theme} onClose={() => setPopupMessage(null)}>
+                    {popupMessage.message}
+                </MessagePopup>
+            )}
         </section>
     );
 }

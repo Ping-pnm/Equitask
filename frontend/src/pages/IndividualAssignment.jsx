@@ -86,7 +86,7 @@ export default function IndividualAssignment() {
 
     return (
         <section className="stream-content hw1-section" style={{ background: '#fff', minHeight: '100vh' }}>
-            <div className="hw1-layout" style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 20px', display: 'grid', gridTemplateColumns: '1fr 340px', gap: '40px' }}>
+            <div className="hw1-layout" style={{ maxWidth: '1300px', margin: '0 auto', padding: '40px 20px', display: 'grid', gridTemplateColumns: '1fr 340px', gap: '40px' }}>
 
                 {/* LEFT COLUMN */}
                 <div className="hw1-main-col">
@@ -156,10 +156,16 @@ export default function IndividualAssignment() {
 
                     {/* Work Card */}
                     <div style={{ background: '#f8f9fa', borderRadius: '16px', padding: '24px', marginBottom: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                             <span style={{ fontSize: '20px', fontWeight: '600', color: '#333' }}>Work</span>
                             <span style={{ fontSize: '14px', color: '#666', fontWeight: '500' }}>{isWorkSubmitted ? 'Turned in' : 'Assigned'}</span>
                         </div>
+                        
+                        {assignment.grades !== null && (
+                            <div style={{ marginBottom: '20px', fontSize: '15px', fontWeight: '600', color: '#1e8e3e' }}>
+                                Grade: {assignment.grades} / {assignment.points}
+                            </div>
+                        )}
 
                         {/* File Submissions */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
