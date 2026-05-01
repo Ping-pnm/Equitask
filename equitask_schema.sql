@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 29, 2026 at 12:06 PM
+-- Generation Time: May 01, 2026 at 06:11 AM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -116,6 +116,7 @@ CREATE TABLE `enrollments` (
 CREATE TABLE `files` (
   `fileId` int(11) NOT NULL,
   `fileUrl` varchar(255) NOT NULL,
+  `fileName` varchar(255) DEFAULT NULL,
   `assignmentId` int(11) DEFAULT NULL,
   `announcementId` int(11) DEFAULT NULL,
   `groupId` int(11) DEFAULT NULL,
@@ -165,6 +166,21 @@ CREATE TABLE `levels` (
   `title` varchar(255) DEFAULT NULL,
   `sort_order` int(11) DEFAULT NULL,
   `rubricId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `links`
+--
+
+CREATE TABLE `links` (
+  `linkId` int(11) NOT NULL,
+  `linkUrl` text,
+  `assignmentId` int(11) DEFAULT NULL,
+  `userId` int(11) DEFAULT NULL,
+  `groupId` int(11) DEFAULT NULL,
+  `taskId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -357,6 +373,16 @@ ALTER TABLE `levels`
   ADD KEY `rubricsId` (`rubricId`);
 
 --
+-- Indexes for table `links`
+--
+ALTER TABLE `links`
+  ADD PRIMARY KEY (`linkId`),
+  ADD KEY `assignmentId` (`assignmentId`,`userId`,`groupId`,`taskId`),
+  ADD KEY `userId` (`userId`),
+  ADD KEY `groupId` (`groupId`),
+  ADD KEY `taskId` (`taskId`);
+
+--
 -- Indexes for table `meettracking`
 --
 ALTER TABLE `meettracking`
@@ -475,6 +501,12 @@ ALTER TABLE `levels`
   MODIFY `levelId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `links`
+--
+ALTER TABLE `links`
+  MODIFY `linkId` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `meettracking`
 --
 ALTER TABLE `meettracking`
@@ -565,6 +597,15 @@ ALTER TABLE `groups`
 --
 ALTER TABLE `levels`
   ADD CONSTRAINT `levels_ibfk_1` FOREIGN KEY (`rubricId`) REFERENCES `rubrics` (`rubricId`);
+
+--
+-- Constraints for table `links`
+--
+ALTER TABLE `links`
+  ADD CONSTRAINT `links_ibfk_1` FOREIGN KEY (`assignmentId`) REFERENCES `assignments` (`assignmentId`),
+  ADD CONSTRAINT `links_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`),
+  ADD CONSTRAINT `links_ibfk_3` FOREIGN KEY (`groupId`) REFERENCES `groups` (`groupId`),
+  ADD CONSTRAINT `links_ibfk_4` FOREIGN KEY (`taskId`) REFERENCES `tasks` (`taskId`);
 
 --
 -- Constraints for table `meettracking`
