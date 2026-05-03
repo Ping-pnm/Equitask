@@ -194,24 +194,9 @@ The backend exposes the following route groups:
 
 ---
 
-## 🤝 Contributing
-
-1. **Branch** off from `frontEndRefactor` or `main`.
-2. Name your branch descriptively: `feature/my-feature` or `fix/my-bug`.
-3. Commit using clear messages: `git commit -m "feat: add rubric display to individual assignment"`.
-4. Open a **Pull Request** and request a review before merging.
-
----
-
 ## 📝 Notes
 
 - Uploaded files are stored locally in `backend/uploads/`. This folder is **gitignored** — the directory is preserved via a `.gitkeep` file but no actual uploads are committed.
 - The application currently runs entirely locally. There is no cloud deployment configuration included.
 - Authentication is session-based via `localStorage` on the frontend. Logging out clears the stored session.
 - The `.env` file is **never committed**. Use `backend/.env.example` as a reference when setting up a new environment.
-
----
-
-## 📄 License
-
-ISC — see [LICENSE](LICENSE) for details.
